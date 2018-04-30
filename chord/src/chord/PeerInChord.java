@@ -19,10 +19,9 @@ import java.util.Collections;
  */
 public class PeerInChord implements Runnable {
 
-	private Short id;
-	private InetAddress addr;
-	private Integer port;
-	private ArrayList<Short> fingerTable = new ArrayList<Short>();
+	private PeerInfo peerInfo;
+	private ArrayList<PeerInfo> fingerTable = new ArrayList<PeerInfo>();
+	private PeerInfo previous;
 	/**
 	 * @param args
 	 */
@@ -55,14 +54,15 @@ public class PeerInChord implements Runnable {
 	}
 
 	public PeerInChord(Integer port) {
+		this.peerInfo = new PeerInfo(null,null, null);
 		try {
-			this.addr = InetAddress.getLocalHost();
+			this.peerInfo.setAddr(InetAddress.getLocalHost());
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		this.port = port;
+		this.peerInfo.setPort(port);
 		MessageDigest digest;
 		try {
 			digest = MessageDigest.getInstance("SHA-256");
@@ -71,24 +71,29 @@ public class PeerInChord implements Runnable {
 			e.printStackTrace();
 			return;
 		}
-		byte[] hash = digest.digest((this.addr.getHostAddress() + this.port).getBytes(StandardCharsets.ISO_8859_1));
-		this.id = ByteBuffer.wrap(hash).getShort();
+		byte[] hash = digest.digest((this.peerInfo.getAddr().getHostAddress() + this.peerInfo.getPort()).getBytes(StandardCharsets.ISO_8859_1));
+		this.peerInfo.setId(ByteBuffer.wrap(hash).getShort());
+		
 		for (int i = 0; i<16; i++) {
-			fingerTable.add(this.id);
+			fingerTable.add(this.peerInfo);
 		}
-//		fingerTable.forEach((v) -> {v=this.id;});
+		previous = this.peerInfo;
 	}
 
 	@Override
 	public void run() {
+		PeerInChord a= this;
 		new Thread() {
 			public void run() {
 			System.out.println("thread");
-			System.out.println("add "+addr.getHostAddress());
-			System.out.println("p "+port);
+			System.out.println("add "+peerInfo.getAddr().getHostAddress());
+			System.out.println("p "+peerInfo.getPort());
 			Server s;
 			try {
-				s = new Server(new String[] { ""+port, "TLS_DHE_RSA_WITH_AES_128_CBC_SHA" });
+				s = new Server(
+						new String[] { ""+peerInfo.getPort(),
+								"TLS_DHE_RSA_WITH_AES_128_CBC_SHA" },
+						a);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -98,10 +103,38 @@ public class PeerInChord implements Runnable {
 		}}.start();
 		// TODO Auto-generated method stub
 //		while(true) {
-			System.out.println("My ID id "+this.id);
-			System.out.println("My successor is "+this.fingerTable.get(0));
+			System.out.println("My ID id "+(short)(this.peerInfo.getId()));
+			System.out.println("My successor is "+(short)(this.fingerTable.get(0).getId()));
 		
 //		}
+	}
+
+	public String lookup(char key) {
+		String res = new String();
+//		I To resolve (lookup) a key k, node n forwards the request
+//		to:
+//		I The next node, i.e. FTn[1], if n < k < FTn[1]
+//		I To node n
+//		0 st n
+//		0 = FTn[j] ≤ k < FTn[j + 1]
+//		(All arithmetic in modulo 2m)
+//		TODO mod 2m
+		if((this.peerInfo.getId() <= key) //TODO: errado 
+				&& (key <= this.fingerTable.get(0).getId())) {
+			res = "Successor "+
+				this.fingerTable.get(0).getId()+
+				" "+
+				this.fingerTable.get(0).getPort()+
+				""+
+				this.fingerTable.get(0).getAddr()
+				;
+		}else {
+//			if((this.peerInfo.getId() <= key)) {
+//				res= 
+//			}
+			res = "TODO";
+		}
+		return res;
 	}
 
 }

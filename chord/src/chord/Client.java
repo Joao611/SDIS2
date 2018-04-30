@@ -15,7 +15,7 @@ public class Client {
     }
     //Criar Request
     String request = new String();
-    request = "0";
+    request = "lookup 0";
     System.setProperty("javax.net.ssl.keyStore","client.keys");
 	System.setProperty("javax.net.ssl.keyStorePassword","123456");
 	System.setProperty("javax.net.ssl.trustStore","truststore");

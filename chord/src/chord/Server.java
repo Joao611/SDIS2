@@ -16,7 +16,9 @@ public class Server implements Runnable{
 
 	private ArrayList<String> cypher;
 	private int port_number;
-	public Server(String[] args) throws Exception {
+	private PeerInChord peer;
+	public Server(String[] args, PeerInChord p) throws Exception {
+		peer = p;
 		if (args.length < 1) {
 			System.out.println("Usage: java SSLServer <port> <cypher-suite>*");
 			return;
@@ -90,8 +92,10 @@ public class Server implements Runnable{
 			String response = new String();
 			
 //			TODO methids
-			System.out.println("Elements 0 " + elements[0]);
-			
+			System.out.println("Elements :" + elements[0]);
+			System.out.println("Elements :" + elements[1]);
+			response = peer.lookup((elements[1].charAt(0)));
+			System.out.println(response);
 			OutputStream out;
 			try {
 				out = socket.getOutputStream();
