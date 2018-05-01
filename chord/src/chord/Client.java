@@ -8,14 +8,14 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 public class Client {
-  public Client(String[] args) throws Exception {
+  public Client(String[] args,UnsignedByte unsignedByte) throws Exception {
     if (args.length < 3) {
       System.out.println("Usage: java SSLClient <host> <port> <cypher-suite>*");
       return;
     }
     //Criar Request
     String request = new String();
-    request = "lookup 0";
+    request = "lookup "+unsignedByte.getB();
     System.setProperty("javax.net.ssl.keyStore","client.keys");
 	System.setProperty("javax.net.ssl.keyStorePassword","123456");
 	System.setProperty("javax.net.ssl.trustStore","truststore");

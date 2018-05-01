@@ -43,12 +43,13 @@ public class PeerInChord implements Runnable {
 			}
 			Integer port1 = Integer.valueOf(args[2]);
 			try {
-				new Client(new String[] {"127.0.1.1","9000", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA" });
+				new Client(new String[] {"127.0.1.1","9000", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA" }, peer.peerInfo.getId());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return;
 			}
+			
 		}
 		peer.run();
 	}
@@ -72,7 +73,7 @@ public class PeerInChord implements Runnable {
 			return;
 		}
 		byte[] hash = digest.digest((this.peerInfo.getAddr().getHostAddress() + this.peerInfo.getPort()).getBytes(StandardCharsets.ISO_8859_1));
-		this.peerInfo.setId(ByteBuffer.wrap(hash).getShort());
+		this.peerInfo.setId(new UnsignedByte(ByteBuffer.wrap(hash).getShort()));
 		
 		for (int i = 0; i<16; i++) {
 			fingerTable.add(this.peerInfo);
@@ -103,13 +104,13 @@ public class PeerInChord implements Runnable {
 		}}.start();
 		// TODO Auto-generated method stub
 //		while(true) {
-			System.out.println("My ID id "+(short)(this.peerInfo.getId()));
-			System.out.println("My successor is "+(short)(this.fingerTable.get(0).getId()));
+			System.out.println("My ID id "+this.peerInfo.getId());
+			System.out.println("My successor is "+this.fingerTable.get(0).getId());
 		
 //		}
 	}
 
-	public String lookup(char key) {
+	public String lookup(UnsignedByte key) {
 		String res = new String();
 //		I To resolve (lookup) a key k, node n forwards the request
 //		to:
@@ -119,14 +120,23 @@ public class PeerInChord implements Runnable {
 //		0 = FTn[j] ≤ k < FTn[j + 1]
 //		(All arithmetic in modulo 2m)
 //		TODO mod 2m
-		if((this.peerInfo.getId() <= key) //TODO: errado 
-				&& (key <= this.fingerTable.get(0).getId())) {
+		if(this.peerInfo.getId().equalTo(key)) { //I am the successor
+			res = "Successor "+
+					this.peerInfo.getId().getB()+
+					" "+
+					this.peerInfo.getPort()+
+					" "+
+					this.peerInfo.getAddr().getHostAddress()
+					;
+		}
+		if((this.peerInfo.getId().smallerThan(key))) { //TODO: errado 
+//				&& (key <= this.fingerTable.get(0).getId())) {
 			res = "Successor "+
 				this.fingerTable.get(0).getId()+
 				" "+
 				this.fingerTable.get(0).getPort()+
-				""+
-				this.fingerTable.get(0).getAddr()
+				" "+
+				this.fingerTable.get(0).getAddr().getHostAddress()
 				;
 		}else {
 //			if((this.peerInfo.getId() <= key)) {

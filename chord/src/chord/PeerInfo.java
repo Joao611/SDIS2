@@ -11,11 +11,11 @@ import java.net.InetAddress;
  */
 public class PeerInfo {
 	
-	private Short id;
+	private UnsignedByte id;
 	private InetAddress addr;
 	private Integer port;
 
-	public PeerInfo(Short id, InetAddress addr, Integer port) {
+	public PeerInfo(UnsignedByte id, InetAddress addr, Integer port) {
 		super();
 		this.setId(id);
 		this.setAddr(addr);
@@ -67,7 +67,7 @@ public class PeerInfo {
 	/**
 	 * @return the id
 	 */
-	public Short getId() {
+	public UnsignedByte getId() {
 		return id;
 	}
 
@@ -75,7 +75,7 @@ public class PeerInfo {
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(Short id) {
+	public void setId(UnsignedByte id) {
 		this.id = id;
 	}
 	

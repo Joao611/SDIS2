@@ -94,7 +94,7 @@ public class Server implements Runnable{
 //			TODO methids
 			System.out.println("Elements :" + elements[0]);
 			System.out.println("Elements :" + elements[1]);
-			response = peer.lookup((elements[1].charAt(0)));
+			response = peer.lookup(new UnsignedByte(Short.valueOf((elements[1]))));
 			System.out.println(response);
 			OutputStream out;
 			try {
