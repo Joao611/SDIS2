@@ -19,6 +19,7 @@ import java.util.Collections;
  */
 public class PeerInChord implements Runnable {
 
+	private static final int M = 8;
 	private PeerInfo peerInfo;
 	private ArrayList<PeerInfo> fingerTable = new ArrayList<PeerInfo>();
 	private PeerInfo previous;
@@ -42,16 +43,23 @@ public class PeerInChord implements Runnable {
 				return;
 			}
 			Integer port1 = Integer.valueOf(args[2]);
+			Client c;
 			try {
-				new Client(new String[] {"127.0.1.1","9000", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA" }, peer.peerInfo.getId());
+				c = new Client(new String[] {"127.0.1.1","9000", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA" }, peer.peerInfo.getId());
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return;
 			}
-			
+			peer.join(c);
 		}
 		peer.run();
+	}
+
+	private void join(Client c) {
+		// TODO Auto-generated method stub
+		PeerInfo p = c.run();
+		
 	}
 
 	public PeerInChord(Integer port) {
@@ -111,14 +119,7 @@ public class PeerInChord implements Runnable {
 	}
 
 	public String lookup(UnsignedByte key) {
-		String res = new String();
-//		I To resolve (lookup) a key k, node n forwards the request
-//		to:
-//		I The next node, i.e. FTn[1], if n < k < FTn[1]
-//		I To node n
-//		0 st n
-//		0 = FTn[j] ≤ k < FTn[j + 1]
-//		(All arithmetic in modulo 2m)
+		String res = null;
 //		TODO mod 2m
 		if(this.peerInfo.getId().equalTo(key)) { //I am the successor
 			res = "Successor "+
@@ -129,21 +130,35 @@ public class PeerInChord implements Runnable {
 					this.peerInfo.getAddr().getHostAddress()
 					;
 		}
-		if((this.peerInfo.getId().smallerThan(key))) { //TODO: errado 
-//				&& (key <= this.fingerTable.get(0).getId())) {
+		if((this.peerInfo.getId().smallerThan(key)) 
+				&& (key.smallerThan(this.fingerTable.get(0).getId()))) {
 			res = "Successor "+
-				this.fingerTable.get(0).getId()+
+				this.fingerTable.get(0).getId().getB()+
 				" "+
 				this.fingerTable.get(0).getPort()+
 				" "+
 				this.fingerTable.get(0).getAddr().getHostAddress()
 				;
-		}else {
-//			if((this.peerInfo.getId() <= key)) {
-//				res= 
-//			}
-			res = "TODO";
+		} else {
+			for(int i = M-1; i >= 0; i--) {
+				if(this.peerInfo.getId().smallerThan(this.fingerTable.get(i).getId())
+						&& this.fingerTable.get(i).getId().smallerThan(key)) {
+					res = "ASK "+
+							this.fingerTable.get(i).getId().getB()+
+							" "+
+							this.fingerTable.get(i).getPort()+
+							" "+
+							this.fingerTable.get(i).getAddr().getHostAddress()
+							;
+					break;
+				}
+			}
+			if(res==null) {
+				res="TODO";
+			}
+			
 		}
+		System.err.println("STTT"+res);
 		return res;
 	}
 
