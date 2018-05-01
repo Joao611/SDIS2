@@ -118,48 +118,34 @@ public class PeerInChord implements Runnable {
 //		}
 	}
 
-	public String lookup(UnsignedByte key) {
-		String res = null;
+	public PeerInfo lookup(UnsignedByte key) {
+		PeerInfo res = null;
 //		TODO mod 2m
 		if(this.peerInfo.getId().equalTo(key)) { //I am the successor
-			res = "Successor "+
-					this.peerInfo.getId().getB()+
-					" "+
-					this.peerInfo.getPort()+
-					" "+
-					this.peerInfo.getAddr().getHostAddress()
-					;
+			return this.peerInfo;
 		}
 		if((this.peerInfo.getId().smallerThan(key)) 
 				&& (key.smallerThan(this.fingerTable.get(0).getId()))) {
-			res = "Successor "+
-				this.fingerTable.get(0).getId().getB()+
-				" "+
-				this.fingerTable.get(0).getPort()+
-				" "+
-				this.fingerTable.get(0).getAddr().getHostAddress()
-				;
+			return this.fingerTable.get(0);
 		} else {
 			for(int i = M-1; i >= 0; i--) {
-				if(this.peerInfo.getId().smallerThan(this.fingerTable.get(i).getId())
-						&& this.fingerTable.get(i).getId().smallerThan(key)) {
-					res = "ASK "+
-							this.fingerTable.get(i).getId().getB()+
-							" "+
-							this.fingerTable.get(i).getPort()+
-							" "+
-							this.fingerTable.get(i).getAddr().getHostAddress()
-							;
-					break;
-				}
+//				if(this.peerInfo.getId().smallerThan(this.fingerTable.get(i).getId())
+//						&& this.fingerTable.get(i).getId().smallerThan(key)) {
+//					;
+//				}
 			}
-			if(res==null) {
-				res="TODO";
-			}
-			
 		}
-		System.err.println("STTT"+res);
-		return res;
+		return null;
+	}
+	
+	
+
+	private void fix_fingerTable() {
+		for(int i = 0; i < M; i++) {
+			this.fingerTable.set(i,
+					lookup(new UnsignedByte((short) (this.peerInfo.getId().getB()+Math.pow(2, i)))));
+		}
+		
 	}
 
 }
