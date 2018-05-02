@@ -83,11 +83,11 @@ public class PeerInChord implements Runnable {
 		byte[] hash = digest.digest((this.peerInfo.getAddr().getHostAddress() + this.peerInfo.getPort()).getBytes(StandardCharsets.ISO_8859_1));
 		this.peerInfo.setId(new UnsignedByte(ByteBuffer.wrap(hash).getShort()));
 		
-		for (int i = 0; i < M; i++) {
-			fingerTable.add(null);
+		for (int i = 0; i < getM(); i++) {
+			fingerTable.add(peerInfo);
 //			TODO: null desing patter
 		}
-		previous = null;
+		previous = peerInfo;
 	}
 
 	@Override
@@ -122,31 +122,30 @@ public class PeerInChord implements Runnable {
 	public String lookup(UnsignedByte key) {
 		String res = null;
 //		TODO mod 2m
+		if(Utils.inBetween(this.previous.getId().getB(),this.peerInfo.getId().getB(), key.getB())) {
+			return "Successor "+ this.peerInfo.toString();
+		}
 		if(this.peerInfo.getId().equalTo(key)) { //I am the successor
 			return "Successor "+ this.peerInfo.toString();
 		}
-		if((this.peerInfo.getId().smallerThan(key)) 
-				&& (key.smallerThan(this.fingerTable.get(0).getId()))) {
+		if(Utils.inBetween(this.peerInfo.getId().getB(), this.fingerTable.get(0).getId().getB(), key.getB())) {
 			return "Successor "+ this.fingerTable.get(0).toString();
-		} else {
-			for(int i = M-1; i >= 0; i--) {
-				if(this.peerInfo.getId().smallerThan(this.fingerTable.get(i).getId())
-						&& this.fingerTable.get(i).getId().smallerThan(key)) {
-					return "Ask "+ this.fingerTable.get(0).toString();
-				}
+		}
+		for(int i = getM()-1; i >= 0; i--) {
+			if(Utils.inBetween(this.peerInfo.getId().getB(), key.getB(), this.fingerTable.get(i).getId().getB())) {
+				return "Ask "+ this.fingerTable.get(i).toString();
 			}
 		}
-		return "Error";
-	}
-	
-	
+		return "Ask "+ this.fingerTable.get(getM()-1).toString();
+		
+		}
 
-//	private void fix_fingerTable() {
-//		for(int i = 0; i < M; i++) {
-//			this.fingerTable.set(i,
-//					lookup(new UnsignedByte((short) (this.peerInfo.getId().getB()+Math.pow(2, i)))));
-//		}
-//		
-//	}
+	/**
+	 * @return the m
+	 */
+	public static int getM() {
+		return M;
+	}
+
 
 }
