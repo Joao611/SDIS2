@@ -24,7 +24,7 @@ public class UnsignedByte {
 	 * @return
 	 */
 	public boolean smallerThan(UnsignedByte key) {
-		return this.getB() < key.getB();
+		return this.getB() <= key.getB();
 	}
 
 	/**
@@ -33,6 +33,7 @@ public class UnsignedByte {
 	 */
 	public boolean equalTo(UnsignedByte key) {
 		// TODO Auto-generated method stub
+		System.out.println("EqualTo "+this +" "+key);
 		return this.getB() == key.getB();
 	}
 

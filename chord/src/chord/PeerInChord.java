@@ -118,34 +118,34 @@ public class PeerInChord implements Runnable {
 //		}
 	}
 
-	public PeerInfo lookup(UnsignedByte key) {
-		PeerInfo res = null;
+	public String lookup(UnsignedByte key) {
+		String res = null;
 //		TODO mod 2m
 		if(this.peerInfo.getId().equalTo(key)) { //I am the successor
-			return this.peerInfo;
+			return "Successor "+this.peerInfo.toString();
 		}
 		if((this.peerInfo.getId().smallerThan(key)) 
 				&& (key.smallerThan(this.fingerTable.get(0).getId()))) {
-			return this.fingerTable.get(0);
+			return "Successor "+ this.fingerTable.get(0).toString();
 		} else {
 			for(int i = M-1; i >= 0; i--) {
-//				if(this.peerInfo.getId().smallerThan(this.fingerTable.get(i).getId())
-//						&& this.fingerTable.get(i).getId().smallerThan(key)) {
-//					;
-//				}
+				if(this.peerInfo.getId().smallerThan(this.fingerTable.get(i).getId())
+						&& this.fingerTable.get(i).getId().smallerThan(key)) {
+					return "Ask "+ this.fingerTable.get(0).toString();
+				}
 			}
 		}
-		return null;
+		return "Error";
 	}
 	
 	
 
-	private void fix_fingerTable() {
-		for(int i = 0; i < M; i++) {
-			this.fingerTable.set(i,
-					lookup(new UnsignedByte((short) (this.peerInfo.getId().getB()+Math.pow(2, i)))));
-		}
-		
-	}
+//	private void fix_fingerTable() {
+//		for(int i = 0; i < M; i++) {
+//			this.fingerTable.set(i,
+//					lookup(new UnsignedByte((short) (this.peerInfo.getId().getB()+Math.pow(2, i)))));
+//		}
+//		
+//	}
 
 }

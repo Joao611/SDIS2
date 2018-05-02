@@ -22,16 +22,6 @@ public class PeerInfo {
 		this.setPort(port);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#clone()
-	 */
-//	@Override
-//	public PeerInfo clone() {
-//		return new PeerInfo(
-//				id,
-//				addr,
-//				port);
-//	}
 	/**
 	 * @return the addr
 	 */
@@ -39,6 +29,14 @@ public class PeerInfo {
 		return addr;
 	}
 
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "PeerInfo [id=" + id + ", addr=" + addr + ", port=" + port + "]";
+	}
 
 	/**
 	 * @param addr the addr to set
