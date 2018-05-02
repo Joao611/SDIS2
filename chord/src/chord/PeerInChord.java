@@ -58,8 +58,16 @@ public class PeerInChord implements Runnable {
 
 	private void join(Client c) {
 		// TODO Auto-generated method stub
-		PeerInfo p = c.run();
-		
+		String p = c.run();
+		p = p.trim();
+		//String[] s = p.split(" ");
+		//int position = p.indexOf(' ');
+		PeerInfo info = new PeerInfo(p);
+		if(p.startsWith("Ask")) {
+			//TODO: Repeat to the new Node
+		} else {
+			this.fingerTable.set(0, info);
+		}
 	}
 
 	public PeerInChord(Integer port) {
@@ -87,7 +95,7 @@ public class PeerInChord implements Runnable {
 			fingerTable.add(peerInfo);
 //			TODO: null desing patter
 		}
-		previous = peerInfo;
+		previous = peerInfo; //TODO null, desing
 	}
 
 	@Override

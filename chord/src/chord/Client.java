@@ -36,7 +36,7 @@ this.unsignedByte= unsignedByte;
     }
       }
 
-public PeerInfo run() {
+public String run() {
 	//Criar Request
     String request = new String();
     request = "lookup "+unsignedByte.getB();
@@ -92,6 +92,6 @@ public PeerInfo run() {
     
     System.out.println("SSLClient: "+ request +" : "+ new String(in_data));
 
-	return null;
+	return new String(in_data);
 }
 }

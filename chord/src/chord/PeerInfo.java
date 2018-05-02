@@ -4,6 +4,7 @@
 package chord;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * @author anabela
@@ -22,6 +23,22 @@ public class PeerInfo {
 		this.setPort(port);
 	}
 
+	public PeerInfo(String substring) {
+		// TODO Auto-generated constructor stub
+		String[] s = substring.split(" ");
+		
+		id = new UnsignedByte(Short.valueOf(s[3].substring(3, s[3].length()-2)));
+		try {
+			addr = InetAddress.getByName(s[4].substring(5, s[4].length()-1));
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+		port = Integer.valueOf(s[5].substring(5, s[5].length()-1));
+		
+	}
+
 	/**
 	 * @return the addr
 	 */
@@ -35,7 +52,7 @@ public class PeerInfo {
 	 */
 	@Override
 	public String toString() {
-		return "PeerInfo [id=" + id + ", addr=" + addr + ", port=" + port + "]";
+		return "PeerInfo [id=" + id + ", addr=" + addr.getHostAddress() + ", port=" + port + "]";
 	}
 
 	/**
