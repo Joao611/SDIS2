@@ -6,6 +6,8 @@ package chord;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import utils.UnsignedByte;
+
 /**
  * @author anabela
  *
@@ -82,8 +84,8 @@ public class PeerInfo {
 	/**
 	 * @return the id
 	 */
-	public UnsignedByte getId() {
-		return id;
+	public short getId() {
+		return id.getB();
 	}
 
 
