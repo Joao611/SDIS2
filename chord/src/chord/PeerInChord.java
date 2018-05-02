@@ -83,10 +83,11 @@ public class PeerInChord implements Runnable {
 		byte[] hash = digest.digest((this.peerInfo.getAddr().getHostAddress() + this.peerInfo.getPort()).getBytes(StandardCharsets.ISO_8859_1));
 		this.peerInfo.setId(new UnsignedByte(ByteBuffer.wrap(hash).getShort()));
 		
-		for (int i = 0; i<16; i++) {
-			fingerTable.add(this.peerInfo);
+		for (int i = 0; i < M; i++) {
+			fingerTable.add(null);
+//			TODO: null desing patter
 		}
-		previous = this.peerInfo;
+		previous = null;
 	}
 
 	@Override
@@ -113,7 +114,7 @@ public class PeerInChord implements Runnable {
 		// TODO Auto-generated method stub
 //		while(true) {
 			System.out.println("My ID id "+this.peerInfo.getId());
-			System.out.println("My successor is "+this.fingerTable.get(0).getId());
+			System.out.println("My successor is "+ this.fingerTable.get(0).getId());
 		
 //		}
 	}
@@ -122,7 +123,7 @@ public class PeerInChord implements Runnable {
 		String res = null;
 //		TODO mod 2m
 		if(this.peerInfo.getId().equalTo(key)) { //I am the successor
-			return "Successor "+this.peerInfo.toString();
+			return "Successor "+ this.peerInfo.toString();
 		}
 		if((this.peerInfo.getId().smallerThan(key)) 
 				&& (key.smallerThan(this.fingerTable.get(0).getId()))) {
