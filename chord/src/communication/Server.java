@@ -101,6 +101,8 @@ public class Server implements Runnable {
 
 		if (elements[0].equals("lookup")) {
 			response = chordManager.lookup(new UnsignedByte(Short.valueOf((elements[1]))));
+		} else if (elements[0].equals("status")) {
+			response = "OK";
 		}
 
 		return response;

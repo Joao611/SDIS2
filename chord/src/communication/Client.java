@@ -21,11 +21,13 @@ public class Client {
 		SSLSocket socket;
 		try {
 			socket = (SSLSocket) socketFactory.createSocket(addr, port);
+			socket.setSoTimeout(1000);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
 		socket.setEnabledCipherSuites(cipher.toArray(new String[0]));
+		
 
 		send(message, socket);
 
@@ -67,6 +69,9 @@ public class Client {
 		}
 		try {
 			readStream.read(readData);
+		} catch(SocketTimeoutException e) {
+			System.err.println("Socket timeout");
+			return null;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

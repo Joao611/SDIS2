@@ -32,7 +32,9 @@ public class ChordManager implements Runnable {
 	public void join(InetAddress addr, int port) {
 		String response = Client.sendMessage(addr, port, "lookup " + peerInfo.getId());
 		response = response.trim();
+
 		PeerInfo info = new PeerInfo(response);
+
 		if(response.startsWith("Ask")) {
 			//TODO: Repeat to the new Node
 		} else {
@@ -41,31 +43,35 @@ public class ChordManager implements Runnable {
 	}
 
 	public ChordManager(Integer port) {
-		this.peerInfo = new PeerInfo(null,null, null);
+		
+		InetAddress addr;
 		try {
-			this.peerInfo.setAddr(InetAddress.getLocalHost());
+			addr = InetAddress.getLocalHost();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		this.peerInfo.setPort(port);
+
 		MessageDigest digest;
 		try {
 			digest = MessageDigest.getInstance("SHA-256");
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		byte[] hash = digest.digest((this.peerInfo.getAddr().getHostAddress() + this.peerInfo.getPort()).getBytes(StandardCharsets.ISO_8859_1));
-		this.peerInfo.setId(new UnsignedByte(ByteBuffer.wrap(hash).getShort()));
+		
+		byte[] hash = digest.digest(("" + addr + port).getBytes(StandardCharsets.ISO_8859_1));
+		UnsignedByte id = new UnsignedByte(ByteBuffer.wrap(hash).getShort());
+		this.peerInfo = new PeerInfo(id,addr, port);
+		
 		
 		for (int i = 0; i < getM(); i++) {
 			fingerTable.add(peerInfo);
 //			TODO: null design pattern
 		}
-		predecessor = peerInfo; //TODO null, design
+		predecessor = new NullPeerInfo(); 
+
 	}
 
 	@Override
