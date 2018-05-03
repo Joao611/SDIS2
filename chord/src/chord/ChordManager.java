@@ -107,5 +107,18 @@ public class ChordManager implements Runnable {
 		return M;
 	}
 
+	public void fix_fingerTable() {
+		for(int i = 0; i < M; i++) {
+			String response = lookup(new UnsignedByte((short) ((this.peerInfo.getId() + Math.pow(2, i))% Math.pow(2, M))));
+			response = response.trim();
+			PeerInfo info = new PeerInfo(response);
+			while(response.startsWith("Ask")) {
+				response = Client.sendMessage(info.getAddr(), info.getPort(), "lookup "+ (this.peerInfo.getId() + Math.pow(2, i)% Math.pow(2, M)));
+				response = response.trim();
+				info = new PeerInfo(response);
+			}
+			this.fingerTable.set(i, info);
+		}
+	}
 
 }
