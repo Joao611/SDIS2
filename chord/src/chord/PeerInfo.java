@@ -47,13 +47,9 @@ public class PeerInfo extends AbstractPeerInfo {
 		return addr;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "PeerInfo [id=" + id + ", addr=" + addr.getHostAddress() + ", port=" + port + "]";
+	
+	public String[] asArray() {
+		return new String[]{id.toString(),addr.getHostAddress(),port.toString()}; 
 	}
 
 	/**
