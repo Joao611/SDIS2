@@ -3,15 +3,14 @@ package program;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import chord.ChordManager;
-import communication.Client;
+import chord.Stabilize;
 import communication.Server;
 
 public class Peer {
 	
-	private ThreadPoolExecutor threadPool = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
+	private ScheduledThreadPoolExecutor threadPool = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
 	private ChordManager chordManager;
 	private Server server;
 	
@@ -59,10 +58,21 @@ public class Peer {
 		if(addr != null) {
 			chordManager.join(addr, port);
 		}
-		threadPool.execute(server);
-		threadPool.execute(chordManager);
+		this.threadPool.execute(server);
+		this.threadPool.execute(chordManager);
+		this.threadPool.execute(new Stabilize(this));
+		
 		while(true) {
 			
 		}
 	}
+
+	public ScheduledThreadPoolExecutor getThreadPool() {
+		return this.threadPool;
+	}
+
+	public ChordManager getChordManager() {
+		return this.chordManager;
+	}
+
 }

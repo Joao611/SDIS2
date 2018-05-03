@@ -11,6 +11,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 
 import chord.ChordManager;
+import chord.PeerInfo;
 import utils.*;
 
 public class Server implements Runnable {
@@ -101,6 +102,9 @@ public class Server implements Runnable {
 
 		if (elements[0].equals("lookup")) {
 			response = chordManager.lookup(new UnsignedByte(Short.valueOf((elements[1]))));
+		} else if (elements[0].equals("stabilize")) {
+			PeerInfo predecessor = this.chordManager.getPredecessor();
+			response = "Predecessor " + predecessor.toString();
 		}
 
 		return response;
