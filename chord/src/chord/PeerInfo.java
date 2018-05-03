@@ -26,17 +26,23 @@ public class PeerInfo extends AbstractPeerInfo {
 	}
 
 	public PeerInfo(String str) {
-		String[] attr = str.split(" ");
-		
-		this.id = new UnsignedByte(Short.valueOf(attr[3].substring(3, attr[3].length() - 2)));
+		System.out.println(str);
+		String[] attr = str.split("\n");
+
+		System.out.println("----");
+		System.out.println(attr[1]);
+		attr = attr[1].split(" ");
+		this.id = new UnsignedByte(Short.valueOf(attr[0]));
 
 		try {
-			this.addr = InetAddress.getByName(attr[4].substring(5, attr[4].length() - 1));
+//			this.addr = InetAddress.getByName(attr[4].substring(5, attr[4].length() - 1));
+			this.addr = InetAddress.getByName(attr[1]);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			return;
 		}
-		this.port = Integer.valueOf(attr[5].substring(5, attr[5].length()-1));
+//		this.port = Integer.valueOf(attr[5].substring(5, attr[5].length()-1));
+		this.port = Integer.valueOf(attr[2]);
 		
 	}
 
