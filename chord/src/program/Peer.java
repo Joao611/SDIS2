@@ -63,7 +63,7 @@ public class Peer {
 		this.threadPool.execute(new Stabilize(this));
 		
 		while(true) {
-			
+			//TODO: recebe pedidos da appTest
 		}
 	}
 

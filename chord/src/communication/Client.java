@@ -9,22 +9,25 @@ import java.util.Arrays;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import utils.UnsignedByte;
-
 public class Client {
 	private static ArrayList<String> cipher = new ArrayList<String>(Arrays.asList("TLS_DHE_RSA_WITH_AES_128_CBC_SHA"));
 
+	
 	public static String sendMessage(InetAddress addr, int port, String message) {
 
 		SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
+		
+//      AsynchronousSocketChannel client = AsynchronousSocketChannel.open();
 		SSLSocket socket;
 		try {
 			socket = (SSLSocket) socketFactory.createSocket(addr, port);
+			socket.setSoTimeout(1000);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
+
 		socket.setEnabledCipherSuites(cipher.toArray(new String[0]));
 
 		send(message, socket);
@@ -67,6 +70,15 @@ public class Client {
 		}
 		try {
 			readStream.read(readData);
+		} catch(SocketTimeoutException e) {
+			System.err.println("Socket timeout");
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		try {
+			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

@@ -12,11 +12,11 @@ import utils.UnsignedByte;
  * @author anabela
  *
  */
-public class PeerInfo {
+public class PeerInfo extends AbstractPeerInfo {
 	
-	private UnsignedByte id;
-	private InetAddress addr;
-	private Integer port;
+//	private UnsignedByte id;
+//	private InetAddress addr;
+//	private Integer port;
 
 	public PeerInfo(UnsignedByte id, InetAddress addr, Integer port) {
 		super();
@@ -84,7 +84,7 @@ public class PeerInfo {
 	 * @return the id
 	 */
 	public short getId() {
-		return id.getUsignedByte();
+		return id.get();
 	}
 
 
@@ -93,6 +93,11 @@ public class PeerInfo {
 	 */
 	public void setId(UnsignedByte id) {
 		this.id = id;
+	}
+
+	@Override
+	public boolean isNull() {
+		return false;
 	}
 	
 	

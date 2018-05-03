@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import communication.Client;
 import utils.UnsignedByte;
@@ -24,19 +26,24 @@ public class ChordManager implements Runnable {
 	private static final int M = 8;
 	private PeerInfo peerInfo;
 	private ArrayList<PeerInfo> fingerTable = new ArrayList<PeerInfo>();
-	private PeerInfo predecessor;
+	private AbstractPeerInfo predecessor;
+	private ScheduledThreadPoolExecutor scheduledPool = new ScheduledThreadPoolExecutor(4);
 
 	public void join(InetAddress addr, int port) {
-		String response = Client.sendMessage(addr, port, "lookup " + peerInfo.getId());
+		System.out.println("JOIN");
+		String response = Client.sendMessage(addr, port, "lookup " + getPeerInfo().getId());
 		response = response.trim();
 
 		PeerInfo info = new PeerInfo(response);
 
-		if (response.startsWith("Ask")) {
-			// TODO: Repeat to the new Node
-		} else {
-			this.fingerTable.set(0, info);
+		while (response.startsWith("Ask")) {
+			System.out.println("\t" + response);
+			response = Client.sendMessage(info.getAddr(), info.getPort(), "lookup " + getPeerInfo().getId());
+			response = response.trim();
+			info = new PeerInfo(response);
 		}
+		this.getFingerTable().set(0, info);
+
 	}
 
 	public ChordManager(Integer port) {
@@ -57,22 +64,26 @@ public class ChordManager implements Runnable {
 			e.printStackTrace();
 			return;
 		}
-		byte[] hash = digest.digest((this.peerInfo.getAddr().getHostAddress() + this.peerInfo.getPort())
-				.getBytes(StandardCharsets.ISO_8859_1));
-		UnsignedByte id = new UnsignedByte(ByteBuffer.wrap(hash).getShort());
 
-		this.peerInfo = new PeerInfo(id, addr, port);
+		byte[] hash = digest.digest(("" + addr + port).getBytes(StandardCharsets.ISO_8859_1));
+		UnsignedByte id = new UnsignedByte(ByteBuffer.wrap(hash).getShort());
+		this.setPeerInfo(new PeerInfo(id, addr, port));
 
 		for (int i = 0; i < getM(); i++) {
-			fingerTable.add(peerInfo);
+			getFingerTable().add(getPeerInfo());
 			// TODO: null design pattern
 		}
+		predecessor = new NullPeerInfo();
 
-		this.predecessor = peerInfo; // TODO null, design
 	}
 
 	@Override
 	public void run() {
+		CheckPredecessor checkPredecessorThread = new CheckPredecessor(predecessor);
+		scheduledPool.scheduleAtFixedRate(checkPredecessorThread, 0, 10000, TimeUnit.MILLISECONDS);
+
+		FixFingerTable fixFingerTableThread = new FixFingerTable(this);
+		scheduledPool.scheduleAtFixedRate(fixFingerTableThread, 0, 10000, TimeUnit.MILLISECONDS);
 
 	}
 
@@ -83,18 +94,18 @@ public class ChordManager implements Runnable {
 	 * @return
 	 */
 	public String lookup(UnsignedByte key) {
-		if (Utils.inBetween(this.predecessor.getId(), this.peerInfo.getId(), key.getUsignedByte())) {
-			return "Successor " + this.peerInfo.toString();
+		if (Utils.inBetween(this.predecessor.getId(), this.getPeerInfo().getId(), key.get())) {
+			return "Successor " + this.getPeerInfo().toString();
 		}
-		if (Utils.inBetween(this.peerInfo.getId(), this.fingerTable.get(0).getId(), key.getUsignedByte())) {
-			return "Successor " + this.fingerTable.get(0).toString();
+		if (Utils.inBetween(this.getPeerInfo().getId(), this.getFingerTable().get(0).getId(), key.get())) {
+			return "Successor " + this.getFingerTable().get(0).toString();
 		}
 		for (int i = getM() - 1; i >= 0; i--) {
-			if (Utils.inBetween(this.peerInfo.getId(), key.getUsignedByte(), this.fingerTable.get(i).getId())) {
-				return "Ask " + this.fingerTable.get(i).toString();
+			if (Utils.inBetween(this.getPeerInfo().getId(), key.get(), this.getFingerTable().get(i).getId())) {
+				return "Ask " + this.getFingerTable().get(i).toString();
 			}
 		}
-		return "Ask " + this.fingerTable.get(getM() - 1).toString();
+		return "Ask " + this.getFingerTable().get(getM() - 1).toString();
 	}
 
 	public boolean stabilize(PeerInfo predecessor) {
@@ -123,12 +134,40 @@ public class ChordManager implements Runnable {
 
 	}
 
-	public PeerInfo getPredecessor() {
+	public AbstractPeerInfo getPredecessor() {
 		return this.predecessor;
 	}
 
 	public void setPredecessor(PeerInfo predecessor) {
 		this.predecessor = predecessor;
+	}
+
+	/**
+	 * @return the peerInfo
+	 */
+	public PeerInfo getPeerInfo() {
+		return peerInfo;
+	}
+
+	/**
+	 * @param peerInfo the peerInfo to set
+	 */
+	public void setPeerInfo(PeerInfo peerInfo) {
+		this.peerInfo = peerInfo;
+	}
+
+	/**
+	 * @return the fingerTable
+	 */
+	public ArrayList<PeerInfo> getFingerTable() {
+		return fingerTable;
+	}
+
+	/**
+	 * @param fingerTable the fingerTable to set
+	 */
+	public void setFingerTable(ArrayList<PeerInfo> fingerTable) {
+		this.fingerTable = fingerTable;
 	}
 
 }

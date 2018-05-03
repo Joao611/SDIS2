@@ -12,7 +12,7 @@ public class UnsignedByte {
 	 */
 	@Override
 	public String toString() {
-		return "UnsignedByte [b=" + getUsignedByte() + "]";
+		return "UnsignedByte [b=" + get() + "]";
 	}
 
 	/**
@@ -21,7 +21,7 @@ public class UnsignedByte {
 	 * @return
 	 */
 	public boolean smallerThan(UnsignedByte key) {
-		return this.getUsignedByte() <= key.getUsignedByte();
+		return this.get() <= key.get();
 	}
 
 	/**
@@ -30,13 +30,13 @@ public class UnsignedByte {
 	 */
 	public boolean equalTo(UnsignedByte key) {
 		System.out.println("EqualTo "+this +" "+key);
-		return this.getUsignedByte() == key.getUsignedByte();
+		return this.get() == key.get();
 	}
 
 	/**
 	 * @return the unsigned byte
 	 */
-	public Short getUsignedByte() {
+	public Short get() {
 		return this.unsigned_byte;
 	}
 	
