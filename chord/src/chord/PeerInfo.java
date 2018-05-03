@@ -14,9 +14,9 @@ import utils.UnsignedByte;
  */
 public class PeerInfo extends AbstractPeerInfo {
 	
-	private UnsignedByte id;
-	private InetAddress addr;
-	private Integer port;
+//	private UnsignedByte id;
+//	private InetAddress addr;
+//	private Integer port;
 
 	public PeerInfo(UnsignedByte id, InetAddress addr, Integer port) {
 		super();

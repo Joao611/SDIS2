@@ -9,65 +9,28 @@ import java.util.Arrays;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import utils.UnsignedByte;
-
 public class Client {
 	private static ArrayList<String> cipher = new ArrayList<String>(Arrays.asList("TLS_DHE_RSA_WITH_AES_128_CBC_SHA"));
 
-	
-
-//		        InetSocketAddress hostAddress = new InetSocketAddress("localhost", 3883);
-//		        Future future = client.connect(hostAddress);
-//		        future.get(); // returns null
-//		 
-//		        System.out.println("Client is started: " + client.isOpen());
-//		        System.out.println("Sending messages to server: ");
-//		         
-//		        String [] messages = new String [] {"Time goes fast.", "What now?", "Bye."};
-//		         
-//		        for (int i = 0; i < messages.length; i++) {
-//		         
-//		            byte [] message = new String(messages [i]).getBytes();
-//		            ByteBuffer buffer = ByteBuffer.wrap(message);
-//		            Future result = client.write(buffer);
-//		         
-//		            while (! result.isDone()) {
-//		                System.out.println("... ");
-//		            }
-//		         
-//		            System.out.println(messages [i]);
-//		            buffer.clear();
-//		            Thread.sleep(3000);
-//		        } // for
-//		         
-//		        client.close();
-//		    }
-
-	
-	
 	
 	public static String sendMessage(InetAddress addr, int port, String message) {
 
 		SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
-		System.out.println("Criar socket Factory");
 		
 //      AsynchronousSocketChannel client = AsynchronousSocketChannel.open();
 		SSLSocket socket;
 		try {
 			socket = (SSLSocket) socketFactory.createSocket(addr, port);
 			socket.setSoTimeout(1000);
-			System.out.println("Criar socket e set Timeout");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
 
 		socket.setEnabledCipherSuites(cipher.toArray(new String[0]));
-		System.out.println("Ennable Suites");
 
 		send(message, socket);
-		System.out.println("sent message");
 
 		return getResponse(socket);
 	}
@@ -110,6 +73,12 @@ public class Client {
 		} catch(SocketTimeoutException e) {
 			System.err.println("Socket timeout");
 			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		try {
+			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

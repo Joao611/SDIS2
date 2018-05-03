@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -12,8 +11,9 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 
+import chord.AbstractPeerInfo;
 import chord.ChordManager;
-import utils.*;
+import utils.UnsignedByte;
 
 public class Server implements Runnable {
 
@@ -103,6 +103,9 @@ public class Server implements Runnable {
 
 		if (elements[0].equals("lookup")) {
 			response = chordManager.lookup(new UnsignedByte(Short.valueOf((elements[1]))));
+		} else if (elements[0].equals("stabilize")) {
+			AbstractPeerInfo predecessor = this.chordManager.getPredecessor();
+			response = "Predecessor " + predecessor.toString();
 		} else if (elements[0].equals("status")) {
 			response = "OK";
 		}

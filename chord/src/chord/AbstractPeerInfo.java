@@ -6,9 +6,9 @@ import utils.UnsignedByte;
 
 public abstract class AbstractPeerInfo {
 
-	private UnsignedByte id;
-	private InetAddress addr;
-	private Integer port;
+	protected UnsignedByte id;
+	protected InetAddress addr;
+	protected Integer port;
 	
 	public abstract boolean isNull();
 	

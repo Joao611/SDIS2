@@ -89,9 +89,8 @@ public class ChordManager implements Runnable {
 	public void run() {
 		CheckPredecessor checkPredecessorThread = new CheckPredecessor(predecessor);
 		scheduledPool.scheduleAtFixedRate(checkPredecessorThread, 0, 1000, TimeUnit.MILLISECONDS);
-
 		FixFingerTable fixFingerTableThread = new FixFingerTable(this);
-		scheduledPool.scheduleAtFixedRate(fixFingerTableThread, 0, 1000, TimeUnit.MILLISECONDS);
+		scheduledPool.scheduleAtFixedRate(fixFingerTableThread, 0, 10000, TimeUnit.MILLISECONDS);
 
 	}
 
@@ -117,11 +116,38 @@ public class ChordManager implements Runnable {
 		return MessageFactory.appendLine(ASK_MESSAGE, this.getFingerTable().get(getM() - 1).asArray());
 	}
 
+	public boolean stabilize(PeerInfo predecessor) {
+
+		PeerInfo successor = this.fingerTable.get(0);
+
+		if (Utils.inBetween(this.peerInfo.getId(), successor.getId(), predecessor.getId())) {
+			setSuccessor(0, predecessor);
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * @return the m
 	 */
 	public static int getM() {
 		return M;
+	}
+
+	public PeerInfo getSuccessor(int index) {
+		return this.fingerTable.get(index);
+	}
+
+	public void setSuccessor(int index, PeerInfo successor) {
+		this.fingerTable.set(index, successor);
+	}
+
+	public AbstractPeerInfo getPredecessor() {
+		return this.predecessor;
+	}
+
+	public void setPredecessor(PeerInfo predecessor) {
+		this.predecessor = predecessor;
 	}
 
 	/**
