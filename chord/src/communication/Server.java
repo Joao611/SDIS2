@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -20,7 +22,8 @@ public class Server implements Runnable {
 	private ArrayList<String> cipher_list;
 	private int port_number;
 	private ChordManager chordManager;
-
+	private ThreadPoolExecutor threadPool = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
+	
 	public Server(String[] cipher_suite, int port, ChordManager chordManager) throws Exception {
 		this.chordManager = chordManager;
 		this.port_number = port;
@@ -67,10 +70,9 @@ public class Server implements Runnable {
 
 			byte[] readData = readSocket(socket);
 
-			String response = parseMessage(readData);
-
-			sendResponse(socket, response);
-
+			ParseMessageAndSendResponse p = new ParseMessageAndSendResponse(this,readData, socket);
+			
+			threadPool.execute(p);	
 		}
 
 	}
@@ -87,7 +89,7 @@ public class Server implements Runnable {
 	 * @param readData
 	 * @return
 	 */
-	private String parseMessage(byte[] readData) {
+	String parseMessage(byte[] readData) {
 		String request = new String(readData);
 		System.out.println("SSLServer: " + request);
 
@@ -135,7 +137,7 @@ public class Server implements Runnable {
 	 * @param socket
 	 * @param response
 	 */
-	private void sendResponse(SSLSocket socket, String response) {
+	void sendResponse(SSLSocket socket, String response) {
 		OutputStream sendStream;
 		try {
 			sendStream = socket.getOutputStream();

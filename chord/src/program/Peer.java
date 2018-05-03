@@ -62,7 +62,7 @@ public class Peer {
 		threadPool.execute(server);
 		threadPool.execute(chordManager);
 		while(true) {
-			
+			//TODO: recebe pedidos da appTest
 		}
 	}
 }
