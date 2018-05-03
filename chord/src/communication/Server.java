@@ -84,31 +84,7 @@ public class Server implements Runnable {
 		System.setProperty("javax.net.ssl.trustStorePassword", "123456");
 	}
 
-	/**
-	 * Parses the received request, processes it and returns the protocol response
-	 * @param readData
-	 * @return
-	 */
-	String parseMessage(byte[] readData) {
-		String request = new String(readData);
-		System.out.println("SSLServer: " + request);
-
-		request = request.trim();
-		String[] elements = request.split(" ");
-		String response = new String();
-
-		for (String element : elements) {
-			System.out.println(element);
-		}
-
-		if (elements[0].equals("lookup")) {
-			response = chordManager.lookup(new UnsignedByte(Short.valueOf((elements[1]))));
-		} else if (elements[0].equals("status")) {
-			response = "OK";
-		}
-
-		return response;
-	}
+	
 
 	/**
 	 * Read socket
@@ -132,26 +108,5 @@ public class Server implements Runnable {
 		return readData;
 	}
 
-	/**
-	 * 
-	 * @param socket
-	 * @param response
-	 */
-	void sendResponse(SSLSocket socket, String response) {
-		OutputStream sendStream;
-		try {
-			sendStream = socket.getOutputStream();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-		byte[] sendData = response.getBytes();
-		try {
-			sendStream.write(sendData);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-	}
 
 }

@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import communication.Client;
 import messages.MessageFactory;
+import messages.MessageType;
 import utils.UnsignedByte;
 import utils.Utils;
 
@@ -159,6 +160,8 @@ public class ChordManager implements Runnable {
 		this.fingerTable = fingerTable;
 	}
 
-
+	public void setPredecessor(PeerInfo newPred) {
+		predecessor = newPred;
+	}
 
 }

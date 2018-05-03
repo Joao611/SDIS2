@@ -3,7 +3,16 @@
  */
 package communication;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+
 import javax.net.ssl.SSLSocket;
+
+import chord.PeerInfo;
+import messages.MessageType;
+import program.Peer;
+import utils.UnsignedByte;
 
 /**
  * @author anabela
@@ -26,10 +35,81 @@ public class ParseMessageAndSendResponse implements Runnable {
 
 	@Override
 	public void run() {
-		String response = server.parseMessage(readData);
+		String response = parseMessage(readData);
 
-		server.sendResponse(socket, response);
+		sendResponse(socket, response);
 
+	}
+	
+	/**
+	 * Parses the received request, processes it and returns the protocol response
+	 * @param readData
+	 * @return
+	 */
+	String parseMessage(byte[] readData) {
+		String request = new String(readData);
+		System.out.println("SSLServer: " + request);
+
+		request = request.trim();
+		String[] elements = request.split(" ");
+		String response = new String();
+
+		for (String element : elements) {
+			System.out.println(element);
+		}
+
+		switch (MessageType.valueOf(elements[0])) {
+		case LOOKUP:
+			response = Peer.chordManager.lookup(new UnsignedByte(Short.valueOf((elements[1]))));
+			break;
+		case PING:
+			response = "OK";
+			break;
+		case NOTIFY:
+			Peer.chordManager.setPredecessor(parseNotifyMsg(elements));
+			break;
+		case ASK:
+			break;
+		case OK:
+			break;
+		case PUTCHUNK:
+			break;
+		case SUCCESSOR:
+			break;
+		default:
+			break;
+		}
+		
+		return response;
+	}
+
+	private PeerInfo parseNotifyMsg(String[] elements) {
+		UnsignedByte id = new UnsignedByte(Short.parseShort(elements[2]));
+		InetAddress addr = socket.getInetAddress();
+		int port = socket.getPort();
+		return new PeerInfo(id, addr, port);
+	}
+
+	/**
+	 * 
+	 * @param socket
+	 * @param response
+	 */
+	void sendResponse(SSLSocket socket, String response) {
+		OutputStream sendStream;
+		try {
+			sendStream = socket.getOutputStream();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		byte[] sendData = response.getBytes();
+		try {
+			sendStream.write(sendData);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
 	}
 
 }

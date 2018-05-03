@@ -12,7 +12,7 @@ import communication.Server;
 public class Peer {
 	
 	private ThreadPoolExecutor threadPool = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
-	private ChordManager chordManager;
+	public static ChordManager chordManager;
 	private Server server;
 	
 	
