@@ -6,7 +6,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import chord.ChordManager;
-import communication.Client;
 import communication.Server;
 
 public class Peer {
