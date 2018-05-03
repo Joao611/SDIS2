@@ -135,7 +135,7 @@ public class ChordManager implements Runnable {
 	 * @param newSuccessorId Closer successor than previous successor.
 	 */
 	public void notify(InetAddress addr, int port, Short newSuccessorId) {
-		if (predecessor.isNull() || Utils.inBetween(predecessor.getId(), this.getPeerInfo().getId(), newSuccessorId.get())) {
+		if (predecessor.isNull() || Utils.inBetween(predecessor.getId(), this.getPeerInfo().getId(), newSuccessorId)) {
 			String message = MessageFactory.getHeader(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
 			if ("OK" != Client.sendMessage(addr, port, message)) {
 				System.err.println("ChordManager notify(): Error on NOTIFY message reply");
