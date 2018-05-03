@@ -31,6 +31,9 @@ public class ChordManager implements Runnable {
 	private AbstractPeerInfo predecessor;
 	private ScheduledThreadPoolExecutor scheduledPool = new ScheduledThreadPoolExecutor(4);
 
+	private String ASK_MESSAGE;
+	private String SUCCESSOR_MESSAGE;
+
 	public void join(InetAddress addr, int port) {
 		System.out.println("JOIN");
 		String response = Client.sendMessage(addr, port, "lookup " + getPeerInfo().getId());
@@ -71,6 +74,9 @@ public class ChordManager implements Runnable {
 		UnsignedByte id = new UnsignedByte(ByteBuffer.wrap(hash).getShort());
 		this.setPeerInfo(new PeerInfo(id, addr, port));
 
+		ASK_MESSAGE = MessageFactory.getFirstLine(MessageType.ASK, "1.0", this.getPeerInfo().getId());
+		SUCCESSOR_MESSAGE = MessageFactory.getFirstLine(MessageType.SUCCESSOR, "1.0", this.getPeerInfo().getId());
+
 		for (int i = 0; i < getM(); i++) {
 			getFingerTable().add(getPeerInfo());
 			// TODO: null design pattern
@@ -82,8 +88,7 @@ public class ChordManager implements Runnable {
 	@Override
 	public void run() {
 		CheckPredecessor checkPredecessorThread = new CheckPredecessor(predecessor);
-		scheduledPool.scheduleAtFixedRate(checkPredecessorThread, 0, 10000, TimeUnit.MILLISECONDS);
-
+		scheduledPool.scheduleAtFixedRate(checkPredecessorThread, 0, 1000, TimeUnit.MILLISECONDS);
 		FixFingerTable fixFingerTableThread = new FixFingerTable(this);
 		scheduledPool.scheduleAtFixedRate(fixFingerTableThread, 0, 10000, TimeUnit.MILLISECONDS);
 
@@ -95,22 +100,23 @@ public class ChordManager implements Runnable {
 	/**
 	 * Returna o successor da key, ou a quem perguntor
 	 * 
-	 * @param key a procurar
+	 * @param key
+	 *            a procurar
 	 * @return
 	 */
 	public String lookup(UnsignedByte key) {
 		if (Utils.inBetween(this.predecessor.getId(), this.getPeerInfo().getId(), key.get())) {
-			return "Successor " + this.getPeerInfo().toString();
+			return MessageFactory.appendLine(SUCCESSOR_MESSAGE, this.getPeerInfo().asArray());
 		}
 		if (Utils.inBetween(this.getPeerInfo().getId(), this.getFingerTable().get(0).getId(), key.get())) {
-			return "Successor " + this.getFingerTable().get(0).toString();
+			return MessageFactory.appendLine(SUCCESSOR_MESSAGE, this.getFingerTable().get(0).asArray());
 		}
-		for (int i = getM() - 1; i >= 0; i--) {
+		for (int i = getM() - 1; i > 0; i--) {
 			if (Utils.inBetween(this.getPeerInfo().getId(), key.get(), this.getFingerTable().get(i).getId())) {
-				return "Ask " + this.getFingerTable().get(i).toString();
+				return MessageFactory.appendLine(ASK_MESSAGE, this.getFingerTable().get(i).asArray());
 			}
 		}
-		return "Ask " + this.getFingerTable().get(getM() - 1).toString();
+		return MessageFactory.appendLine(ASK_MESSAGE, this.getFingerTable().get(getM() - 1).asArray());
 	}
 
 	public boolean stabilize(PeerInfo predecessor) {
@@ -170,7 +176,8 @@ public class ChordManager implements Runnable {
 	}
 
 	/**
-	 * @param peerInfo the peerInfo to set
+	 * @param peerInfo
+	 *            the peerInfo to set
 	 */
 	public void setPeerInfo(PeerInfo peerInfo) {
 		this.peerInfo = peerInfo;
@@ -184,7 +191,8 @@ public class ChordManager implements Runnable {
 	}
 
 	/**
-	 * @param fingerTable the fingerTable to set
+	 * @param fingerTable
+	 *            the fingerTable to set
 	 */
 	public void setFingerTable(ArrayList<PeerInfo> fingerTable) {
 		this.fingerTable = fingerTable;

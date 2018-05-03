@@ -12,7 +12,7 @@ public class UnsignedByte {
 	 */
 	@Override
 	public String toString() {
-		return "UnsignedByte [b=" + get() + "]";
+		return get().toString();
 	}
 
 	/**
