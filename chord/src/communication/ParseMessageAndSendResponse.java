@@ -9,6 +9,7 @@ import java.net.InetAddress;
 
 import javax.net.ssl.SSLSocket;
 
+import chord.ChordManager;
 import chord.PeerInfo;
 import messages.MessageType;
 import program.Peer;
@@ -23,12 +24,14 @@ public class ParseMessageAndSendResponse implements Runnable {
 	private byte[] readData;
 	private SSLSocket socket;
 	private Server server;
+	private ChordManager chordManager;
 
 	
-	public ParseMessageAndSendResponse(Server server, byte[] readData, SSLSocket socket) {
+	public ParseMessageAndSendResponse(Server server, ChordManager chordManager, byte[] readData, SSLSocket socket) {
 		super();
 		this.readData = readData;
 		this.socket = socket;
+		this.chordManager = chordManager;
 		this.server = server;
 	}
 
@@ -60,13 +63,14 @@ public class ParseMessageAndSendResponse implements Runnable {
 
 		switch (MessageType.valueOf(elements[0])) {
 		case LOOKUP:
-			response = Peer.chordManager.lookup(new UnsignedByte(Short.valueOf((elements[1]))));
+			response = chordManager.lookup(new UnsignedByte(Short.valueOf((elements[1]))));
 			break;
 		case PING:
 			response = "OK";
 			break;
 		case NOTIFY:
-			Peer.chordManager.setPredecessor(parseNotifyMsg(elements));
+			chordManager.setPredecessor(parseNotifyMsg(elements));
+			response = "OK";
 			break;
 		case ASK:
 			break;

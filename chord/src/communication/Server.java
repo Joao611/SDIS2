@@ -2,7 +2,6 @@ package communication;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -12,7 +11,6 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 
 import chord.ChordManager;
-import utils.*;
 
 public class Server implements Runnable {
 
@@ -69,7 +67,7 @@ public class Server implements Runnable {
 
 			byte[] readData = readSocket(socket);
 
-			ParseMessageAndSendResponse p = new ParseMessageAndSendResponse(this,readData, socket);
+			ParseMessageAndSendResponse p = new ParseMessageAndSendResponse(this, chordManager, readData, socket);
 			
 			threadPool.execute(p);	
 		}

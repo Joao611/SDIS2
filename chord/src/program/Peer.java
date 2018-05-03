@@ -6,12 +6,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import chord.ChordManager;
+import communication.Client;
 import communication.Server;
 
 public class Peer {
 	
 	private ThreadPoolExecutor threadPool = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
-	public static ChordManager chordManager;
+	private ChordManager chordManager;
 	private Server server;
 	
 	
