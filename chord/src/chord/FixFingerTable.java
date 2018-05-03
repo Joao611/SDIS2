@@ -33,7 +33,7 @@ public class FixFingerTable implements Runnable {
 			response = response.trim();
 			PeerInfo info = new PeerInfo(response);
 			while(response.startsWith("Ask")) {
-				response = Client.sendMessage(info.getAddr(), info.getPort(), "lookup "+ (chord.getPeerInfo().getId() + Math.pow(2, i)% Math.pow(2, ChordManager.getM())));
+				response = Client.sendMessage(info.getAddr(), info.getPort(), "lookup "+ (short)(chord.getPeerInfo().getId() + Math.pow(2, i)% Math.pow(2, ChordManager.getM())));
 				response = response.trim();
 				info = new PeerInfo(response);
 			}

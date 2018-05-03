@@ -30,13 +30,15 @@ public class ChordManager implements Runnable {
 	private ScheduledThreadPoolExecutor scheduledPool = new ScheduledThreadPoolExecutor(4);
 
 	public void join(InetAddress addr, int port) {
+		System.out.println("JOIN");
 		String response = Client.sendMessage(addr, port, "lookup " + getPeerInfo().getId());
 		response = response.trim();
-
+		
 		PeerInfo info = new PeerInfo(response);
 		
 		while(response.startsWith("Ask")) {
-			response = Client.sendMessage(addr, port, "lookup " + getPeerInfo().getId());
+			System.out.println("\t"+response);
+			response = Client.sendMessage(info.getAddr(), info.getPort(), "lookup " + getPeerInfo().getId());
 			response = response.trim();
 			info = new PeerInfo(response);
 		}
