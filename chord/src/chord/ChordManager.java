@@ -92,6 +92,9 @@ public class ChordManager implements Runnable {
 		FixFingerTable fixFingerTableThread = new FixFingerTable(this);
 		scheduledPool.scheduleAtFixedRate(fixFingerTableThread, 0, 10000, TimeUnit.MILLISECONDS);
 
+		Stabilize stabilizeThread = new Stabilize(this);
+		scheduledPool.scheduleAtFixedRate(stabilizeThread, 0, 10000, TimeUnit.MILLISECONDS);
+
 	}
 
 	/**
