@@ -17,43 +17,43 @@ public class Server implements Runnable {
 
 	public static final int MAX_LENGTH_PACKET = 300;
 
-	private ArrayList<String> cipher_list;
+	private ArrayList<String> cypher_list;
 	private int port_number;
 	private ChordManager chordManager;
-	
-	public Server(String[] cipher_suite, int port, ChordManager p) throws Exception {
-		chordManager = p;
-		port_number = port;
-		
-		System.setProperty("javax.net.ssl.keyStore","server.keys");
-		System.setProperty("javax.net.ssl.keyStorePassword","123456");
-		System.setProperty("javax.net.ssl.trustStore","truststore");
-		System.setProperty("javax.net.ssl.trustStorePassword","123456");
-		
-		cipher_list = new ArrayList<String>();
-		for(int i = 1; i < cipher_suite.length; i++) {
-	    	cipher_list.add(cipher_suite[i]);
-	    }
+
+	public Server(String[] cypher_suite, int port, ChordManager chordManager) throws Exception {
+		this.chordManager = chordManager;
+		this.port_number = port;
+
+		setSystemProperties();
+
+		this.cypher_list = new ArrayList<String>();
+
+		for (int i = 1; i < cypher_suite.length; i++) {
+			cypher_list.add(cypher_suite[i]);
+		}
 	}
 
 	@Override
 	public void run() {
-		SSLServerSocketFactory serverfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-		SSLServerSocket server;
+		SSLServerSocketFactory serverFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+		SSLServerSocket serverSocket;
 		try {
-			server = (SSLServerSocket) serverfactory.createServerSocket(port_number);
+			serverSocket = (SSLServerSocket) serverFactory.createServerSocket(this.port_number);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		server.setNeedClientAuth(true);
-		server.setEnabledProtocols(server.getSupportedProtocols());
-		cipher_list.toArray(new String[0]);
+
+		serverSocket.setNeedClientAuth(true);
+		serverSocket.setEnabledProtocols(serverSocket.getSupportedProtocols());
+
+		this.cypher_list.toArray(new String[0]);
+
 		while (true) {
 			SSLSocket socket;
 			try {
-				socket = (SSLSocket) server.accept();
+				socket = (SSLSocket) serverSocket.accept();
 			} catch (IOException e) {
 				e.printStackTrace();
 				return;
@@ -64,66 +64,90 @@ public class Server implements Runnable {
 				e.printStackTrace();
 				return;
 			}
-			InputStream in;
-			try {
-				in = socket.getInputStream();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
-			
-			byte[] in_data = new byte[1024];
-			try {
-				in.read(in_data);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
-			String response = parseMessage(in_data);
-			sendResponse(socket,response);
-			
+
+			byte[] readData = readSocket(socket);
+
+			String response = parseMessage(readData);
+
+			sendResponse(socket, response);
+
 		}
 
 	}
-	
+
+	public void setSystemProperties() {
+		System.setProperty("javax.net.ssl.keyStore", "server.keys");
+		System.setProperty("javax.net.ssl.keyStorePassword", "123456");
+		System.setProperty("javax.net.ssl.trustStore", "truststore");
+		System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+	}
+
+	/**
+	 * Parses the received request, processes it and returns the protocol response
+	 * @param readData
+	 * @return
+	 */
+	private String parseMessage(byte[] readData) {
+		String request = new String(readData);
+		System.out.println("SSLServer: " + request);
+
+		request = request.trim();
+		String[] elements = request.split(" ");
+		String response = new String();
+
+		for (String element : elements) {
+			System.out.println(element);
+		}
+
+		if (elements[0].equals("lookup")) {
+			response = chordManager.lookup(new UnsignedByte(Short.valueOf((elements[1]))));
+		}
+
+		return response;
+	}
+
+	/**
+	 * Read socket
+	 */
+	public byte[] readSocket(SSLSocket socket) {
+		InputStream readStream;
+		try {
+			readStream = socket.getInputStream();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		byte[] readData = new byte[1024];
+		try {
+			readStream.read(readData);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return readData;
+	}
+
 	/**
 	 * 
 	 * @param socket
 	 * @param response
 	 */
 	private void sendResponse(SSLSocket socket, String response) {
-		OutputStream out;
+		OutputStream sendStream;
 		try {
-			out = socket.getOutputStream();
+			sendStream = socket.getOutputStream();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
-		byte[] out_data = response.getBytes();
+		byte[] sendData = response.getBytes();
 		try {
-			out.write(out_data);
+			sendStream.write(sendData);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
-	}
-
-	/**
-	 * 
-	 * @param in_data
-	 * @return
-	 */
-	private String parseMessage(byte[] in_data) {
-		String request = new String(in_data);
-		System.out.println("SSLServer: "+ request);
-		request = request.trim();
-		String[] elements = request.split(" ");
-		String response = new String();
-		
-//		TODO methods
-		System.out.println("Elements :" + elements[0]);
-		System.out.println("Elements :" + elements[1]);
-		return chordManager.lookup(new UnsignedByte(Short.valueOf((elements[1]))));
 	}
 
 }
