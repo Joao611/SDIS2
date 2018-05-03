@@ -34,12 +34,14 @@ public class ChordManager implements Runnable {
 		response = response.trim();
 
 		PeerInfo info = new PeerInfo(response);
-
-		if(response.startsWith("Ask")) {
-			//TODO: Repeat to the new Node
-		} else {
-			this.getFingerTable().set(0, info);
+		
+		while(response.startsWith("Ask")) {
+			response = Client.sendMessage(addr, port, "lookup " + getPeerInfo().getId());
+			response = response.trim();
+			info = new PeerInfo(response);
 		}
+		this.getFingerTable().set(0, info);
+
 	}
 
 	public ChordManager(Integer port) {

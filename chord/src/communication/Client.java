@@ -14,10 +14,43 @@ import utils.UnsignedByte;
 public class Client {
 	private static ArrayList<String> cipher = new ArrayList<String>(Arrays.asList("TLS_DHE_RSA_WITH_AES_128_CBC_SHA"));
 
+	
+
+//		        InetSocketAddress hostAddress = new InetSocketAddress("localhost", 3883);
+//		        Future future = client.connect(hostAddress);
+//		        future.get(); // returns null
+//		 
+//		        System.out.println("Client is started: " + client.isOpen());
+//		        System.out.println("Sending messages to server: ");
+//		         
+//		        String [] messages = new String [] {"Time goes fast.", "What now?", "Bye."};
+//		         
+//		        for (int i = 0; i < messages.length; i++) {
+//		         
+//		            byte [] message = new String(messages [i]).getBytes();
+//		            ByteBuffer buffer = ByteBuffer.wrap(message);
+//		            Future result = client.write(buffer);
+//		         
+//		            while (! result.isDone()) {
+//		                System.out.println("... ");
+//		            }
+//		         
+//		            System.out.println(messages [i]);
+//		            buffer.clear();
+//		            Thread.sleep(3000);
+//		        } // for
+//		         
+//		        client.close();
+//		    }
+
+	
+	
+	
 	public static String sendMessage(InetAddress addr, int port, String message) {
 
 		SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
+//      AsynchronousSocketChannel client = AsynchronousSocketChannel.open();
 		SSLSocket socket;
 		try {
 			socket = (SSLSocket) socketFactory.createSocket(addr, port);
