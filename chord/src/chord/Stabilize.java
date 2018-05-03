@@ -6,15 +6,15 @@ import communication.Client;
 import program.Peer;
 
 public class Stabilize implements Runnable {
-    private Peer peer;
+    private ChordManager chordManager;
 
-    public Stabilize(Peer peer) {
-        this.peer = peer;
+    public Stabilize(ChordManager chordManager) {
+        this.chordManager = chordManager;
     }
 
     @Override
     public void run() {
-        PeerInfo successor = peer.getChordManager().getSuccessor(0);
+        PeerInfo successor = this.chordManager.getSuccessor(0);
 
         String response = Client.sendMessage(successor.getAddr(), successor.getPort(), "stabilize");// receives my
                                                                                                     // successor's
@@ -23,10 +23,10 @@ public class Stabilize implements Runnable {
 
         PeerInfo predecessor = new PeerInfo(response);
 
-        if (this.peer.getChordManager().stabilize(predecessor)) {
+        if (this.chordManager.stabilize(predecessor)) {
             System.out.println("Successor updated");
         }
 
-        peer.getThreadPool().schedule(this, 1000, TimeUnit.MILLISECONDS);
+        //TODO: notify
     }
 }
