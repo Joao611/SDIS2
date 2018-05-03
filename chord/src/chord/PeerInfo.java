@@ -19,7 +19,6 @@ public class PeerInfo extends AbstractPeerInfo {
 //	private Integer port;
 
 	public PeerInfo(UnsignedByte id, InetAddress addr, Integer port) {
-		super();
 		this.id = id;
 		this.addr = addr;
 		this.port = port;
@@ -27,7 +26,7 @@ public class PeerInfo extends AbstractPeerInfo {
 
 	public PeerInfo(String str) {
 		System.out.println(str);
-		String[] attr = str.split("\n");
+		String[] attr = str.split("\r\n");
 
 		System.out.println("----");
 		System.out.println(attr[1]);
@@ -35,13 +34,11 @@ public class PeerInfo extends AbstractPeerInfo {
 		this.id = new UnsignedByte(Short.valueOf(attr[0]));
 
 		try {
-//			this.addr = InetAddress.getByName(attr[4].substring(5, attr[4].length() - 1));
 			this.addr = InetAddress.getByName(attr[1]);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			return;
 		}
-//		this.port = Integer.valueOf(attr[5].substring(5, attr[5].length()-1));
 		this.port = Integer.valueOf(attr[2]);
 		
 	}
