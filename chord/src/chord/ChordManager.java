@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import communication.Client;
 import utils.UnsignedByte;
@@ -24,7 +26,8 @@ public class ChordManager implements Runnable {
 	private static final int M = 8;
 	private PeerInfo peerInfo;
 	private ArrayList<PeerInfo> fingerTable = new ArrayList<PeerInfo>();
-	private PeerInfo previous;
+	private AbstractPeerInfo predecessor;
+	private ScheduledThreadPoolExecutor scheduledPool = new ScheduledThreadPoolExecutor(4);
 
 	public void join(InetAddress addr, int port) {
 		String response = Client.message(addr, port, "lookup " + peerInfo.getId());
@@ -62,12 +65,13 @@ public class ChordManager implements Runnable {
 			fingerTable.add(peerInfo);
 //			TODO: null design pattern
 		}
-		previous = peerInfo; //TODO null, design
+		predecessor = peerInfo; //TODO null, design
 	}
 
 	@Override
 	public void run() {
-		
+		CheckPredecessor checkPredecessorThread = new CheckPredecessor(predecessor);
+		scheduledPool.scheduleAtFixedRate(checkPredecessorThread, 0, 1000, TimeUnit.MILLISECONDS);
 	}
 
 	/**
@@ -76,7 +80,7 @@ public class ChordManager implements Runnable {
 	 * @return 
 	 */
 	public String lookup(UnsignedByte key) {
-		if(Utils.inBetween(this.previous.getId(),this.peerInfo.getId(), key.getB())) {
+		if(Utils.inBetween(this.predecessor.getId(),this.peerInfo.getId(), key.getB())) {
 			return "Successor "+ this.peerInfo.toString();
 		}
 		if(Utils.inBetween(this.peerInfo.getId(), this.fingerTable.get(0).getId(), key.getB())) {
