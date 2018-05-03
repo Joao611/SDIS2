@@ -131,7 +131,7 @@ public class ChordManager implements Runnable {
 	}
 
 	public void setSuccessor(int index, PeerInfo successor) {
-
+		this.fingerTable.set(index, successor);
 	}
 
 	public AbstractPeerInfo getPredecessor() {
