@@ -20,24 +20,23 @@ public class PeerInfo {
 
 	public PeerInfo(UnsignedByte id, InetAddress addr, Integer port) {
 		super();
-		this.setId(id);
-		this.setAddr(addr);
-		this.setPort(port);
+		this.id = id;
+		this.addr = addr;
+		this.port = port;
 	}
 
-	public PeerInfo(String substring) {
-		// TODO Auto-generated constructor stub
-		String[] s = substring.split(" ");
+	public PeerInfo(String str) {
+		String[] attr = str.split(" ");
 		
-		id = new UnsignedByte(Short.valueOf(s[3].substring(3, s[3].length()-2)));
+		this.id = new UnsignedByte(Short.valueOf(attr[3].substring(3, attr[3].length() - 2)));
+
 		try {
-			addr = InetAddress.getByName(s[4].substring(5, s[4].length()-1));
+			this.addr = InetAddress.getByName(attr[4].substring(5, attr[4].length() - 1));
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		port = Integer.valueOf(s[5].substring(5, s[5].length()-1));
+		this.port = Integer.valueOf(attr[5].substring(5, attr[5].length()-1));
 		
 	}
 
@@ -85,7 +84,7 @@ public class PeerInfo {
 	 * @return the id
 	 */
 	public short getId() {
-		return id.getB();
+		return id.getUsignedByte();
 	}
 
 
