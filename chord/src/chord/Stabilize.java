@@ -39,8 +39,8 @@ public class Stabilize implements Runnable {
 
         if (this.chordManager.stabilize(predecessor)) {
             System.out.println("Successor updated");
+            this.chordManager.notify(predecessor.getAddr(), predecessor.getPort(), predecessor.getId());
         }
 
-        //TODO: notify
     }
 }
