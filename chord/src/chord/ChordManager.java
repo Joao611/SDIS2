@@ -35,11 +35,11 @@ public class ChordManager implements Runnable {
 		System.out.println("JOIN");
 		String response = Client.sendMessage(addr, port, "lookup " + getPeerInfo().getId());
 		response = response.trim();
-		
+
 		PeerInfo info = new PeerInfo(response);
-		
-		while(response.startsWith("Ask")) {
-			System.out.println("\t"+response);
+
+		while (response.startsWith("Ask")) {
+			System.out.println("\t" + response);
 			response = Client.sendMessage(info.getAddr(), info.getPort(), "lookup " + getPeerInfo().getId());
 			response = response.trim();
 			info = new PeerInfo(response);
@@ -49,7 +49,7 @@ public class ChordManager implements Runnable {
 	}
 
 	public ChordManager(Integer port) {
-		
+
 		InetAddress addr;
 		try {
 			addr = InetAddress.getLocalHost();
@@ -66,17 +66,16 @@ public class ChordManager implements Runnable {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		byte[] hash = digest.digest(("" + addr + port).getBytes(StandardCharsets.ISO_8859_1));
 		UnsignedByte id = new UnsignedByte(ByteBuffer.wrap(hash).getShort());
-		this.setPeerInfo(new PeerInfo(id,addr, port));
-		
-		
+		this.setPeerInfo(new PeerInfo(id, addr, port));
+
 		for (int i = 0; i < getM(); i++) {
 			getFingerTable().add(getPeerInfo());
-//			TODO: null design pattern
+			// TODO: null design pattern
 		}
-		predecessor = new NullPeerInfo(); 
+		predecessor = new NullPeerInfo();
 
 	}
 
@@ -84,7 +83,7 @@ public class ChordManager implements Runnable {
 	public void run() {
 		CheckPredecessor checkPredecessorThread = new CheckPredecessor(predecessor);
 		scheduledPool.scheduleAtFixedRate(checkPredecessorThread, 0, 10000, TimeUnit.MILLISECONDS);
-		
+
 		FixFingerTable fixFingerTableThread = new FixFingerTable(this);
 		scheduledPool.scheduleAtFixedRate(fixFingerTableThread, 0, 10000, TimeUnit.MILLISECONDS);
 
@@ -92,22 +91,34 @@ public class ChordManager implements Runnable {
 
 	/**
 	 * Returna o successor da key, ou a quem perguntor
+	 * 
 	 * @param key a procurar
-	 * @return 
+	 * @return
 	 */
 	public String lookup(UnsignedByte key) {
-		if(Utils.inBetween(this.predecessor.getId(),this.getPeerInfo().getId(), key.get())) {
-			return "Successor "+ this.getPeerInfo().toString();
+		if (Utils.inBetween(this.predecessor.getId(), this.getPeerInfo().getId(), key.get())) {
+			return "Successor " + this.getPeerInfo().toString();
 		}
-		if(Utils.inBetween(this.getPeerInfo().getId(), this.getFingerTable().get(0).getId(), key.get())) {
-			return "Successor "+ this.getFingerTable().get(0).toString();
+		if (Utils.inBetween(this.getPeerInfo().getId(), this.getFingerTable().get(0).getId(), key.get())) {
+			return "Successor " + this.getFingerTable().get(0).toString();
 		}
-		for(int i = getM()-1; i >= 0; i--) {
-			if(Utils.inBetween(this.getPeerInfo().getId(), key.get(), this.getFingerTable().get(i).getId())) {
-				return "Ask "+ this.getFingerTable().get(i).toString();
+		for (int i = getM() - 1; i >= 0; i--) {
+			if (Utils.inBetween(this.getPeerInfo().getId(), key.get(), this.getFingerTable().get(i).getId())) {
+				return "Ask " + this.getFingerTable().get(i).toString();
 			}
 		}
-		return "Ask "+ this.getFingerTable().get(getM()-1).toString();
+		return "Ask " + this.getFingerTable().get(getM() - 1).toString();
+	}
+
+	public boolean stabilize(PeerInfo predecessor) {
+
+		PeerInfo successor = this.fingerTable.get(0);
+
+		if (Utils.inBetween(this.peerInfo.getId(), successor.getId(), predecessor.getId())) {
+			setSuccessor(0, predecessor);
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -130,6 +141,22 @@ public class ChordManager implements Runnable {
 	 */
 	public static int getM() {
 		return M;
+	}
+
+	public PeerInfo getSuccessor(int index) {
+		return this.fingerTable.get(index);
+	}
+
+	public void setSuccessor(int index, PeerInfo successor) {
+		this.fingerTable.set(index, successor);
+	}
+
+	public AbstractPeerInfo getPredecessor() {
+		return this.predecessor;
+	}
+
+	public void setPredecessor(PeerInfo newPred) {
+		predecessor = newPred;
 	}
 
 	/**
@@ -159,9 +186,4 @@ public class ChordManager implements Runnable {
 	public void setFingerTable(ArrayList<PeerInfo> fingerTable) {
 		this.fingerTable = fingerTable;
 	}
-
-	public void setPredecessor(PeerInfo newPred) {
-		predecessor = newPred;
-	}
-
 }

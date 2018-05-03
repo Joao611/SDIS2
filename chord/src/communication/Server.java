@@ -81,8 +81,6 @@ public class Server implements Runnable {
 		System.setProperty("javax.net.ssl.trustStorePassword", "123456");
 	}
 
-	
-
 	/**
 	 * Read socket
 	 */
