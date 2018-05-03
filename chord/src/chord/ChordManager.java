@@ -135,12 +135,12 @@ public class ChordManager implements Runnable {
 	 * @param newSuccessorId Closer successor than previous successor.
 	 */
 	public void notify(UnsignedByte newSuccessorId) {
-		if (predecessor == null || Utils.inBetween(predecessor.getId(), this.getPeerInfo().getId(), newSuccessorId.get())) {
+		if (predecessor.isNull() || Utils.inBetween(predecessor.getId(), this.getPeerInfo().getId(), newSuccessorId.get())) {
 			InetAddress addr = null;
 			int port = -1;
-			String message = MessageFactory.getHeader(MessageType.LOOKUP, "1.0", this.getPeerInfo().getId());
+			String message = MessageFactory.getHeader(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
 			if ("OK" != Client.sendMessage(addr, port, message)) {
-				System.err.println("ChordManager notify(): Error on LOOKUP message reply");
+				System.err.println("ChordManager notify(): Error on NOTIFY message reply");
 			}
 		}
 	}

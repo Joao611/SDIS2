@@ -15,4 +15,5 @@ public abstract class AbstractPeerInfo {
 	public abstract InetAddress getAddr();
 	public abstract Integer getPort();
 	public abstract short getId();
+	public abstract String[] asArray();
 }

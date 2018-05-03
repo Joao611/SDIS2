@@ -5,7 +5,6 @@ import java.net.UnknownHostException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import chord.ChordManager;
-import chord.Stabilize;
 import communication.Server;
 
 public class Peer {

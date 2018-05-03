@@ -11,6 +11,7 @@ import javax.net.ssl.SSLSocket;
 
 import chord.ChordManager;
 import chord.PeerInfo;
+import messages.MessageFactory;
 import messages.MessageType;
 import program.Peer;
 import utils.UnsignedByte;
@@ -77,6 +78,10 @@ public class ParseMessageAndSendResponse implements Runnable {
 		case OK:
 			break;
 		case PUTCHUNK:
+			break;
+		case STABILIZE:
+			response = MessageFactory.getFirstLine(MessageType.PREDECESSOR, "1.0", chordManager.getPeerInfo().getId());
+			response = MessageFactory.appendLine(response, chordManager.getPredecessor().asArray());
 			break;
 		case SUCCESSOR:
 			break;

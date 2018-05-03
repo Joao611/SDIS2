@@ -53,7 +53,7 @@ public class PeerInfo extends AbstractPeerInfo {
 		return addr;
 	}
 
-	
+	@Override
 	public String[] asArray() {
 		return new String[]{id.toString(),addr.getHostAddress(),port.toString()}; 
 	}

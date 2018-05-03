@@ -2,13 +2,16 @@ package messages;
 
 public enum MessageType {
 
+	ASK("ASK"),
 	PUTCHUNK("PUTCHUNK"),
 	PING("PING"),
 	OK("OK"),
 	NOTIFY("NOTIFY"),
 	LOOKUP("LOOKUP"),
-	SUCCESSOR("SUCCESSOR"),
-	ASK("ASK");
+	PREDECESSOR("PREDECESSOR"),
+	STABILIZE("STABILIZE"),
+	SUCCESSOR("SUCCESSOR");
+	
 	
 	private String type;
 	 

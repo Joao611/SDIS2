@@ -26,4 +26,9 @@ public class NullPeerInfo extends AbstractPeerInfo{
 		return -1;
 	}
 
+	@Override
+	public String[] asArray() {
+		return new String[]{"null"};
+	}
+
 }
