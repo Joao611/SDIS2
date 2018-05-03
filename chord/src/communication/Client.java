@@ -114,6 +114,12 @@ public class Client {
 			e.printStackTrace();
 			return null;
 		}
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 		return new String(readData);
 
 	}
