@@ -35,12 +35,17 @@ public class Stabilize implements Runnable {
         String response = Client.sendMessage(successor.getAddr(), successor.getPort(), stabilizeMessage);
         AbstractPeerInfo predecessor = parseResponse(response);
         
-        
-
-        if (this.chordManager.stabilize(predecessor)) {
-            System.out.println("Successor updated");
-            this.chordManager.notify(predecessor.getAddr(), predecessor.getPort(), predecessor.getId());
+        if (predecessor.isNull()) {
+        	PeerInfo successor = this.chordManager.getFingerTable().get(0);
+        	this.chordManager.notify(successor);
+        } else {
+        	if (this.chordManager.stabilize((PeerInfo)predecessor)) {
+                System.out.println("Successor updated");
+                this.chordManager.notify(predecessor);
+            }
         }
+
+        
 
     }
 }
