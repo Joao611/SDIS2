@@ -12,54 +12,66 @@ import javax.net.ssl.SSLSocketFactory;
 import utils.UnsignedByte;
 
 public class Client {
-	private static ArrayList<String> cypher = new ArrayList<String>(Arrays.asList("TLS_DHE_RSA_WITH_AES_128_CBC_SHA"));
+	private static ArrayList<String> cipher = new ArrayList<String>(Arrays.asList("TLS_DHE_RSA_WITH_AES_128_CBC_SHA"));
 
-	public static String message(InetAddress addr, int port, String message) {
+	public static String sendMessage(InetAddress addr, int port, String message) {
 
-		SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+		SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+
 		SSLSocket socket;
 		try {
-			socket = (SSLSocket) factory.createSocket(addr, port);
+			socket = (SSLSocket) socketFactory.createSocket(addr, port);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
-		socket.setEnabledCipherSuites(cypher.toArray(new String[0]));
+		socket.setEnabledCipherSuites(cipher.toArray(new String[0]));
 
-		byte[] out_data = message.getBytes();
+		send(message, socket);
 
-		OutputStream out;
-		try {
-			out = socket.getOutputStream();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-		try {
-			out.write(out_data);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
 		return getResponse(socket);
 	}
 
+	/**
+	 * Write to the socket (send message)
+	 */
+	public static void send(String message, SSLSocket socket) {
+		byte[] sendData = message.getBytes();
+
+		OutputStream sendStream;
+		try {
+			sendStream = socket.getOutputStream();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		try {
+			sendStream.write(sendData);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+	}
+
+	/**
+	 * Receives the message's response
+	 */
 	public static String getResponse(SSLSocket socket) {
-		byte[] in_data = new byte[1024];
-		InputStream in;
+		byte[] readData = new byte[1024];
+		InputStream readStream;
 		try {
-			in = socket.getInputStream();
+			readStream = socket.getInputStream();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
 		try {
-			in.read(in_data);
+			readStream.read(readData);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
-		return new String(in_data);
+		return new String(readData);
 
 	}
 

@@ -17,20 +17,20 @@ public class Server implements Runnable {
 
 	public static final int MAX_LENGTH_PACKET = 300;
 
-	private ArrayList<String> cypher_list;
+	private ArrayList<String> cipher_list;
 	private int port_number;
 	private ChordManager chordManager;
 
-	public Server(String[] cypher_suite, int port, ChordManager chordManager) throws Exception {
+	public Server(String[] cipher_suite, int port, ChordManager chordManager) throws Exception {
 		this.chordManager = chordManager;
 		this.port_number = port;
 
 		setSystemProperties();
 
-		this.cypher_list = new ArrayList<String>();
+		this.cipher_list = new ArrayList<String>();
 
-		for (int i = 1; i < cypher_suite.length; i++) {
-			cypher_list.add(cypher_suite[i]);
+		for (int i = 1; i < cipher_suite.length; i++) {
+			this.cipher_list.add(cipher_suite[i]);
 		}
 	}
 
@@ -48,7 +48,7 @@ public class Server implements Runnable {
 		serverSocket.setNeedClientAuth(true);
 		serverSocket.setEnabledProtocols(serverSocket.getSupportedProtocols());
 
-		this.cypher_list.toArray(new String[0]);
+		this.cipher_list.toArray(new String[0]);
 
 		while (true) {
 			SSLSocket socket;
