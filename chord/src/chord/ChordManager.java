@@ -27,7 +27,7 @@ public class ChordManager implements Runnable {
 	private PeerInfo previous;
 
 	public void join(InetAddress addr, int port) {
-		String response = Client.message(addr, port, "lookup " + peerInfo.getId());
+		String response = Client.sendMessage(addr, port, "lookup " + peerInfo.getId());
 		response = response.trim();
 		PeerInfo info = new PeerInfo(response);
 		if(response.startsWith("Ask")) {
@@ -76,14 +76,14 @@ public class ChordManager implements Runnable {
 	 * @return 
 	 */
 	public String lookup(UnsignedByte key) {
-		if(Utils.inBetween(this.previous.getId(),this.peerInfo.getId(), key.getB())) {
+		if(Utils.inBetween(this.previous.getId(),this.peerInfo.getId(), key.getUsignedByte())) {
 			return "Successor "+ this.peerInfo.toString();
 		}
-		if(Utils.inBetween(this.peerInfo.getId(), this.fingerTable.get(0).getId(), key.getB())) {
+		if(Utils.inBetween(this.peerInfo.getId(), this.fingerTable.get(0).getId(), key.getUsignedByte())) {
 			return "Successor "+ this.fingerTable.get(0).toString();
 		}
 		for(int i = getM()-1; i >= 0; i--) {
-			if(Utils.inBetween(this.peerInfo.getId(), key.getB(), this.fingerTable.get(i).getId())) {
+			if(Utils.inBetween(this.peerInfo.getId(), key.getUsignedByte(), this.fingerTable.get(i).getId())) {
 				return "Ask "+ this.fingerTable.get(i).toString();
 			}
 		}

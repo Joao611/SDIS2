@@ -85,7 +85,7 @@ public class PeerInfo {
 	 * @return the id
 	 */
 	public short getId() {
-		return id.getB();
+		return id.getUsignedByte();
 	}
 
 
