@@ -134,10 +134,8 @@ public class ChordManager implements Runnable {
 	 * Notify newly found closer successor node that this node is now its predecessor.
 	 * @param newSuccessorId Closer successor than previous successor.
 	 */
-	public void notify(UnsignedByte newSuccessorId) {
+	public void notify(InetAddress addr, int port, Short newSuccessorId) {
 		if (predecessor.isNull() || Utils.inBetween(predecessor.getId(), this.getPeerInfo().getId(), newSuccessorId.get())) {
-			InetAddress addr = null;
-			int port = -1;
 			String message = MessageFactory.getHeader(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
 			if ("OK" != Client.sendMessage(addr, port, message)) {
 				System.err.println("ChordManager notify(): Error on NOTIFY message reply");
