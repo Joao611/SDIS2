@@ -105,6 +105,21 @@ public class ChordManager implements Runnable {
 		}
 		return "Ask "+ this.getFingerTable().get(getM()-1).toString();
 	}
+	
+	/**
+	 * Notify newly found closer successor node that this node is now its predecessor.
+	 * @param newSuccessorId Closer successor than previous successor.
+	 */
+	public void notify(UnsignedByte newSuccessorId) {
+		if (predecessor == null || Utils.inBetween(predecessor.getId(), this.getPeerInfo().getId(), newSuccessorId.get())) {
+			InetAddress addr = null;
+			int port = -1;
+			String message = MessageFactory.getHeader(MessageType.LOOKUP, "1.0", this.getPeerInfo().getId());
+			if ("OK" != Client.sendMessage(addr, port, message)) {
+				System.err.println("ChordManager notify(): Error on LOOKUP message reply");
+			}
+		}
+	}
 
 	/**
 	 * @return the m
