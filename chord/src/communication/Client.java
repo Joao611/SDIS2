@@ -50,19 +50,24 @@ public class Client {
 
 		SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
+		System.out.println("Criar socket Factory");
+		
 //      AsynchronousSocketChannel client = AsynchronousSocketChannel.open();
 		SSLSocket socket;
 		try {
 			socket = (SSLSocket) socketFactory.createSocket(addr, port);
 			socket.setSoTimeout(1000);
+			System.out.println("Criar socket e set Timeout");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
+
 		socket.setEnabledCipherSuites(cipher.toArray(new String[0]));
-		
+		System.out.println("Ennable Suites");
 
 		send(message, socket);
+		System.out.println("sent message");
 
 		return getResponse(socket);
 	}
