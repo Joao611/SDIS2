@@ -85,7 +85,7 @@ public class PeerInfo extends AbstractPeerInfo {
 	 * @return the id
 	 */
 	public short getId() {
-		return id.getB();
+		return id.get();
 	}
 
 

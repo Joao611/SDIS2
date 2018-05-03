@@ -23,38 +23,41 @@ public class Peer {
 	
 	public static void main(String[] args) {
 		if(args.length < 1) {
-			System.err.println("Need a port Number");
+			System.err.println("Error: Need a port Number");
 			return;
 		}
-		int port = Integer.valueOf(args[0]);
+		Integer port = Integer.valueOf(args[0]);
 		ChordManager chordManager = new ChordManager(port);
+
 		Server server;
 		try {
-			server = new Server(new String[] {"TLS_DHE_RSA_WITH_AES_128_CBC_SHA"},port,chordManager);
+			server = new Server(new String[] {"TLS_DHE_RSA_WITH_AES_128_CBC_SHA"}, port, chordManager);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			return;
 		}
+
 		Peer peer = new Peer(chordManager,server);
 		
-		InetAddress addr1 = null;
-		Integer port1 = null;
+		InetAddress addr = null;
+		port = null;
+
 		if(args.length >= 3) {
 			try {
-				addr1 = InetAddress.getByName(args[1]);
+				addr = InetAddress.getByName(args[1]);
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 				return;
 			}
-			port1 = Integer.valueOf(args[2]);
+			port = Integer.valueOf(args[2]);
 		}
-		peer.go(addr1, port1);
+		peer.joinNetwork(addr, port);
 	}
 
-	public void go(InetAddress addr1, Integer port) {
-		System.out.println("IN Peer.go()");
-		if(addr1 != null) {
-			chordManager.join(addr1, port);
+	public void joinNetwork(InetAddress addr, Integer port) {
+		
+		if(addr != null) {
+			chordManager.join(addr, port);
 		}
 		threadPool.execute(server);
 		threadPool.execute(chordManager);

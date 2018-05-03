@@ -1,13 +1,10 @@
 package utils;
 
 public class UnsignedByte {
-	private Short b;
+	private Short unsigned_byte;
 
-	public UnsignedByte(short short1) {
-		
-		this.setB((short) (short1 & 0xFF));
-		System.out.println("Create "+ this.getB());
-		// TODO see unsigness
+	public UnsignedByte(short unsigned_byte) {
+		this.unsigned_byte = ((short) (unsigned_byte & 0xFF));
 	}
 
 	/* (non-Javadoc)
@@ -15,7 +12,7 @@ public class UnsignedByte {
 	 */
 	@Override
 	public String toString() {
-		return "UnsignedByte [b=" + getB() + "]";
+		return "UnsignedByte [b=" + get() + "]";
 	}
 
 	/**
@@ -24,7 +21,7 @@ public class UnsignedByte {
 	 * @return
 	 */
 	public boolean smallerThan(UnsignedByte key) {
-		return this.getB() <= key.getB();
+		return this.get() <= key.get();
 	}
 
 	/**
@@ -32,23 +29,15 @@ public class UnsignedByte {
 	 * @return
 	 */
 	public boolean equalTo(UnsignedByte key) {
-		// TODO Auto-generated method stub
 		System.out.println("EqualTo "+this +" "+key);
-		return this.getB() == key.getB();
+		return this.get() == key.get();
 	}
 
 	/**
-	 * @return the b
+	 * @return the unsigned byte
 	 */
-	public Short getB() {
-		return b;
-	}
-
-	/**
-	 * @param b the b to set
-	 */
-	public void setB(Short b) {
-		this.b = b;
+	public Short get() {
+		return this.unsigned_byte;
 	}
 	
 }

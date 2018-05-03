@@ -12,7 +12,7 @@ public class CheckPredecessor implements Runnable {
 	
 	@Override
 	public void run() {
-		String response = Client.message(predecessor.getAddr(), predecessor.getPort(), "STATUS");
+		String response = Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), "STATUS");
 		if (response == null) {
 			System.out.println("Predecessor is null");
 			predecessor = new NullPeerInfo();
