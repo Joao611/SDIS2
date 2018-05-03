@@ -81,10 +81,10 @@ public class ChordManager implements Runnable {
 	@Override
 	public void run() {
 		CheckPredecessor checkPredecessorThread = new CheckPredecessor(predecessor);
-		scheduledPool.scheduleAtFixedRate(checkPredecessorThread, 0, 1000, TimeUnit.MILLISECONDS);
+		scheduledPool.scheduleAtFixedRate(checkPredecessorThread, 0, 10000, TimeUnit.MILLISECONDS);
 		
 		FixFingerTable fixFingerTableThread = new FixFingerTable(this);
-		scheduledPool.scheduleAtFixedRate(fixFingerTableThread, 0, 1000, TimeUnit.MILLISECONDS);
+		scheduledPool.scheduleAtFixedRate(fixFingerTableThread, 0, 10000, TimeUnit.MILLISECONDS);
 
 	}
 
