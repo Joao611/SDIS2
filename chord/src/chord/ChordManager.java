@@ -102,7 +102,7 @@ public class ChordManager implements Runnable {
 		PeerInfo successor = this.fingerTable.get(0);
 
 		if (Utils.inBetween(this.peerInfo.getId(), successor.getId(), predecessor.getId())) {
-			setPredecessor(predecessor);
+			setSuccessor(0, predecessor);
 			return true;
 		}
 		return false;

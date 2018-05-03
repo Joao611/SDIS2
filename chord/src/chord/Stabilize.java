@@ -16,7 +16,7 @@ public class Stabilize implements Runnable {
     public void run() {
         PeerInfo successor = peer.getChordManager().getSuccessor(0);
 
-        String response = Client.sendMessage(successor.getAddr(), successor.getPort(), "stabilize");// receives the
+        String response = Client.sendMessage(successor.getAddr(), successor.getPort(), "stabilize");// receives my
                                                                                                     // successor's
                                                                                                     // predecessor
         response = response.trim();
@@ -24,7 +24,7 @@ public class Stabilize implements Runnable {
         PeerInfo predecessor = new PeerInfo(response);
 
         if (this.peer.getChordManager().stabilize(predecessor)) {
-            System.out.println("Predecessor updated");
+            System.out.println("Successor updated");
         }
 
         peer.getThreadPool().schedule(this, 1000, TimeUnit.MILLISECONDS);
