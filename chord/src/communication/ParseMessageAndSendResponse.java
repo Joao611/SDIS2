@@ -75,7 +75,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			response = MessageFactory.getHeader(MessageType.OK, "1.0", chordManager.getPeerInfo().getId());
 			break;
 		case NOTIFY:
-			chordManager.setPredecessor(parseNotifyMsg(firstLine));
+			chordManager.setPredecessor(parseNotifyMsg(firstLine,secondLine));
 			response = MessageFactory.getHeader(MessageType.OK, "1.0", chordManager.getPeerInfo().getId());
 			break;
 		case PUTCHUNK:
@@ -90,10 +90,10 @@ public class ParseMessageAndSendResponse implements Runnable {
 		return response;
 	}
 
-	private PeerInfo parseNotifyMsg(String[] header) {
-		UnsignedByte id = new UnsignedByte(Short.parseShort(header[2]));
+	private PeerInfo parseNotifyMsg(String[] firstLine, String[] secondLine) {
+		UnsignedByte id = new UnsignedByte(Short.parseShort(firstLine[2]));
 		InetAddress addr = socket.getInetAddress();
-		int port = socket.getPort();
+		int port = Integer.parseInt(secondLine[0].trim());
 		return new PeerInfo(id, addr, port);
 	}
 

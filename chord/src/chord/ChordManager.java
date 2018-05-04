@@ -144,7 +144,8 @@ public class ChordManager implements Runnable {
 	 */
 	public void notify(PeerInfo newSuccessor) {
 		if (predecessor.isNull() || Utils.inBetween(predecessor.getId(), this.getPeerInfo().getId(), newSuccessor.getId())) {
-			String message = MessageFactory.getHeader(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
+			String message = MessageFactory.getFirstLine(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
+			message = MessageFactory.appendLine(message, new String[] {"" + this.getPeerInfo().getPort()});
 			String response = Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message).trim();
 			String expectedResponse = MessageFactory.getHeader(MessageType.OK, "1.0", newSuccessor.getId()).trim();
 			if (!expectedResponse.equals(response)) {
