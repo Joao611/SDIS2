@@ -22,7 +22,7 @@ public class Client {
 		SSLSocket socket;
 		try {
 			socket = (SSLSocket) socketFactory.createSocket(addr, port);
-			socket.setSoTimeout(5000);
+			socket.setSoTimeout(25000);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

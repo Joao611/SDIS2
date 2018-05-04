@@ -72,15 +72,11 @@ public class ParseMessageAndSendResponse implements Runnable {
 			}
 			break;
 		case PING:
-			response = "OK";
+			response = MessageFactory.getHeader(MessageType.OK, "1.0", chordManager.getPeerInfo().getId());
 			break;
 		case NOTIFY:
 			chordManager.setPredecessor(parseNotifyMsg(firstLine));
 			response = MessageFactory.getHeader(MessageType.OK, "1.0", chordManager.getPeerInfo().getId());
-			break;
-		case ASK:
-			break;
-		case OK:
 			break;
 		case PUTCHUNK:
 			break;
@@ -88,12 +84,9 @@ public class ParseMessageAndSendResponse implements Runnable {
 			response = MessageFactory.getFirstLine(MessageType.PREDECESSOR, "1.0", chordManager.getPeerInfo().getId());
 			response = MessageFactory.appendLine(response, chordManager.getPredecessor().asArray());
 			break;
-		case SUCCESSOR:
-			break;
 		default:
 			break;
 		}
-		
 		return response;
 	}
 

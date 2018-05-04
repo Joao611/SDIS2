@@ -54,6 +54,7 @@ public class ChordManager implements Runnable {
 			nextPeer = new PeerInfo(response);
 		}
 		this.getFingerTable().set(0, nextPeer);
+		System.out.println("Joined");
 
 	}
 

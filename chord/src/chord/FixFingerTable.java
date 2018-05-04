@@ -4,6 +4,8 @@
 package chord;
 
 import communication.Client;
+import messages.MessageFactory;
+import messages.MessageType;
 import utils.UnsignedByte;
 
 /**
@@ -18,6 +20,7 @@ public class FixFingerTable implements Runnable {
 	 */
 	@Override
 	public void run() {
+		System.out.println("Running fix finger table\n");
 		fix_fingerTable();
 		printFingerTable();
 	}
@@ -28,12 +31,15 @@ public class FixFingerTable implements Runnable {
 	}
 
 	public void fix_fingerTable() {
+		
 		for(int i = 0; i < ChordManager.getM(); i++) {
-			String response = chord.lookup(new UnsignedByte((short) ((chord.getPeerInfo().getId() + Math.pow(2, i))% Math.pow(2, ChordManager.getM()))));
+			short keyToLookup = (short) ((chord.getPeerInfo().getId() + Math.pow(2, i))% Math.pow(2, ChordManager.getM()));
+			String lookupMessage = MessageFactory.getLookup(chord.getPeerInfo().getId(), keyToLookup);
+			String response = chord.lookup(new UnsignedByte(keyToLookup));
 			response = response.trim();
 			PeerInfo info = new PeerInfo(response);
-			while(response.startsWith("Ask")) {
-				response = Client.sendMessage(info.getAddr(), info.getPort(), "lookup "+ (short)(chord.getPeerInfo().getId() + Math.pow(2, i)% Math.pow(2, ChordManager.getM())));
+			while(response.startsWith(MessageType.ASK.getType())) {
+				response = Client.sendMessage(info.getAddr(), info.getPort(), lookupMessage);
 				response = response.trim();
 				info = new PeerInfo(response);
 			}
@@ -42,7 +48,6 @@ public class FixFingerTable implements Runnable {
 	}
 
 	public FixFingerTable(ChordManager chord) {
-		super();
 		this.chord = chord;
 	}
 }

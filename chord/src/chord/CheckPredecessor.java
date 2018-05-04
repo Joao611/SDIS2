@@ -12,7 +12,10 @@ public class CheckPredecessor implements Runnable {
 	
 	@Override
 	public void run() {
-		if (predecessor.isNull()) return;
+		if (predecessor.isNull()) {
+			System.out.println("Predecessor not set yet");
+			return;
+		} 
 		String response = Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), "status");
 		if (response == null) {
 			System.out.println("Could not establish connection with predecessor");
