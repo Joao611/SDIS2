@@ -2,14 +2,13 @@ package program;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import chord.ChordManager;
 import communication.Server;
+import utils.SingletonThreadPoolExecutor;
 
 public class Peer {
 	
-	private ScheduledThreadPoolExecutor threadPool = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
 	private ChordManager chordManager;
 	private Server server;
 	
@@ -57,16 +56,12 @@ public class Peer {
 		if(addr != null) {
 			chordManager.join(addr, port);
 		}
-		this.threadPool.execute(server);
-		this.threadPool.execute(chordManager);
+		SingletonThreadPoolExecutor.getInstance().get().execute(server);
+		SingletonThreadPoolExecutor.getInstance().get().execute(chordManager);
 		
 		while(true) {
 			//TODO: recebe pedidos da appTest
 		}
-	}
-
-	public ScheduledThreadPoolExecutor getThreadPool() {
-		return this.threadPool;
 	}
 
 	public ChordManager getChordManager() {

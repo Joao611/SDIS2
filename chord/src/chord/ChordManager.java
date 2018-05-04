@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import communication.Client;
@@ -18,6 +17,7 @@ import messages.MessageFactory;
 import messages.MessageType;
 import utils.UnsignedByte;
 import utils.Utils;
+import utils.SingletonThreadPoolExecutor;
 
 /**
  * @author anabela
@@ -29,8 +29,7 @@ public class ChordManager implements Runnable {
 	private PeerInfo peerInfo;
 	private ArrayList<PeerInfo> fingerTable = new ArrayList<PeerInfo>();
 	private AbstractPeerInfo predecessor;
-	private ScheduledThreadPoolExecutor scheduledPool = new ScheduledThreadPoolExecutor(4);
-
+	
 	private String ASK_MESSAGE;
 	private String SUCCESSOR_MESSAGE;
 	private String LOOKUP_MESSAGE;
@@ -98,12 +97,12 @@ public class ChordManager implements Runnable {
 	@Override
 	public void run() {
 		CheckPredecessor checkPredecessorThread = new CheckPredecessor(predecessor);
-		scheduledPool.scheduleAtFixedRate(checkPredecessorThread, 4000, 10000, TimeUnit.MILLISECONDS);
+		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(checkPredecessorThread, 4000, 10000, TimeUnit.MILLISECONDS);
 		FixFingerTable fixFingerTableThread = new FixFingerTable(this);
-		scheduledPool.scheduleAtFixedRate(fixFingerTableThread, 2000, 10000, TimeUnit.MILLISECONDS);
+		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(fixFingerTableThread, 2000, 10000, TimeUnit.MILLISECONDS);
 
 		Stabilize stabilizeThread = new Stabilize(this);
-		scheduledPool.scheduleAtFixedRate(stabilizeThread, 0, 10000, TimeUnit.MILLISECONDS);
+		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(stabilizeThread, 0, 10000, TimeUnit.MILLISECONDS);
 
 	}
 
@@ -146,7 +145,8 @@ public class ChordManager implements Runnable {
 	 */
 	public void notify(PeerInfo newSuccessor) {
 		if (predecessor.isNull() || Utils.inBetween(predecessor.getId(), this.getPeerInfo().getId(), newSuccessor.getId())) {
-			String message = MessageFactory.getHeader(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
+			String message = MessageFactory.getFirstLine(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
+			message = MessageFactory.appendLine(message, new String[] {"" + this.getPeerInfo().getPort()});
 			String response = Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message).trim();
 			String expectedResponse = MessageFactory.getHeader(MessageType.OK, "1.0", newSuccessor.getId()).trim();
 			if (!expectedResponse.equals(response)) {
