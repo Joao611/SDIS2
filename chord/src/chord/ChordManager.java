@@ -33,21 +33,28 @@ public class ChordManager implements Runnable {
 
 	private String ASK_MESSAGE;
 	private String SUCCESSOR_MESSAGE;
+	private String LOOKUP_MESSAGE;
 
 	public void join(InetAddress addr, int port) {
 		System.out.println("JOIN");
-		String response = Client.sendMessage(addr, port, "lookup " + getPeerInfo().getId());
+		String lookupMessage = MessageFactory.getFirstLine(MessageType.LOOKUP, "1.0",getPeerInfo().getId());
+		lookupMessage = MessageFactory.appendLine(lookupMessage, new String[]{""+getPeerInfo().getId()});
+		String response = Client.sendMessage(addr, port, lookupMessage);
 		response = response.trim();
 
-		PeerInfo info = new PeerInfo(response);
+		PeerInfo nextPeer = new PeerInfo(response);
 
 		while (response.startsWith("Ask")) {
 			System.out.println("\t" + response);
-			response = Client.sendMessage(info.getAddr(), info.getPort(), "lookup " + getPeerInfo().getId());
+			response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), lookupMessage);
+			if (response == null) {
+				System.err.println("Could not join the network");
+				return;
+			}
 			response = response.trim();
-			info = new PeerInfo(response);
+			nextPeer = new PeerInfo(response);
 		}
-		this.getFingerTable().set(0, info);
+		this.getFingerTable().set(0, nextPeer);
 
 	}
 
@@ -88,9 +95,9 @@ public class ChordManager implements Runnable {
 	@Override
 	public void run() {
 		CheckPredecessor checkPredecessorThread = new CheckPredecessor(predecessor);
-		scheduledPool.scheduleAtFixedRate(checkPredecessorThread, 0, 1000, TimeUnit.MILLISECONDS);
+		scheduledPool.scheduleAtFixedRate(checkPredecessorThread, 4000, 10000, TimeUnit.MILLISECONDS);
 		FixFingerTable fixFingerTableThread = new FixFingerTable(this);
-		scheduledPool.scheduleAtFixedRate(fixFingerTableThread, 0, 10000, TimeUnit.MILLISECONDS);
+		scheduledPool.scheduleAtFixedRate(fixFingerTableThread, 2000, 10000, TimeUnit.MILLISECONDS);
 
 		Stabilize stabilizeThread = new Stabilize(this);
 		scheduledPool.scheduleAtFixedRate(stabilizeThread, 0, 10000, TimeUnit.MILLISECONDS);
@@ -137,8 +144,11 @@ public class ChordManager implements Runnable {
 	public void notify(PeerInfo newSuccessor) {
 		if (predecessor.isNull() || Utils.inBetween(predecessor.getId(), this.getPeerInfo().getId(), newSuccessor.getId())) {
 			String message = MessageFactory.getHeader(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
-			if ("OK" != Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message)) {
-				System.err.println("ChordManager notify(): Error on NOTIFY message reply");
+			String response = Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message).trim();
+			String expectedResponse = MessageFactory.getHeader(MessageType.OK, "1.0", newSuccessor.getId()).trim();
+			if (!expectedResponse.equals(response)) {
+				System.err.println("Expected: " + expectedResponse);
+				System.err.println("ChordManager notify(): Error on NOTIFY message reply: " + response);
 			}
 		}
 	}

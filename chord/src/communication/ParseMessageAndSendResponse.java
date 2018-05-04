@@ -55,23 +55,28 @@ public class ParseMessageAndSendResponse implements Runnable {
 		System.out.println("SSLServer: " + request);
 
 		request = request.trim();
-		String[] elements = request.split(" ");
+		String[] lines = request.split("\r\n");
+		String[] firstLine = lines[0].split(" ");
+		String[] secondLine = null;
+		if (lines.length > 1) {
+			secondLine = lines[1].split(" ");
+		}
 		String response = new String();
 
-		for (String element : elements) {
-			System.out.println(element);
-		}
-
-		switch (MessageType.valueOf(elements[0])) {
+		switch (MessageType.valueOf(firstLine[0])) {
 		case LOOKUP:
-			response = chordManager.lookup(new UnsignedByte(Short.valueOf((elements[1]))));
+			if (secondLine != null) {
+				response = chordManager.lookup(new UnsignedByte(Short.valueOf((secondLine[0]))));
+			}else {
+				System.err.println("Invalid lookup message");
+			}
 			break;
 		case PING:
 			response = "OK";
 			break;
 		case NOTIFY:
-			chordManager.setPredecessor(parseNotifyMsg(elements));
-			response = "OK";
+			chordManager.setPredecessor(parseNotifyMsg(firstLine));
+			response = MessageFactory.getHeader(MessageType.OK, "1.0", chordManager.getPeerInfo().getId());
 			break;
 		case ASK:
 			break;
@@ -92,8 +97,8 @@ public class ParseMessageAndSendResponse implements Runnable {
 		return response;
 	}
 
-	private PeerInfo parseNotifyMsg(String[] elements) {
-		UnsignedByte id = new UnsignedByte(Short.parseShort(elements[2]));
+	private PeerInfo parseNotifyMsg(String[] header) {
+		UnsignedByte id = new UnsignedByte(Short.parseShort(header[2]));
 		InetAddress addr = socket.getInetAddress();
 		int port = socket.getPort();
 		return new PeerInfo(id, addr, port);

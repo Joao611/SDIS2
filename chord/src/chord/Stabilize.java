@@ -1,11 +1,8 @@
 package chord;
 
-import java.util.concurrent.TimeUnit;
-
 import communication.Client;
 import messages.MessageFactory;
 import messages.MessageType;
-import program.Peer;
 
 public class Stabilize implements Runnable {
     private ChordManager chordManager;
@@ -36,12 +33,11 @@ public class Stabilize implements Runnable {
         AbstractPeerInfo predecessor = parseResponse(response);
         
         if (predecessor.isNull()) {
-        	PeerInfo successor = this.chordManager.getFingerTable().get(0);
         	this.chordManager.notify(successor);
         } else {
         	if (this.chordManager.stabilize((PeerInfo)predecessor)) {
                 System.out.println("Successor updated");
-                this.chordManager.notify(predecessor);
+                this.chordManager.notify((PeerInfo)predecessor);
             }
         }
 
