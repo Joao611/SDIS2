@@ -14,11 +14,9 @@ public class Stabilize implements Runnable {
     private AbstractPeerInfo parseResponse(String response) { 
     	//response should be a string of PREDECESSOR Type
     	response = response.trim();
-        String[] responseArray = response.split("\r\n");
-        String secondLine = responseArray[1];
-        String[] args = secondLine.split(" ");
+        String[] args = response.split("\r\n")[1].split(" ");
         if (args.length == 3) {
-        	return new PeerInfo(secondLine);
+        	return new PeerInfo(response);
         }else {
         	return new NullPeerInfo();
         }
@@ -27,6 +25,7 @@ public class Stabilize implements Runnable {
     
     @Override
     public void run() {
+    	System.out.println("Running Stabilize\n");
         PeerInfo successor = this.chordManager.getSuccessor(0);
         String stabilizeMessage = MessageFactory.getHeader(MessageType.STABILIZE, "1.0", this.chordManager.getPeerInfo().getId());
         String response = Client.sendMessage(successor.getAddr(), successor.getPort(), stabilizeMessage);
