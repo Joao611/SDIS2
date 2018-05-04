@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
+import utils.SingletonThreadPoolExecutor;
 
 import chord.ChordManager;
 
@@ -19,7 +20,6 @@ public class Server implements Runnable {
 	private ArrayList<String> cipher_list;
 	private int port_number;
 	private ChordManager chordManager;
-	private ThreadPoolExecutor threadPool = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
 	
 	public Server(String[] cipher_suite, int port, ChordManager chordManager) throws Exception {
 		this.chordManager = chordManager;
@@ -69,7 +69,7 @@ public class Server implements Runnable {
 
 			ParseMessageAndSendResponse p = new ParseMessageAndSendResponse(this, chordManager, readData, socket);
 			
-			threadPool.execute(p);	
+			SingletonThreadPoolExecutor.getInstance().get().execute(p);	
 		}
 
 	}
