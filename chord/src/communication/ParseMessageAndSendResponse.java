@@ -83,6 +83,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		case STABILIZE:
 			response = MessageFactory.getFirstLine(MessageType.PREDECESSOR, "1.0", chordManager.getPeerInfo().getId());
 			response = MessageFactory.appendLine(response, chordManager.getPredecessor().asArray());
+			System.err.println(response);
 			break;
 		default:
 			break;

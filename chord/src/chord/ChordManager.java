@@ -90,6 +90,8 @@ public class ChordManager implements Runnable {
 			// TODO: null design pattern
 		}
 		predecessor = new NullPeerInfo();
+		
+		System.err.println(MessageFactory.appendLine(SUCCESSOR_MESSAGE, this.getPeerInfo().asArray()));
 
 	}
 
