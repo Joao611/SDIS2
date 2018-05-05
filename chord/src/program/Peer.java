@@ -27,16 +27,16 @@ import utils.SingletonThreadPoolExecutor;
 import utils.Utils;
 
 public class Peer {
-	
+
 	private ChordManager chordManager;
 	private Server server;
-	
-	
+
+
 	public Peer(ChordManager chordManager, Server server) {
 		this.chordManager = chordManager;
 		this.server = server;
 	}
-	
+
 	public static void main(String[] args) {
 		if(args.length < 1) {
 			System.err.println("Error: Need a port Number");
@@ -54,7 +54,7 @@ public class Peer {
 		}
 
 		Peer peer = new Peer(chordManager,server);
-		
+
 		InetAddress addr = null;
 		port = null;
 
@@ -71,13 +71,13 @@ public class Peer {
 	}
 
 	public void joinNetwork(InetAddress addr, Integer port) {
-		
+
 		if(addr != null) {
 			chordManager.join(addr, port);
 		}
 		SingletonThreadPoolExecutor.getInstance().get().execute(server);
 		SingletonThreadPoolExecutor.getInstance().get().execute(chordManager);
-		
+
 		while(true) {
 			//TODO: recebe pedidos da appTest
 		}
@@ -86,28 +86,25 @@ public class Peer {
 	public ChordManager getChordManager() {
 		return this.chordManager;
 	}
-	
-	public void backup(String fileName, int replicationDegree) {
+
+	public void backup(String fileName, int replicationDegree) throws NoSuchAlgorithmException, IOException {
 		Path filePath = Paths.get(fileName);
 		if(!Files.exists(filePath)) { 
 			System.out.println("Error: File "+fileName+" does not exist: ");
 			return;
 		}
 		Long numberOfChunks = null;
-		String fileID = null;
-		try {
-			numberOfChunks = (Math.floorDiv(Files.size(filePath), Utils.MAX_LENGTH_CHUNK))+1;
-			fileID = this.getFileID(fileName);
-		} catch (NoSuchAlgorithmException | IOException e2) {
-			e2.printStackTrace();
-		}
-		
+		String fileID = this.getFileID(fileName);
+
+		numberOfChunks = (Math.floorDiv(Files.size(filePath), Utils.MAX_LENGTH_CHUNK))+1;
 		
 		int peerID = this.chordManager.getPeerInfo().getId();
+
 		LocalState.getInstance().getBackupFiles().put(fileID, new BackupFile(fileName, peerID, replicationDegree));
 		int chunkNo = 0;
+		
 		while(chunkNo < numberOfChunks) {
-			
+
 			AsynchronousFileChannel channel;
 			try {
 				channel = AsynchronousFileChannel.open(filePath);
@@ -128,21 +125,21 @@ public class Peer {
 					} catch (UnsupportedEncodingException | InterruptedException e) {
 						e.printStackTrace();
 					} 
-					
+
 				}
-	
+
 				@Override
 				public void failed(Throwable arg0, ByteBuffer arg1) {
 					System.err.println("Error: Could not read!");
-					
+
 				}
-				
+
 			};
 			//channel.read(body, Utils.MAX_LENGTH_CHUNK*chunkNo, body, reader);
 			chunkNo++;
 		}
 	}
-	
+
 	/**
 	 * Generate a file ID
 	 * @param filename - the filename
@@ -156,7 +153,7 @@ public class Peer {
 		byte[] hash = digest.digest((filename + attr.lastModifiedTime()).getBytes(StandardCharsets.UTF_8));
 		return DatatypeConverter.printHexBinary(hash);
 	}
-	
+
 	/**
 	 * @param chunkNo
 	 * @param replicationDegree
@@ -168,14 +165,16 @@ public class Peer {
 	 * @throws UnsupportedEncodingException
 	 */
 	public void backupChunk(int chunkNo, int replicationDegree, byte[] bodyOfTheChunk, String fileID, String fileName) throws InterruptedException, UnsupportedEncodingException {
-		
+
 		int peerID = this.chordManager.getPeerInfo().getId();
+
+		//guardar chunk com replication degree a -1. assim quando o backup for feito e ele receber uma resposta com o replication degree atual do chunk, atualiza da hashmap
+		//		LocalState.getInstance().saveChunk(fileID, fileName, peerID, replicationDegree, chunk);
+		//		LocalState.getInstance().decreaseReplicationDegree(fileID, chunk.getID(), peerID, peerID);
 		
-//		LocalState.getInstance().saveChunk(fileID, fileName, peerID, replicationDegree, chunk);
-//		LocalState.getInstance().decreaseReplicationDegree(fileID, chunk.getID(), peerID, peerID);
-		double version = 1.1;
-		
-		SendPutChunk subprotocol = new SendPutChunk(version, peerID, fileID, fileName, chunkNo, replicationDegree, bodyOfTheChunk);
+
+		//enviar a mensagem de PUTCHUNK
+		SendPutChunk subprotocol = new SendPutChunk(peerID, fileID, fileName, chunkNo, replicationDegree, bodyOfTheChunk);
 		SingletonThreadPoolExecutor.getInstance().get().submit(subprotocol);
 		return;
 	}

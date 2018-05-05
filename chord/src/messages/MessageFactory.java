@@ -1,6 +1,9 @@
 package messages;
 
+import java.io.UnsupportedEncodingException;
+
 import chord.PeerInfo;
+import utils.Utils;
 
 public class MessageFactory {
 
@@ -22,6 +25,11 @@ public class MessageFactory {
 		message += END_HEADER;
 		return message;
 	}
+	public static String appendBody(String message, byte [] body) throws UnsupportedEncodingException {
+		String bodyStr = new String(body, Utils.ENCODING_TYPE);
+		message += bodyStr;
+		return message;
+	}
 	public static String getLookup(short senderId, short lookupKey) {
 		String msg = getFirstLine(MessageType.LOOKUP,"1.0",senderId);
 		return appendLine(msg, new String[] {""+lookupKey});
@@ -37,5 +45,15 @@ public class MessageFactory {
 	public static String getAsk(short senderId, PeerInfo peer) {
 		String msg = getFirstLine(MessageType.ASK,"1.0",senderId);
 		return appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort()});
+	}
+	public static String getPutChunk(short senderId, PeerInfo peer, String fileID, int chunkNo, int replicationDeg, byte[] body) {
+		String msg = getFirstLine(MessageType.PUTCHUNK,"1.0",senderId);
+		String msg2 = appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort(), fileID, chunkNo, replicationDeg});
+		try {
+			return appendBody(msg2, body);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

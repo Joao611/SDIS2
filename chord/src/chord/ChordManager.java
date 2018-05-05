@@ -29,34 +29,10 @@ public class ChordManager implements Runnable {
 	private PeerInfo peerInfo;
 	private ArrayList<PeerInfo> fingerTable = new ArrayList<PeerInfo>();
 	private AbstractPeerInfo predecessor;
-	
+
 	private String ASK_MESSAGE;
 	private String SUCCESSOR_MESSAGE;
 	private String LOOKUP_MESSAGE;
-
-	public void join(InetAddress addr, int port) {
-		System.out.println("JOIN");
-		String lookupMessage = MessageFactory.getFirstLine(MessageType.LOOKUP, "1.0",getPeerInfo().getId());
-		lookupMessage = MessageFactory.appendLine(lookupMessage, new String[]{""+getPeerInfo().getId()});
-		String response = Client.sendMessage(addr, port, lookupMessage);
-		response = response.trim();
-
-		PeerInfo nextPeer = new PeerInfo(response);
-
-		while (response.startsWith("Ask")) {
-			System.out.println("\t" + response);
-			response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), lookupMessage);
-			if (response == null) {
-				System.err.println("Could not join the network");
-				return;
-			}
-			response = response.trim();
-			nextPeer = new PeerInfo(response);
-		}
-		this.getFingerTable().set(0, nextPeer);
-		System.out.println("Joined");
-
-	}
 
 	public ChordManager(Integer port) {
 
@@ -89,7 +65,7 @@ public class ChordManager implements Runnable {
 			// TODO: null design pattern
 		}
 		predecessor = new NullPeerInfo();
-		
+
 		System.err.println(MessageFactory.appendLine(SUCCESSOR_MESSAGE, this.getPeerInfo().asArray()));
 
 	}
@@ -103,6 +79,30 @@ public class ChordManager implements Runnable {
 
 		Stabilize stabilizeThread = new Stabilize(this);
 		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(stabilizeThread, 0, 10000, TimeUnit.MILLISECONDS);
+
+	}
+
+	public void join(InetAddress addr, int port) {
+		System.out.println("JOIN");
+		String lookupMessage = MessageFactory.getFirstLine(MessageType.LOOKUP, "1.0",getPeerInfo().getId());
+		lookupMessage = MessageFactory.appendLine(lookupMessage, new String[]{""+getPeerInfo().getId()});
+		String response = Client.sendMessage(addr, port, lookupMessage);
+		response = response.trim();
+
+		PeerInfo nextPeer = new PeerInfo(response);
+
+		while (response.startsWith("Ask")) {
+			System.out.println("\t" + response);
+			response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), lookupMessage);
+			if (response == null) {
+				System.err.println("Could not join the network");
+				return;
+			}
+			response = response.trim();
+			nextPeer = new PeerInfo(response);
+		}
+		this.getFingerTable().set(0, nextPeer);
+		System.out.println("Joined");
 
 	}
 
@@ -138,7 +138,7 @@ public class ChordManager implements Runnable {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Notify newly found closer successor node that this node is now its predecessor.
 	 * @param newSuccessorId Closer successor than previous successor.
@@ -154,6 +154,49 @@ public class ChordManager implements Runnable {
 				System.err.println("ChordManager notify(): Error on NOTIFY message reply: " + response);
 			}
 		}
+	}
+
+	public PeerInfo getChunkOwner(short key) {
+
+		if (Utils.inBetween(this.predecessor.getId(), this.getPeerInfo().getId(), key)) {
+			return this.peerInfo;
+		}
+		if (Utils.inBetween(this.getPeerInfo().getId(), this.getFingerTable().get(0).getId(), key)) {
+			return this.getFingerTable().get(0);
+		}
+		
+		InetAddress addr = null;
+		int port = -1;
+		
+		for (int i = getM() - 1; i > 0; i--) {
+			if (Utils.inBetween(this.getPeerInfo().getId(), key, this.getFingerTable().get(i).getId())) {
+				addr = this.getFingerTable().get(i).getAddr();
+				port = this.getFingerTable().get(i).getPort();
+			}
+		}
+		if(port == -1) {
+			addr = this.getFingerTable().get(getM() - 1).getAddr();
+			port = this.getFingerTable().get(getM() - 1).getPort();
+		}
+
+		String lookupMessage = MessageFactory.getLookup(this.peerInfo.getId(), key);
+		String response = Client.sendMessage(addr, port, lookupMessage);
+		response = response.trim();
+
+		PeerInfo owner = new PeerInfo(response);
+
+		while (response.startsWith("Ask")) {
+			System.out.println("\t" + response);
+			response = Client.sendMessage(owner.getAddr(), owner.getPort(), lookupMessage);
+			if (response == null) {
+				System.err.println("Could not join the network");
+				return null;
+			}
+			response = response.trim();
+			owner = new PeerInfo(response);
+		}
+
+		return owner;
 	}
 
 	/**
