@@ -13,7 +13,7 @@ public class Client {
 	private static ArrayList<String> cipher = new ArrayList<String>(Arrays.asList("TLS_DHE_RSA_WITH_AES_128_CBC_SHA"));
 
 	
-	public static String sendMessage(InetAddress addr, int port, String message) {
+	public static String sendMessage(InetAddress addr, int port, String message, boolean waitForResponse) {
 
 		SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
@@ -32,7 +32,10 @@ public class Client {
 
 		send(message, socket);
 
-		return getResponse(socket);
+		if(waitForResponse) {
+			return getResponse(socket);//fica bloqueado a espera de resposta
+		}
+		return null;
 	}
 
 	/**

@@ -86,14 +86,14 @@ public class ChordManager implements Runnable {
 		System.out.println("JOIN");
 		String lookupMessage = MessageFactory.getFirstLine(MessageType.LOOKUP, "1.0",getPeerInfo().getId());
 		lookupMessage = MessageFactory.appendLine(lookupMessage, new String[]{""+getPeerInfo().getId()});
-		String response = Client.sendMessage(addr, port, lookupMessage);
+		String response = Client.sendMessage(addr, port, lookupMessage, true);
 		response = response.trim();
 
 		PeerInfo nextPeer = new PeerInfo(response);
 
 		while (response.startsWith("Ask")) {
 			System.out.println("\t" + response);
-			response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), lookupMessage);
+			response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), lookupMessage, true);
 			if (response == null) {
 				System.err.println("Could not join the network");
 				return;
@@ -147,7 +147,7 @@ public class ChordManager implements Runnable {
 		if (predecessor.isNull() || Utils.inBetween(predecessor.getId(), this.getPeerInfo().getId(), newSuccessor.getId())) {
 			String message = MessageFactory.getFirstLine(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
 			message = MessageFactory.appendLine(message, new String[] {"" + this.getPeerInfo().getPort()});
-			String response = Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message).trim();
+			String response = Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message, true).trim();
 			String expectedResponse = MessageFactory.getHeader(MessageType.OK, "1.0", newSuccessor.getId()).trim();
 			if (!expectedResponse.equals(response)) {
 				System.err.println("Expected: " + expectedResponse);
@@ -180,14 +180,14 @@ public class ChordManager implements Runnable {
 		}
 
 		String lookupMessage = MessageFactory.getLookup(this.peerInfo.getId(), key);
-		String response = Client.sendMessage(addr, port, lookupMessage);
+		String response = Client.sendMessage(addr, port, lookupMessage, true);
 		response = response.trim();
 
 		PeerInfo owner = new PeerInfo(response);
 
 		while (response.startsWith("Ask")) {
 			System.out.println("\t" + response);
-			response = Client.sendMessage(owner.getAddr(), owner.getPort(), lookupMessage);
+			response = Client.sendMessage(owner.getAddr(), owner.getPort(), lookupMessage, true);
 			if (response == null) {
 				System.err.println("Could not join the network");
 				return null;

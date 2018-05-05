@@ -16,7 +16,7 @@ public class CheckPredecessor implements Runnable {
 			System.out.println("Predecessor not set yet");
 			return;
 		} 
-		String response = Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), "status");
+		String response = Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), "status", true);
 		if (response == null) {
 			System.out.println("Could not establish connection with predecessor");
 			predecessor = new NullPeerInfo();

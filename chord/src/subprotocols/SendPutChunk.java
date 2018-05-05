@@ -34,10 +34,8 @@ public class SendPutChunk implements Runnable {
 	public void run() {
 		PeerInfo owner = chord.getChunkOwner(Short.parseShort(fileID));
 		String putChunkMessage = MessageFactory.getPutChunk(chord.getPeerInfo().getId(), owner, this.fileID, this.chunkNo, this.replicationDeg, this.body);
-		String response = Client.sendMessage(owner.getAddr(), owner.getPort(), putChunkMessage);
-		
-		//recebe uma resposta com o replication degree atual do ficheiro
-		//guardar informacao no LocalState
+		String response = Client.sendMessage(owner.getAddr(), owner.getPort(), putChunkMessage, false);
+
 	}
 	
 }
