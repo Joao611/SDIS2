@@ -360,6 +360,11 @@ public class LocalState {
 	public boolean isReplicationDegreeZero(String fileName) {
 		return this.backupFiles.get(fileName).isReplicationDegreeZero();
 	}
+
+	public boolean amIResponsavel(String fileID) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 //	public boolean isStoringChunk(String fileID, int chunkID) {
 //		return backupFiles.get(fileID).isStoringChunk(chunkID);

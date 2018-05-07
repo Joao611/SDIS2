@@ -14,6 +14,8 @@ import chord.PeerInfo;
 import messages.MessageFactory;
 import messages.MessageType;
 import program.Peer;
+import state_info.BackupFile;
+import state_info.LocalState;
 import utils.UnsignedByte;
 import utils.Utils;
 
@@ -87,7 +89,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			System.err.println(response);
 			break;
 		case STORED: {
-			response = parseStoredMsg(lines);
+			response = parseStoredMsg(secondLine);
 			break;
 		}
 		default:
@@ -97,7 +99,20 @@ public class ParseMessageAndSendResponse implements Runnable {
 	}
 
 	private String parseStoredMsg(String[] lines) {
-		// TODO Auto-generated method stub
+		String fileID = lines[0];
+		Integer chunkNo = Integer.valueOf(lines[1]);
+		Integer repDegree = Integer.valueOf(lines[2]);
+		
+		BackupFile b = LocalState.getInstance().getBackupFiles().get(fileID);
+		if(b != null) {
+			repDegree++;
+		}
+		if(LocalState.getInstance().amIResponsavel(fileID)) {
+//			TODO: end cyclo
+		} else {
+			String message = MessageFactory.getStored(chordManager.getPeerInfo().getId(), fileID, chunkNo, repDegree);
+			Client.sendMessage(chordManager.getPredecessor().getAddr(),chordManager.getPredecessor().getPort(), message, false);
+		}
 		return null;
 	}
 
