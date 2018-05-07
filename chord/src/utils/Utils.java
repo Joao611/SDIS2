@@ -1,6 +1,9 @@
 package utils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Random;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
@@ -57,6 +60,10 @@ public class Utils {
 		logger.info(message);
 	}
 	
+	public static String readFile(String filepath) throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(filepath));
+		return new String(encoded, StandardCharsets.UTF_8);
+	}
 	
 }
 

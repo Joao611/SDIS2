@@ -1,5 +1,8 @@
-/communication/
 /chord/
-/subprotocols/
+/communication/
+/messages/
 /program/
 /utils/
+/database/
+/state_info/
+/subprotocols/
