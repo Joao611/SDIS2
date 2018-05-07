@@ -88,6 +88,7 @@ public class Peer {
 	}
 
 	public void backup(String fileName, int replicationDegree) throws NoSuchAlgorithmException, IOException {
+		
 		Path filePath = Paths.get(fileName);
 		if(!Files.exists(filePath)) { 
 			Utils.log("Error: File "+fileName+" does not exist: ");
@@ -102,14 +103,13 @@ public class Peer {
 
 		LocalState.getInstance().getBackupFiles().put(fileID, new BackupFile(fileName, peerID, replicationDegree));
 		int chunkNo = 0;
-		
 		while(chunkNo < numberOfChunks) {
-
 			AsynchronousFileChannel channel;
 			try {
 				channel = AsynchronousFileChannel.open(filePath);
 			} catch (IOException e1) {
 				e1.printStackTrace();
+				return;
 			}
 			ByteBuffer body = ByteBuffer.allocate(Utils.MAX_LENGTH_CHUNK);
 			int numberOfChunk = chunkNo;
@@ -120,6 +120,8 @@ public class Peer {
 					byte[] data = new byte[buffer.limit()];
 					buffer.get(data);
 					buffer.clear();
+					System.out.println("Chegei Aqui");
+					
 					try {
 						backupChunk(numberOfChunk, replicationDegree, data, fileID, fileName);
 					} catch (UnsupportedEncodingException | InterruptedException e) {
@@ -135,7 +137,7 @@ public class Peer {
 				}
 
 			};
-			//channel.read(body, Utils.MAX_LENGTH_CHUNK*chunkNo, body, reader);
+			channel.read(body, Utils.MAX_LENGTH_CHUNK*chunkNo, body, reader);
 			chunkNo++;
 		}
 	}
@@ -173,6 +175,7 @@ public class Peer {
 		//		LocalState.getInstance().decreaseReplicationDegree(fileID, chunk.getID(), peerID, peerID);
 		
 
+		System.out.println("Chegei Aqui");
 		//enviar a mensagem de PUTCHUNK
 		SendPutChunk subprotocol = new SendPutChunk(peerID, fileID, fileName, chunkNo, replicationDegree, bodyOfTheChunk);
 		SingletonThreadPoolExecutor.getInstance().get().submit(subprotocol);
