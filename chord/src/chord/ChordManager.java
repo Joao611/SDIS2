@@ -83,7 +83,7 @@ public class ChordManager implements Runnable {
 	}
 
 	public void join(InetAddress addr, int port) {
-		System.out.println("JOIN");
+		Utils.log("JOIN");
 		String lookupMessage = MessageFactory.getFirstLine(MessageType.LOOKUP, "1.0",getPeerInfo().getId());
 		lookupMessage = MessageFactory.appendLine(lookupMessage, new String[]{""+getPeerInfo().getId()});
 		String response = Client.sendMessage(addr, port, lookupMessage, true);
@@ -92,7 +92,7 @@ public class ChordManager implements Runnable {
 		PeerInfo nextPeer = new PeerInfo(response);
 
 		while (response.startsWith("Ask")) {
-			System.out.println("\t" + response);
+			Utils.log("\t" + response);
 			response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), lookupMessage, true);
 			if (response == null) {
 				System.err.println("Could not join the network");
@@ -102,7 +102,7 @@ public class ChordManager implements Runnable {
 			nextPeer = new PeerInfo(response);
 		}
 		this.getFingerTable().set(0, nextPeer);
-		System.out.println("Joined");
+		Utils.log("Joined");
 
 	}
 
@@ -186,7 +186,7 @@ public class ChordManager implements Runnable {
 		PeerInfo owner = new PeerInfo(response);
 
 		while (response.startsWith("Ask")) {
-			System.out.println("\t" + response);
+			Utils.log("\t" + response);
 			response = Client.sendMessage(owner.getAddr(), owner.getPort(), lookupMessage, true);
 			if (response == null) {
 				System.err.println("Could not join the network");

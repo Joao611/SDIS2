@@ -1,6 +1,7 @@
 package chord;
 
 import communication.Client;
+import utils.Utils;
 
 public class CheckPredecessor implements Runnable {
 
@@ -13,12 +14,12 @@ public class CheckPredecessor implements Runnable {
 	@Override
 	public void run() {
 		if (predecessor.isNull()) {
-			System.out.println("Predecessor not set yet");
+			Utils.log("Predecessor not set yet");
 			return;
 		} 
 		String response = Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), "status", true);
 		if (response == null) {
-			System.out.println("Could not establish connection with predecessor");
+			Utils.log("Could not establish connection with predecessor");
 			predecessor = new NullPeerInfo();
 		}
 	}

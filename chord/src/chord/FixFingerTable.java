@@ -7,6 +7,7 @@ import communication.Client;
 import messages.MessageFactory;
 import messages.MessageType;
 import utils.UnsignedByte;
+import utils.Utils;
 
 /**
  * @author anabela
@@ -20,14 +21,14 @@ public class FixFingerTable implements Runnable {
 	 */
 	@Override
 	public void run() {
-		System.out.println("Running fix finger table\n");
+		Utils.log("Running fix finger table\n");
 		fix_fingerTable();
 		printFingerTable();
 	}
 
 	private void printFingerTable() {
-		System.out.println("Tabela de dedos: "+chord.getPeerInfo().getId());
-			chord.getFingerTable().forEach((v) -> { System.out.println("\t"+v.getId()); } );
+		Utils.log("Tabela de dedos: "+chord.getPeerInfo().getId());
+			chord.getFingerTable().forEach((v) -> { Utils.log("\t"+v.getId()); } );
 	}
 
 	public void fix_fingerTable() {

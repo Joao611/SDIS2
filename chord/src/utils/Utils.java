@@ -33,4 +33,8 @@ public class Utils {
 		return ((inf < value) && (value <= sup));
 		
 	}
+	
+	public static void log(String message) {
+		
+	}
 }

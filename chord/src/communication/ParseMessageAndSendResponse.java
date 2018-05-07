@@ -52,7 +52,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 	 */
 	String parseMessage(byte[] readData) {
 		String request = new String(readData);
-		System.out.println("SSLServer: " + request);
+		Utils.log("SSLServer: " + request);
 
 		request = request.trim();
 		String[] lines = request.split("\r\n");

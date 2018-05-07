@@ -3,6 +3,7 @@ package chord;
 import communication.Client;
 import messages.MessageFactory;
 import messages.MessageType;
+import utils.Utils;
 
 public class Stabilize implements Runnable {
     private ChordManager chordManager;
@@ -25,7 +26,7 @@ public class Stabilize implements Runnable {
     
     @Override
     public void run() {
-    	System.out.println("Running Stabilize\n");
+    	Utils.log("Running Stabilize\n");
         PeerInfo successor = this.chordManager.getSuccessor(0);
         String stabilizeMessage = MessageFactory.getHeader(MessageType.STABILIZE, "1.0", this.chordManager.getPeerInfo().getId());
         String response = Client.sendMessage(successor.getAddr(), successor.getPort(), stabilizeMessage, true);
@@ -35,7 +36,7 @@ public class Stabilize implements Runnable {
         	this.chordManager.notify(successor);
         } else {
         	if (this.chordManager.stabilize((PeerInfo)predecessor)) {
-                System.out.println("Successor updated");
+        		Utils.log("Successor updated");
                 this.chordManager.notify((PeerInfo)predecessor);
             }
         }

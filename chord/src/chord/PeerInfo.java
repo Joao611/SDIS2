@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import utils.UnsignedByte;
+import utils.Utils;
 
 /**
  * @author anabela
@@ -25,11 +26,11 @@ public class PeerInfo extends AbstractPeerInfo {
 	}
 
 	public PeerInfo(String str) {
-		System.out.println(str);
+		Utils.log(str);
 		String[] attr = str.split("\r\n");
 
-		System.out.println("----");
-		System.out.println(attr[1]);
+		Utils.log("----");
+		Utils.log(attr[1]);
 		attr = attr[1].split(" ");
 		this.id = new UnsignedByte(Short.valueOf(attr[0]));
 

@@ -90,7 +90,7 @@ public class Peer {
 	public void backup(String fileName, int replicationDegree) throws NoSuchAlgorithmException, IOException {
 		Path filePath = Paths.get(fileName);
 		if(!Files.exists(filePath)) { 
-			System.out.println("Error: File "+fileName+" does not exist: ");
+			Utils.log("Error: File "+fileName+" does not exist: ");
 			return;
 		}
 		Long numberOfChunks = null;
