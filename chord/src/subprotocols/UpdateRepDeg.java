@@ -1,6 +1,7 @@
 package subprotocols;
 
-import sateInfo.LocalState;
+import program.Peer;
+import state_info.LocalState;
 
 public class UpdateRepDeg implements Runnable {
 	private int senderID;

@@ -1,6 +1,7 @@
 package subprotocols;
 
-import sateInfo.LocalState;
+import program.Peer;
+import state_info.LocalState;
 
 public class IterativeDelete implements Runnable {
 	private int senderID;

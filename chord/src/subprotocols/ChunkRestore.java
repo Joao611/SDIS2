@@ -11,12 +11,8 @@ import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.file.Path;
 
-import initiator.Peer;
-import message.ChannelMDR;
-import message.Parser;
-import sateInfo.Chunk;
-import sateInfo.LocalState;
-import server.Utils;
+import program.Peer;
+import state_info.LocalState;
 
 public class ChunkRestore implements Runnable {
 

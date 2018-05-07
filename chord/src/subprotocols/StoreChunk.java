@@ -14,10 +14,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 
-import initiator.Peer;
-import message.Parser;
-import sateInfo.LocalState;
-import server.Utils;
+import program.Peer;
+import state_info.LocalState;
 
 public class StoreChunk implements Runnable {
 	private Parser parser;

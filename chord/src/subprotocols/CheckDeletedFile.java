@@ -2,8 +2,8 @@ package subprotocols;
 
 import java.io.UnsupportedEncodingException;
 
-import initiator.Peer;
-import sateInfo.LocalState;
+import program.Peer;
+import state_info.LocalState;
 
 public class CheckDeletedFile implements Runnable {
 

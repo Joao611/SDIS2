@@ -3,11 +3,8 @@ package subprotocols;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import initiator.Peer;
-import message.SingletonThreadPoolExecutor;
-import sateInfo.BackupFile;
-import sateInfo.Chunk;
-import sateInfo.LocalState;
+import program.Peer;
+import state_info.LocalState;
 
 public class SaveChunkInfo implements Runnable {
 	

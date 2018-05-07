@@ -1,11 +1,8 @@
 package subprotocols;
 
 import java.io.UnsupportedEncodingException;
-import initiator.Peer;
-import message.ChannelMC;
-import message.Parser;
-import sateInfo.LocalState;
-import server.Utils;
+import program.Peer;
+import state_info.LocalState;
 
 public class Deletion implements Runnable {
 	public String fileID = null;

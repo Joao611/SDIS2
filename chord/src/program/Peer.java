@@ -79,7 +79,17 @@ public class Peer {
 		SingletonThreadPoolExecutor.getInstance().get().execute(chordManager);
 
 		while(true) {
-			//TODO: recebe pedidos da appTest
+			System.out.println("Choose an option: ");
+			System.out.println("\t1. Backup");
+			System.out.println("\t2. Restore");
+			System.out.println("\t3. Delete");
+			try {
+				System.in.read();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			}
 		}
 	}
 

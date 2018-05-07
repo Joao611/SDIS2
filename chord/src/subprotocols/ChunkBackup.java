@@ -9,12 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import initiator.Peer;
-import message.*;
-import sateInfo.BackupFile;
-import sateInfo.Chunk;
-import sateInfo.LocalState;
-import server.Utils;
+import program.Peer;
+import state_info.LocalState;
 
 public class ChunkBackup implements Runnable {	
 

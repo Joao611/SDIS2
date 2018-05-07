@@ -7,11 +7,8 @@ import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.file.Paths;
 
-import initiator.Peer;
-import message.Parser;
-import sateInfo.Chunk;
-import sateInfo.LocalState;
-import server.Utils;
+import program.Peer;
+import state_info.LocalState;
 
 public class Reclaiming implements Runnable{
 	public double version = 0.0;
