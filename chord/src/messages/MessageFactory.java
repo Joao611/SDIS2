@@ -56,4 +56,10 @@ public class MessageFactory {
 			return null;
 		}
 	}
+	public static String getStored(short senderId, PeerInfo peer, String fileID, int chunkNo, int replicationDeg) {
+		String msg = getFirstLine(MessageType.STORED,"1.0",senderId);
+		String msg2 = appendLine(msg, new Object[] {fileID, chunkNo, replicationDeg});
+		return msg2;
+		
+	}
 }

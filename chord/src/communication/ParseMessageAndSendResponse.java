@@ -69,7 +69,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			if (secondLine != null) {
 				response = chordManager.lookup(new UnsignedByte(Short.valueOf((secondLine[0]))));
 			}else {
-				System.err.println("Invalid lookup message");
+				Utils.LOGGER.info("Invalid lookup message");
 			}
 			break;
 		case PING:
@@ -86,11 +86,21 @@ public class ParseMessageAndSendResponse implements Runnable {
 			response = MessageFactory.appendLine(response, chordManager.getPredecessor().asArray());
 			System.err.println(response);
 			break;
+		case STORED: {
+			response = parseStoredMsg(lines);
+			break;
+		}
 		default:
 			break;
 		}
 		return response;
 	}
+
+	private String parseStoredMsg(String[] lines) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 	private PeerInfo parseNotifyMsg(String[] firstLine, String[] secondLine) {
 		UnsignedByte id = new UnsignedByte(Short.parseShort(firstLine[2]));

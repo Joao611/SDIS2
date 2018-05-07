@@ -15,7 +15,7 @@ public class Utils {
 	public static final int MAX_LENGTH_CHUNK = 64000;
 	public static final int BYTE_TO_KBYTE = 1000;
 	
-	static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	public static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	
 	static {
 		LOGGER.setUseParentHandlers(false);
