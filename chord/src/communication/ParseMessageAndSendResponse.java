@@ -14,7 +14,10 @@ import chord.PeerInfo;
 import messages.MessageFactory;
 import messages.MessageType;
 import program.Peer;
+import state_info.BackupFile;
+import state_info.LocalState;
 import utils.UnsignedByte;
+import utils.Utils;
 
 /**
  * @author anabela
@@ -68,7 +71,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			if (secondLine != null) {
 				response = chordManager.lookup(new UnsignedByte(Short.valueOf((secondLine[0]))));
 			}else {
-				System.err.println("Invalid lookup message");
+				Utils.LOGGER.info("Invalid lookup message");
 			}
 			break;
 		case PING:
@@ -85,11 +88,34 @@ public class ParseMessageAndSendResponse implements Runnable {
 			response = MessageFactory.appendLine(response, chordManager.getPredecessor().asArray());
 			System.err.println(response);
 			break;
+		case STORED: {
+			response = parseStoredMsg(secondLine);
+			break;
+		}
 		default:
 			break;
 		}
 		return response;
 	}
+
+	private String parseStoredMsg(String[] lines) {
+		String fileID = lines[0];
+		Integer chunkNo = Integer.valueOf(lines[1]);
+		Integer repDegree = Integer.valueOf(lines[2]);
+		
+		BackupFile b = LocalState.getInstance().getBackupFiles().get(fileID);
+		if(b != null) {
+			repDegree++;
+		}
+		if(LocalState.getInstance().amIResponsavel(fileID)) {
+//			TODO: end cyclo
+		} else {
+			String message = MessageFactory.getStored(chordManager.getPeerInfo().getId(), fileID, chunkNo, repDegree);
+			Client.sendMessage(chordManager.getPredecessor().getAddr(),chordManager.getPredecessor().getPort(), message, false);
+		}
+		return null;
+	}
+
 
 	private PeerInfo parseNotifyMsg(String[] firstLine, String[] secondLine) {
 		UnsignedByte id = new UnsignedByte(Short.parseShort(firstLine[2]));

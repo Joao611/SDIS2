@@ -10,7 +10,8 @@ public enum MessageType {
 	LOOKUP("LOOKUP"),
 	PREDECESSOR("PREDECESSOR"),
 	STABILIZE("STABILIZE"),
-	SUCCESSOR("SUCCESSOR");
+	SUCCESSOR("SUCCESSOR"),
+	STORED("STORED");
 	
 	
 	private String type;

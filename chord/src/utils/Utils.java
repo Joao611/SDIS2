@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Random;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import chord.ChordManager;
 
@@ -17,13 +18,14 @@ public class Utils {
 	public static final int MAX_LENGTH_CHUNK = 64000;
 	public static final int BYTE_TO_KBYTE = 1000;
 	
-	static Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	public static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 	
 	static {
-		logger.setUseParentHandlers(false);
+		LOGGER.setUseParentHandlers(false);
 		try {
-
-			logger.addHandler(new FileHandler("AnabelaSilvaLOG.txt", true));
+			FileHandler h = new FileHandler("AnabelaSilvaLOG.txt", true);
+			h.setFormatter(new SimpleFormatter());
+			LOGGER.addHandler(h);
 		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -57,7 +59,7 @@ public class Utils {
 	}
 	
 	public static void log(String message) {
-		logger.info(message);
+		LOGGER.info(message);
 	}
 	
 	public static String readFile(String filepath) throws IOException {
@@ -66,25 +68,3 @@ public class Utils {
 	}
 	
 }
-
-  
-//FileHandler fh;  
-//
-//try {  
-//
-//    // This block configure the logger with handler and formatter  
-//    fh = new FileHandler("C:/temp/test/MyLogFile.log");  
-//    logger.addHandler(fh);
-//    SimpleFormatter formatter = new SimpleFormatter();  
-//    fh.setFormatter(formatter);  
-//
-//    // the following statement is used to log any messages  
-//    logger.info("My first log");  
-//
-//} catch (SecurityException e) {  
-//    e.printStackTrace();  
-//} catch (IOException e) {  
-//    e.printStackTrace();  
-//}  
-
-//logger.info("Hi How r u?"); 
