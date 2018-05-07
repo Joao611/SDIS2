@@ -36,6 +36,10 @@ public class Database {
 			}  	
 	}
      
+    public Connection getConnection() {
+    	return conn;
+    }
+     
     public void closeConnection() {
     	if (driver.equals("org.apache.derby.jdbc.EmbeddedDriver")) {
             boolean gotSQLExc = false;

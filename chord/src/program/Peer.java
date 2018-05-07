@@ -19,6 +19,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import chord.ChordManager;
 import communication.Server;
+import database.Database;
 import state_info.Chunk;
 import state_info.BackupFile;
 import state_info.LocalState;
@@ -31,11 +32,13 @@ public class Peer {
 
 	private ChordManager chordManager;
 	private Server server;
+	private Database database;
 
 
-	public Peer(ChordManager chordManager, Server server) {
+	public Peer(ChordManager chordManager, Server server, Database database) {
 		this.chordManager = chordManager;
 		this.server = server;
+		this.database = database;
 	}
 
 	public static void main(String[] args) {
@@ -53,8 +56,9 @@ public class Peer {
 			e1.printStackTrace();
 			return;
 		}
+		Database database = new Database();
 
-		Peer peer = new Peer(chordManager,server);
+		Peer peer = new Peer(chordManager,server, database);
 
 		InetAddress addr = null;
 		port = null;
