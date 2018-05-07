@@ -21,14 +21,31 @@ public class Database {
      
      public Database(){
     	 connect();
-    	 loadDB();
+    	 if (!checkDBExisted()) {
+    		 loadDB();
+    	 }
+    	 
      }
-
+     private boolean checkDBExisted() {
+		try {
+			
+			DatabaseMetaData metadata = conn.getMetaData();
+	    	ResultSet tables = metadata.getTables(conn.getCatalog(), null, "FILESSTORED", null);
+	    	boolean tableExists = tables.next();
+	    	Utils.log("DB existed: " + tableExists);
+	    	return tableExists;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+    	 
+     }
      
      public void connect() {
     		 try {
 				conn = DriverManager.getConnection(connectionURL);
-				System.out.println("Connected to database " + dbName);
+				Utils.log("Connected to database " + dbName);
 				
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -51,9 +68,9 @@ public class Database {
                }
             }
             if (!gotSQLExc) {
-            	  System.out.println("Database did not shut down normally");
+            	  Utils.log("Database did not shut down normally");
             }  else  {
-               System.out.println("Database shut down normally");	
+               Utils.log("Database shut down normally");	
             }  
          }
     }
@@ -71,9 +88,14 @@ public class Database {
     private void runScript(String sql) {
     	try {
 			Statement stmt = conn.createStatement();
-			stmt.execute(sql);
+			String[] stmtList = sql.split(";");
+			for (int i = 0; i < stmtList.length; i++) {
+				String currentStmt = stmtList[i].trim();
+				if (!currentStmt.isEmpty()) {
+					stmt.execute(stmtList[i].trim());	
+				}
+			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
     }
