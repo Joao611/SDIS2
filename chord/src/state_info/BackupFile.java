@@ -16,6 +16,8 @@ public class BackupFile {
 	private Map<Integer,Chunk> chunks = new ConcurrentHashMap<Integer, Chunk>();
 	private boolean wasDeleted = false;
 	
+	private boolean reponsavel = false;
+	
 	/**
 	 * @return the wasDeleted
 	 */
@@ -229,6 +231,20 @@ public class BackupFile {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * @return the reponsavel
+	 */
+	public boolean isReponsavel() {
+		return reponsavel;
+	}
+
+	/**
+	 * @param reponsavel the reponsavel to set
+	 */
+	public void setReponsavel(boolean reponsavel) {
+		this.reponsavel = reponsavel;
 	}
 	
 //	public boolean isStoringChunk(int chunkID) {

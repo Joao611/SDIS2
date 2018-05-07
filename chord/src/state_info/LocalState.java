@@ -363,7 +363,11 @@ public class LocalState {
 
 	public boolean amIResponsavel(String fileID) {
 		// TODO Auto-generated method stub
-		return false;
+		BackupFile f= getBackupFiles().get(fileID);
+		if(f == null) {
+			return false;
+		}
+		return f.isReponsavel();
 	}
 	
 //	public boolean isStoringChunk(String fileID, int chunkID) {
