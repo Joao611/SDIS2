@@ -1,6 +1,5 @@
 package state_info;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
