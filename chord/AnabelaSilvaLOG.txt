@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2018-05-07T13:56:26</date>
+  <millis>1525697786879</millis>
+  <sequence>0</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>10</thread>
+  <message>Running Stabilize
+</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788835</millis>
+  <sequence>1</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>Running fix finger table
+</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788836</millis>
+  <sequence>2</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>SUCCESSOR 1.0 131 
+131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788837</millis>
+  <sequence>3</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>----</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788837</millis>
+  <sequence>4</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788837</millis>
+  <sequence>5</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>SUCCESSOR 1.0 131 
+131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788838</millis>
+  <sequence>6</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>----</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788838</millis>
+  <sequence>7</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788839</millis>
+  <sequence>8</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>SUCCESSOR 1.0 131 
+131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788839</millis>
+  <sequence>9</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>----</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788839</millis>
+  <sequence>10</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788839</millis>
+  <sequence>11</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>SUCCESSOR 1.0 131 
+131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788840</millis>
+  <sequence>12</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>----</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788840</millis>
+  <sequence>13</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788840</millis>
+  <sequence>14</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>SUCCESSOR 1.0 131 
+131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788841</millis>
+  <sequence>15</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>----</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788841</millis>
+  <sequence>16</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788841</millis>
+  <sequence>17</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>SUCCESSOR 1.0 131 
+131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788842</millis>
+  <sequence>18</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>----</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788842</millis>
+  <sequence>19</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788842</millis>
+  <sequence>20</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>SUCCESSOR 1.0 131 
+131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788843</millis>
+  <sequence>21</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>----</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788843</millis>
+  <sequence>22</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788843</millis>
+  <sequence>23</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>SUCCESSOR 1.0 131 
+131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788844</millis>
+  <sequence>24</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>----</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788844</millis>
+  <sequence>25</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>131 127.0.1.1 9000</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788844</millis>
+  <sequence>26</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>Tabela de dedos: 131</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788922</millis>
+  <sequence>27</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>	131</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788922</millis>
+  <sequence>28</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>	131</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788922</millis>
+  <sequence>29</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>	131</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788922</millis>
+  <sequence>30</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>	131</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788923</millis>
+  <sequence>31</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>	131</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788923</millis>
+  <sequence>32</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>	131</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788923</millis>
+  <sequence>33</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>	131</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:28</date>
+  <millis>1525697788923</millis>
+  <sequence>34</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>12</thread>
+  <message>	131</message>
+</record>
+<record>
+  <date>2018-05-07T13:56:30</date>
+  <millis>1525697790831</millis>
+  <sequence>35</sequence>
+  <logger>global</logger>
+  <level>INFO</level>
+  <class>utils.Utils</class>
+  <method>log</method>
+  <thread>11</thread>
+  <message>Predecessor not set yet</message>
+</record>
+</log>
