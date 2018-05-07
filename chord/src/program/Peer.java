@@ -23,6 +23,7 @@ import state_info.Chunk;
 import state_info.BackupFile;
 import state_info.LocalState;
 import subprotocols.SendPutChunk;
+import utils.ReadInput;
 import utils.SingletonThreadPoolExecutor;
 import utils.Utils;
 
@@ -78,19 +79,8 @@ public class Peer {
 		SingletonThreadPoolExecutor.getInstance().get().execute(server);
 		SingletonThreadPoolExecutor.getInstance().get().execute(chordManager);
 
-		while(true) {
-			System.out.println("Choose an option: ");
-			System.out.println("\t1. Backup");
-			System.out.println("\t2. Restore");
-			System.out.println("\t3. Delete");
-			try {
-				System.in.read();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return;
-			}
-		}
+		//cyclo while
+		ReadInput.readInput(this);
 	}
 
 	public ChordManager getChordManager() {
