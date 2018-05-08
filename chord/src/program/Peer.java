@@ -3,12 +3,20 @@ package program;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import javax.xml.bind.DatatypeConverter;
+
 import chord.ChordManager;
 import communication.Server;
 import database.Database;
+import runnableProtocols.SendPutChunk;
 import utils.ReadInput;
 import utils.SingletonThreadPoolExecutor;
 
@@ -81,20 +89,20 @@ public class Peer {
 		return this.chordManager;
 	}
 
-//	/**
-//	 * Generate a file ID
-//	 * @param filename - the filename
-//	 * @return Hexadecimal SHA-256 encoded fileID
-//	 * @throws IOException, NoSuchAlgorithmException
-//	 * */
-//	public String getFileID(String filename) throws IOException, NoSuchAlgorithmException {
-//		Path filePath = Paths.get(filename); //The filename, not FileID
-//		BasicFileAttributes attr = Files.readAttributes(filePath, BasicFileAttributes.class);
-//		MessageDigest digest = MessageDigest.getInstance("SHA-256");
-//		byte[] hash = digest.digest((filename + attr.lastModifiedTime()).getBytes(StandardCharsets.UTF_8));
-//		return DatatypeConverter.printHexBinary(hash);
-//	}
-//	
+	/**
+	 * Generate a file ID
+	 * @param filename - the filename
+	 * @return Hexadecimal SHA-256 encoded fileID
+	 * @throws IOException, NoSuchAlgorithmException
+	 * */
+	public String getFileID(String filename) throws IOException, NoSuchAlgorithmException {
+		Path filePath = Paths.get(filename); //The filename, not FileID
+		BasicFileAttributes attr = Files.readAttributes(filePath, BasicFileAttributes.class);
+		MessageDigest digest = MessageDigest.getInstance("SHA-256");
+		byte[] hash = digest.digest((filename + attr.lastModifiedTime()).getBytes(StandardCharsets.UTF_8));
+		return DatatypeConverter.printHexBinary(hash);
+	}
+	
 	/**
 	 * @return the p
 	 */
@@ -135,6 +143,23 @@ public class Peer {
 		//atualizar espaco usado
 		usedStorage += amount;
 		return false;
+	}
+
+	public void backup(String filename, Integer degree, boolean encript) {
+		String fileID;
+		try {
+			fileID = this.getFileID(filename);
+		} catch (NoSuchAlgorithmException | IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		int chunkNo = 0;
+		
+		SendPutChunk th = new SendPutChunk(this.getChordManager().getPeerInfo().getId(),
+				fileID, chunkNo, degree, body, this.getChordManager());
+		SingletonThreadPoolExecutor.getInstance().get().execute(th);
+		
+		
 	}
 
 }
