@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import communication.Client;
+import database.DBUtils;
 import database.Database;
+import database.FileStoredInfo;
 import messages.MessageFactory;
 import messages.MessageType;
 import utils.UnsignedByte;
@@ -58,7 +60,7 @@ public class ChordManager implements Runnable {
 		byte[] hash = digest.digest(("" + addr + port).getBytes(StandardCharsets.ISO_8859_1));
 		UnsignedByte id = new UnsignedByte(ByteBuffer.wrap(hash).getShort());
 		this.setPeerInfo(new PeerInfo(id, addr, port));
-
+		
 		ASK_MESSAGE = MessageFactory.getFirstLine(MessageType.ASK, "1.0", this.getPeerInfo().getId());
 		SUCCESSOR_MESSAGE = MessageFactory.getFirstLine(MessageType.SUCCESSOR, "1.0", this.getPeerInfo().getId());
 

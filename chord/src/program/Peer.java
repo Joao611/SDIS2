@@ -33,17 +33,28 @@ public class Peer {
 
 	private ChordManager chordManager;
 	private Server server;
+<<<<<<< HEAD
 	private Database database;
 	private static Path path;
 	private static int storageCapacity;
 	private static int usedStorage = 0;
+=======
+>>>>>>> branch 'master' of https://github.com/joao611/SDIS2
 
 
+<<<<<<< HEAD
 	public Peer(ChordManager chordManager, Server server, Database database, int storageCapacity) {
+=======
+	public Peer(ChordManager chordManager, Server server) {
+>>>>>>> branch 'master' of https://github.com/joao611/SDIS2
 		this.chordManager = chordManager;
 		this.server = server;
+<<<<<<< HEAD
 		this.database = database;
 		this.storageCapacity = storageCapacity;
+=======
+		this.server.setPeer(this);
+>>>>>>> branch 'master' of https://github.com/joao611/SDIS2
 	}
 
 	public static void main(String[] args) {
@@ -58,14 +69,17 @@ public class Peer {
 		
 		Server server;
 		try {
-			server = new Server(new String[] {"TLS_DHE_RSA_WITH_AES_128_CBC_SHA"}, port, chordManager);
+			server = new Server(new String[] {"TLS_DHE_RSA_WITH_AES_128_CBC_SHA"}, port);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			return;
 		}
-		Database database = new Database();
 
+<<<<<<< HEAD
 		Peer peer = new Peer(chordManager,server, database, Integer.valueOf(args[1]));
+=======
+		Peer peer = new Peer(chordManager,server);
+>>>>>>> branch 'master' of https://github.com/joao611/SDIS2
 
 		InetAddress addr = null;
 		port = null;
@@ -79,7 +93,7 @@ public class Peer {
 			}
 			port = Integer.valueOf(args[3]);
 		}
-		chordManager.setDatabase(database);
+		chordManager.setDatabase(new Database());
 		peer.joinNetwork(addr, port);
 	}
 
