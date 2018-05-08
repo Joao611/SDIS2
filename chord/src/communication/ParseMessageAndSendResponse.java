@@ -16,7 +16,6 @@ import chord.ChordManager;
 import chord.PeerInfo;
 import messages.MessageFactory;
 import messages.MessageType;
-import program.Peer;
 import state_info.BackupFile;
 import state_info.LocalState;
 import utils.UnsignedByte;
@@ -122,6 +121,12 @@ public class ParseMessageAndSendResponse implements Runnable {
 				int peer_which_requested = result.getInt("peer_which_requested");
 				
 				repDegree++; // I am also storing the chunk
+				
+				PreparedStatement p = chordManager.getDatabase().getConnection().prepareStatement("UPDATE filesstored SET actual_rep_degree = ? WHERE id = ?");
+				p.setInt(1, repDegree);
+				p.setString(2, fileID);
+				p.executeUpdate();
+				
 				if(i_am_responsible) {
 					//TODO: send response to requesting peer
 					return null;

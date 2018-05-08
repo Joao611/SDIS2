@@ -3,15 +3,13 @@ package communication;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
-import utils.SingletonThreadPoolExecutor;
 
 import chord.ChordManager;
+import utils.SingletonThreadPoolExecutor;
 
 public class Server implements Runnable {
 
