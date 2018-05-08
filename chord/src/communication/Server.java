@@ -3,15 +3,14 @@ package communication;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
-import utils.SingletonThreadPoolExecutor;
 
 import chord.ChordManager;
+import program.Peer;
+import utils.SingletonThreadPoolExecutor;
 
 public class Server implements Runnable {
 
@@ -19,10 +18,10 @@ public class Server implements Runnable {
 
 	private ArrayList<String> cipher_list;
 	private int port_number;
-	private ChordManager chordManager;
+	private Peer peer = null;
 	
-	public Server(String[] cipher_suite, int port, ChordManager chordManager) throws Exception {
-		this.chordManager = chordManager;
+	public Server(String[] cipher_suite, int port) throws Exception {
+		
 		this.port_number = port;
 
 		setSystemProperties();
@@ -67,7 +66,7 @@ public class Server implements Runnable {
 
 			byte[] readData = readSocket(socket);
 
-			ParseMessageAndSendResponse p = new ParseMessageAndSendResponse(this, chordManager, readData, socket);
+			ParseMessageAndSendResponse p = new ParseMessageAndSendResponse(this, getPeer(), readData, socket);
 			
 			SingletonThreadPoolExecutor.getInstance().get().execute(p);	
 		}
@@ -101,6 +100,20 @@ public class Server implements Runnable {
 			return null;
 		}
 		return readData;
+	}
+
+	/**
+	 * @return the peer
+	 */
+	public Peer getPeer() {
+		return peer;
+	}
+
+	/**
+	 * @param peer the peer to set
+	 */
+	public void setPeer(Peer peer) {
+		this.peer = peer;
 	}
 
 

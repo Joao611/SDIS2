@@ -39,6 +39,7 @@ public class Peer {
 		this.chordManager = chordManager;
 		this.server = server;
 		this.database = database;
+		this.server.setPeer(this);
 	}
 
 	public static void main(String[] args) {
@@ -51,7 +52,7 @@ public class Peer {
 
 		Server server;
 		try {
-			server = new Server(new String[] {"TLS_DHE_RSA_WITH_AES_128_CBC_SHA"}, port, chordManager);
+			server = new Server(new String[] {"TLS_DHE_RSA_WITH_AES_128_CBC_SHA"}, port);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			return;
