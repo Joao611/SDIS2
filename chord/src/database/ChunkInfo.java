@@ -3,9 +3,9 @@ package database;
 public class ChunkInfo {
 
 	private Integer chunkId;
-	private Integer fileId;
+	private String fileId;
 	
-	public ChunkInfo(Integer chunkId, Integer fileId) {
+	public ChunkInfo(Integer chunkId,String fileId) {
 		this.chunkId = chunkId;
 		this.fileId = fileId;
 	}
@@ -14,7 +14,7 @@ public class ChunkInfo {
 		return chunkId;
 	}
 	
-	public Integer getFileId() {
+	public String getFileId() {
 		return fileId;
 	}
 	

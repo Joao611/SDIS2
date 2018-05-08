@@ -192,7 +192,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		PeerInfo peerThatRequestedBackup = new PeerInfo(new UnsignedByte(id),addr,port);
 		DBUtils.insertPeer(dbConnection, peerThatRequestedBackup);
 		FileStoredInfo fileInfo = new FileStoredInfo(id, true);
-		fileInfo.setPeerWhichRequested(peerThatRequestedBackup.getId());
+		fileInfo.setPeerRequesting(peerThatRequestedBackup.getId());
 		DBUtils.insertStoredFile(dbConnection, fileInfo);
 		
 		

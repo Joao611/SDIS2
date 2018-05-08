@@ -1,12 +1,10 @@
 package database;
 
-import java.math.BigInteger;
-
 public class FileStoredInfo {
 
 	private String fileId;
 	private Boolean iAmResponsible;
-	private Short peerWhichRequested;
+	private String peerRequesting;
 	
 	public FileStoredInfo(String fileId, Boolean iAmResponsible){
 		this.fileId = fileId;
@@ -21,12 +19,12 @@ public class FileStoredInfo {
 		return iAmResponsible;
 	}
 
-	public Short getPeerWhichRequested() {
-		return peerWhichRequested;
+	public String getPeerRequesting() {
+		return peerRequesting;
 	}
 
-	public void setPeerWhichRequested(short s) {
-		this.peerWhichRequested = s;
+	public void setPeerRequesting(String peerId) {
+		this.peerRequesting = peerId;
 	}
 
 

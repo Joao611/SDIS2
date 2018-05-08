@@ -19,7 +19,7 @@ public class PeerInfo extends AbstractPeerInfo {
 //	private InetAddress addr;
 //	private Integer port;
 
-	public PeerInfo(UnsignedByte id, InetAddress addr, Integer port) {
+	public PeerInfo(String id, InetAddress addr, Integer port) {
 		this.id = id;
 		this.addr = addr;
 		this.port = port;
@@ -32,7 +32,7 @@ public class PeerInfo extends AbstractPeerInfo {
 		Utils.LOGGER.finest("----");
 		Utils.LOGGER.finest(attr[1]);
 		attr = attr[1].split(" ");
-		this.id = new UnsignedByte(Short.valueOf(attr[0]));
+		this.id = attr[0];
 
 		try {
 			this.addr = InetAddress.getByName(attr[1]);
@@ -83,15 +83,15 @@ public class PeerInfo extends AbstractPeerInfo {
 	/**
 	 * @return the id
 	 */
-	public short getId() {
-		return id.get();
+	public String getId() {
+		return id;
 	}
 
 
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(UnsignedByte id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

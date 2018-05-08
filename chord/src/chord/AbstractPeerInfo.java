@@ -6,7 +6,7 @@ import utils.UnsignedByte;
 
 public abstract class AbstractPeerInfo {
 
-	protected UnsignedByte id;
+	protected String id;
 	protected InetAddress addr;
 	protected Integer port;
 	
@@ -14,6 +14,6 @@ public abstract class AbstractPeerInfo {
 	
 	public abstract InetAddress getAddr();
 	public abstract Integer getPort();
-	public abstract short getId();
+	public abstract String getId();
 	public abstract String[] asArray();
 }

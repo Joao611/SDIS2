@@ -8,24 +8,24 @@ import utils.Utils;
 public class DBUtils {
 	
 	private static final String insertFileStored = "INSERT INTO FILESSTORED "
-			+ "(id, i_am_responsible, peer_requesting) VALUES (?,?,?)";
+			+ "(file_id, i_am_responsible, peer_requesting) VALUES (?,?,?)";
 	private static final String insertPeer = "INSERT INTO PEERS "
-			+ "(id,ip,port) VALUES (?,?,?)";
+			+ "(peer_id,ip,port) VALUES (?,?,?)";
 	private static final String insertChunkStored = "INSERT INTO CHUNKSSTORED "
-			+ "(id,file_id) VALUES (?,?)";
+			+ "(chunk_id,file_id) VALUES (?,?)";
 	private static final String getFileById = "SELECT * FROM FILESSTORED "
 			+ "WHERE id=?";
 
 	public static void insertStoredFile(Connection conn, FileStoredInfo fileInfo) {
-		Short peerRequesting = fileInfo.getPeerWhichRequested();
+		String peerRequesting = fileInfo.getPeerRequesting();
 		try {
 			PreparedStatement p = conn.prepareStatement(insertFileStored);
 			p.setString(1, fileInfo.getFileId());
 			p.setBoolean(2, fileInfo.getiAmResponsible());
 			if (peerRequesting == null) {
-				p.setNull(3, Types.INTEGER);
+				p.setNull(3, Types.VARCHAR);
 			} else {
-				p.setInt(3, peerRequesting);
+				p.setString(3, peerRequesting);
 			}
 			p.executeUpdate();
 			Utils.log("File " + fileInfo.getFileId() + " has been stored");
@@ -36,7 +36,7 @@ public class DBUtils {
 	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
 		try {
 			PreparedStatement p = conn.prepareStatement(insertPeer);
-			p.setInt(1, peerInfo.getId());
+			p.setString(1, peerInfo.getId());
 			p.setString(2, peerInfo.getAddr().getHostAddress());
 			p.setInt(3, peerInfo.getPort());
 			p.executeUpdate();
@@ -50,7 +50,7 @@ public class DBUtils {
 		try {
 			PreparedStatement p = conn.prepareStatement(insertChunkStored);
 			p.setInt(1, chunkInfo.getChunkId());
-			p.setInt(2, chunkInfo.getFileId());
+			p.setString(2, chunkInfo.getFileId());
 			p.executeUpdate();
 			Utils.log("Chunk " + chunkInfo.getChunkId() + " has been stored");
 		} catch (SQLException e) {
