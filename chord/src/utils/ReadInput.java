@@ -72,7 +72,7 @@ public class ReadInput {
 			System.out.println("Error: Invalid Input!");
 			return;
 		}
-		peer.backup(filename, degree);
+		peer.backup(filename, degree,true);
 		System.out.println("Called Backup!");
 	}
 
