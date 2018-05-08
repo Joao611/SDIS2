@@ -2,7 +2,6 @@ package chord;
 
 import java.net.InetAddress;
 
-import utils.UnsignedByte;
 
 public abstract class AbstractPeerInfo {
 

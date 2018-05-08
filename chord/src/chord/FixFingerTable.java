@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import communication.Client;
 import messages.MessageFactory;
 import messages.MessageType;
-import utils.UnsignedByte;
 import utils.Utils;
 
 /**

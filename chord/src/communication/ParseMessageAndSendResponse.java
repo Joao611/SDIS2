@@ -23,9 +23,6 @@ import database.FileStoredInfo;
 import messages.MessageFactory;
 import messages.MessageType;
 import program.Peer;
-import state_info.BackupFile;
-import state_info.LocalState;
-import utils.UnsignedByte;
 import utils.Utils;
 
 /**

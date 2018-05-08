@@ -6,7 +6,6 @@ package chord;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import utils.UnsignedByte;
 import utils.Utils;
 
 /**

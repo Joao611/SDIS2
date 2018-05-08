@@ -5,7 +5,6 @@ package chord;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -15,14 +14,11 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.bind.DatatypeConverter;
 
 import communication.Client;
-import database.DBUtils;
 import database.Database;
-import database.FileStoredInfo;
 import messages.MessageFactory;
 import messages.MessageType;
-import utils.UnsignedByte;
-import utils.Utils;
 import utils.SingletonThreadPoolExecutor;
+import utils.Utils;
 
 /**
  * @author anabela
