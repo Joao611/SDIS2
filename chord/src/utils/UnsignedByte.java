@@ -29,7 +29,7 @@ public class UnsignedByte {
 	 * @return
 	 */
 	public boolean equalTo(UnsignedByte key) {
-		Utils.log("EqualTo "+this +" "+key);
+		Utils.LOGGER.finest("EqualTo "+this +" "+key);
 		return this.get() == key.get();
 	}
 

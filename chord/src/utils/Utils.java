@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
@@ -22,15 +23,14 @@ public class Utils {
 	
 	static {
 		LOGGER.setUseParentHandlers(false);
+		LOGGER.setLevel(Level.ALL);
 		try {
-			FileHandler h = new FileHandler("AnabelaSilvaLOG.txt", true);
+			FileHandler h = new FileHandler("backup_%g_log_%u.txt", true);
 			h.setFormatter(new SimpleFormatter());
 			LOGGER.addHandler(h);
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -60,6 +60,21 @@ public class Utils {
 	
 	public static void log(String message) {
 		LOGGER.info(message);
+//		The following lists the Log Levels in descending order:
+//
+//			SEVERE (highest)
+//
+//			WARNING
+//
+//			INFO
+//
+//			CONFIG
+//
+//			FINE
+//
+//			FINER
+//
+//			FINEST
 	}
 	
 	public static String readFile(String filepath) throws IOException {

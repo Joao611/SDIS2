@@ -72,6 +72,7 @@ public class Peer {
 			}
 			port = Integer.valueOf(args[2]);
 		}
+		chordManager.setDatabase(database);
 		peer.joinNetwork(addr, port);
 	}
 
@@ -95,7 +96,7 @@ public class Peer {
 		
 		Path filePath = Paths.get(fileName);
 		if(!Files.exists(filePath)) { 
-			Utils.log("Error: File "+fileName+" does not exist: ");
+			Utils.LOGGER.finest("Error: File "+fileName+" does not exist: ");
 			return;
 		}
 		Long numberOfChunks = null;
