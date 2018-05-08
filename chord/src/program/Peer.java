@@ -1,12 +1,8 @@
 package program;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousFileChannel;
-import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,13 +16,8 @@ import javax.xml.bind.DatatypeConverter;
 import chord.ChordManager;
 import communication.Server;
 import database.Database;
-import state_info.Chunk;
-import state_info.BackupFile;
-import state_info.LocalState;
-import subprotocols.SendPutChunk;
 import utils.ReadInput;
 import utils.SingletonThreadPoolExecutor;
-import utils.Utils;
 
 public class Peer {
 
@@ -38,11 +29,11 @@ public class Peer {
 	private static int usedStorage = 0;
 
 
-	public Peer(ChordManager chordManager, Server server, Database database, int storageCapacity) {
+	public Peer(ChordManager chordManager, Server server, Database database) {
 		this.chordManager = chordManager;
 		this.server = server;
 		this.database = database;
-		this.storageCapacity = storageCapacity;
+		Peer.storageCapacity = Integer.MAX_VALUE;
 		this.server.setPeer(this);
 	}
 
@@ -65,7 +56,7 @@ public class Peer {
 		}
 		chordManager.setDatabase(new Database());
 		
-		Peer peer = new Peer(chordManager,server, chordManager.getDatabase(), Integer.valueOf(args[1]));
+		Peer peer = new Peer(chordManager,server, chordManager.getDatabase());
 
 		InetAddress addr = null;
 		port = null;

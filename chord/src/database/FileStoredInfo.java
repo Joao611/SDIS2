@@ -4,7 +4,7 @@ public class FileStoredInfo {
 
 	private int fileId;
 	private Boolean iAmResponsible;
-	private Integer peerWhichRequested;
+	private Short peerWhichRequested;
 	
 	public FileStoredInfo(int fileId, Boolean iAmResponsible){
 		this.fileId = fileId;
@@ -19,12 +19,12 @@ public class FileStoredInfo {
 		return iAmResponsible;
 	}
 
-	public Integer getPeerWhichRequested() {
+	public Short getPeerWhichRequested() {
 		return peerWhichRequested;
 	}
 
-	public void setPeerWhichRequested(Integer peerWhichRequested) {
-		this.peerWhichRequested = peerWhichRequested;
+	public void setPeerWhichRequested(short s) {
+		this.peerWhichRequested = s;
 	}
 
 

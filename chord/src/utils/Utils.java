@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import chord.ChordManager;
-import initiator.Peer;
 
 public class Utils {
 	

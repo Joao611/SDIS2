@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +17,9 @@ import javax.net.ssl.SSLSocket;
 
 import chord.ChordManager;
 import chord.PeerInfo;
+import database.ChunkInfo;
+import database.DBUtils;
+import database.FileStoredInfo;
 import messages.MessageFactory;
 import messages.MessageType;
 import program.Peer;
@@ -34,6 +38,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 	private SSLSocket socket;
 	private Server server;
 	private Peer peer;
+	private Connection dbConnection;
 
 
 	public ParseMessageAndSendResponse(Server server, Peer peer, byte[] readData, SSLSocket socket) {
@@ -42,6 +47,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		this.socket = socket;
 		this.peer = peer;
 		this.server = server;
+		this.dbConnection = peer.getChordManager().getDatabase().getConnection();
 	}
 
 
@@ -183,7 +189,12 @@ public class ParseMessageAndSendResponse implements Runnable {
 		
 		Path filePath = Peer.getPath().resolve(fileID + "_" + chunkNo);
 		
-		//TODO: guardar na DB que sou o key owner deste fileID
+		PeerInfo peerThatRequestedBackup = new PeerInfo(new UnsignedByte(id),addr,port);
+		DBUtils.insertPeer(dbConnection, peerThatRequestedBackup);
+		FileStoredInfo fileInfo = new FileStoredInfo(id, true);
+		fileInfo.setPeerWhichRequested(peerThatRequestedBackup.getId());
+		DBUtils.insertStoredFile(dbConnection, fileInfo);
+		
 		
 		if(addr.equals(peer.getChordManager().getPeerInfo().getAddr())) {//sou o dono do ficheiro que quero fazer backup...
 			//nao faz senido guardarmos um ficheiro com o chunk, visto que guardamos o ficheiro
@@ -231,6 +242,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		int port = Integer.parseInt(header[2].trim());
 		
 		String fileID = header[3];
+		Integer fileId_Integer = Integer.parseInt(fileID,16);
 		int chunkNo = Integer.parseInt(header[4]);
 		int replicationDegree = Integer.parseInt(header[5]);
 		
@@ -241,14 +253,14 @@ public class ParseMessageAndSendResponse implements Runnable {
 			Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
 			return;
 		}
-		if(/* TODO: ver na DB se sou o key owner deste fileID */) {//a mensagem ja deu uma volta completa. repDeg nao vai ser o desejado
+		if(DBUtils.amIResponsible(dbConnection, fileId_Integer)) {//a mensagem ja deu uma volta completa. repDeg nao vai ser o desejado
 			//enviar STORE para o predecessor
 			String message = MessageFactory.getStored(chordManager.getPeerInfo().getId(), fileID, chunkNo, 0);//porque enviar o nosso id???
 			Client.sendMessage(chordManager.getPredecessor().getAddr(), chordManager.getPredecessor().getPort(), message, false);
 			return;
 		}
 		if(!Peer.capacityExceeded(body_bytes.length)) { //tem espaco para fazer o backup
-			//TODO: guardar na DB info do chunk
+			DBUtils.insertStoredChunk(dbConnection, new ChunkInfo(chunkNo,fileId_Integer));
 			try {
 				Utils.writeToFile(filePath, body_bytes);
 			} catch (IOException e) {
