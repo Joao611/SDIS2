@@ -19,7 +19,9 @@ public class Database {
 	private Connection conn = null;
 
 
-	public Database(){
+	public Database(String string){
+		dbName = "localDB"+string;
+		connectionURL = "jdbc:derby:" + dbName + ";create=true";
 		connect();
 		if (!checkDBExisted()) {
 			loadDB();

@@ -55,7 +55,7 @@ public class Peer {
 			e1.printStackTrace();
 			return;
 		}
-		chordManager.setDatabase(new Database());
+		chordManager.setDatabase(new Database(chordManager.getPeerInfo().getId()));
 		
 		Peer peer = new Peer(chordManager,server, chordManager.getDatabase());
 
