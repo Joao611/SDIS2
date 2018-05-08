@@ -1,17 +1,19 @@
 package database;
 
+import java.math.BigInteger;
+
 public class FileStoredInfo {
 
-	private int fileId;
+	private String fileId;
 	private Boolean iAmResponsible;
 	private Short peerWhichRequested;
 	
-	public FileStoredInfo(int fileId, Boolean iAmResponsible){
+	public FileStoredInfo(String fileId, Boolean iAmResponsible){
 		this.fileId = fileId;
 		this.iAmResponsible = iAmResponsible;
 	}
 
-	public int getFileId() {
+	public String getFileId() {
 		return fileId;
 	}
 

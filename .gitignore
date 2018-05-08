@@ -1,5 +1,6 @@
 chord/localDB
 .recommenders/
+*.txt
 
 # Compiled class file
 *.class

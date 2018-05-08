@@ -20,7 +20,7 @@ public class DBUtils {
 		Short peerRequesting = fileInfo.getPeerWhichRequested();
 		try {
 			PreparedStatement p = conn.prepareStatement(insertFileStored);
-			p.setInt(1, fileInfo.getFileId());
+			p.setString(1, fileInfo.getFileId());
 			p.setBoolean(2, fileInfo.getiAmResponsible());
 			if (peerRequesting == null) {
 				p.setNull(3, Types.INTEGER);
