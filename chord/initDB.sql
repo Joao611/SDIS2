@@ -21,7 +21,7 @@ CREATE TABLE backupsrequested(
 CREATE TABLE chunksstored(
 	id INT NOT NULL,
 	chunk_id INT NOT NULL,
-	file_id VARCHAR(32) NOT NULL,
+	file_id VARCHAR(32) NOT NULL
 );
 
 ALTER TABLE chunksstored
