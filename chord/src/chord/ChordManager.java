@@ -26,7 +26,7 @@ import utils.Utils;
  */
 public class ChordManager implements Runnable {
 
-	private static final int M = 8;
+	private static final int M = 32;
 	private PeerInfo peerInfo;
 	private ArrayList<PeerInfo> fingerTable = new ArrayList<PeerInfo>();
 	private AbstractPeerInfo predecessor;
