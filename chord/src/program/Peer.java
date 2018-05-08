@@ -32,13 +32,11 @@ public class Peer {
 
 	private ChordManager chordManager;
 	private Server server;
-	private Database database;
 
 
-	public Peer(ChordManager chordManager, Server server, Database database) {
+	public Peer(ChordManager chordManager, Server server) {
 		this.chordManager = chordManager;
 		this.server = server;
-		this.database = database;
 		this.server.setPeer(this);
 	}
 
@@ -57,9 +55,8 @@ public class Peer {
 			e1.printStackTrace();
 			return;
 		}
-		Database database = new Database();
 
-		Peer peer = new Peer(chordManager,server, database);
+		Peer peer = new Peer(chordManager,server);
 
 		InetAddress addr = null;
 		port = null;
@@ -73,7 +70,7 @@ public class Peer {
 			}
 			port = Integer.valueOf(args[2]);
 		}
-		chordManager.setDatabase(database);
+		chordManager.setDatabase(new Database());
 		peer.joinNetwork(addr, port);
 	}
 

@@ -1,9 +1,7 @@
 CREATE TABLE filesstored(
 	id INT NOT NULL,
 	i_am_responsible BOOLEAN DEFAULT false,
-	desired_rep_degree INT,
-	actual_rep_degree INT,
-	peer_which_requested INT
+	peer_requesting INT
 );
 
 CREATE TABLE peer(
@@ -19,6 +17,6 @@ ALTER TABLE peer
    ADD CONSTRAINT peer_PK Primary Key (id);
 
 ALTER TABLE filesstored
-   ADD CONSTRAINT filesstored_FK Foreign Key (peer_which_requested)
+   ADD CONSTRAINT filesstored_FK Foreign Key (peer_requesting)
    REFERENCES peer;
 
