@@ -6,6 +6,9 @@ package communication;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.net.ssl.SSLSocket;
 
@@ -30,7 +33,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 	private Server server;
 	private ChordManager chordManager;
 
-	
+
 	public ParseMessageAndSendResponse(Server server, ChordManager chordManager, byte[] readData, SSLSocket socket) {
 		super();
 		this.readData = readData;
@@ -47,7 +50,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		sendResponse(socket, response);
 
 	}
-	
+
 	/**
 	 * Parses the received request, processes it and returns the protocol response
 	 * @param readData
@@ -102,17 +105,36 @@ public class ParseMessageAndSendResponse implements Runnable {
 		String fileID = lines[0];
 		Integer chunkNo = Integer.valueOf(lines[1]);
 		Integer repDegree = Integer.valueOf(lines[2]);
-		
+
 		BackupFile b = LocalState.getInstance().getBackupFiles().get(fileID);
-		if(b != null) {
-			repDegree++;
+
+		PreparedStatement preparedStatement;
+		ResultSet result;
+		try {
+			preparedStatement = chordManager.getDatabase().getConnection().prepareStatement("SELECT * FROM filesstored WHERE id=?");
+			preparedStatement.setString(1, fileID); //STARTS AT 1 FOR SOME REASON
+			result = preparedStatement.executeQuery();
+			if(result.first()) { //Exists
+				int id = result.getInt("id");
+				boolean i_am_responsible = result.getBoolean("i_am_responsible");
+				int desired_rep_degree = result.getInt("desired_rep_degree");
+				int actual_rep_degree = result.getInt("actual_rep_degree");
+				int peer_which_requested = result.getInt("peer_which_requested");
+				
+				repDegree++; // I am also storing the chunk
+				if(i_am_responsible) {
+					//TODO: send response to requesting peer
+					return null;
+				}
+			}
+			result.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		}
-		if(LocalState.getInstance().amIResponsavel(fileID)) {
-//			TODO: end cyclo
-		} else {
-			String message = MessageFactory.getStored(chordManager.getPeerInfo().getId(), fileID, chunkNo, repDegree);
-			Client.sendMessage(chordManager.getPredecessor().getAddr(),chordManager.getPredecessor().getPort(), message, false);
-		}
+		
+		String message = MessageFactory.getStored(chordManager.getPeerInfo().getId(), fileID, chunkNo, repDegree);
+		Client.sendMessage(chordManager.getPredecessor().getAddr(),chordManager.getPredecessor().getPort(), message, false);
+		
 		return null;
 	}
 

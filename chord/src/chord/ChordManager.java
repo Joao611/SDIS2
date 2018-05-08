@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import communication.Client;
+import database.Database;
 import messages.MessageFactory;
 import messages.MessageType;
 import utils.UnsignedByte;
@@ -33,6 +34,7 @@ public class ChordManager implements Runnable {
 	private String ASK_MESSAGE;
 	private String SUCCESSOR_MESSAGE;
 	private String LOOKUP_MESSAGE;
+	private Database database;
 
 	public ChordManager(Integer port) {
 
@@ -247,5 +249,19 @@ public class ChordManager implements Runnable {
 	 */
 	public void setFingerTable(ArrayList<PeerInfo> fingerTable) {
 		this.fingerTable = fingerTable;
+	}
+
+	/**
+	 * @return the database
+	 */
+	public Database getDatabase() {
+		return database;
+	}
+
+	/**
+	 * @param database the database to set
+	 */
+	public void setDatabase(Database database) {
+		this.database = database;
 	}
 }

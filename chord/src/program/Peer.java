@@ -72,6 +72,7 @@ public class Peer {
 			}
 			port = Integer.valueOf(args[2]);
 		}
+		chordManager.setDatabase(database);
 		peer.joinNetwork(addr, port);
 	}
 
