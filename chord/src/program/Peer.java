@@ -65,14 +65,14 @@ public class Peer {
 		InetAddress addr = null;
 		port = null;
 
-		if(args.length >= 4) {
+		if(args.length >= 3) {
 			try {
-				addr = InetAddress.getByName(args[2]);
+				addr = InetAddress.getByName(args[1]);
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 				return;
 			}
-			port = Integer.valueOf(args[3]);
+			port = Integer.valueOf(args[2]);
 		}
 		peer.joinNetwork(addr, port);
 	}
@@ -101,9 +101,9 @@ public class Peer {
 	public String getFileID(String filename) throws IOException, NoSuchAlgorithmException {
 		Path filePath = Paths.get(filename); //The filename, not FileID
 		BasicFileAttributes attr = Files.readAttributes(filePath, BasicFileAttributes.class);
-		MessageDigest digest = MessageDigest.getInstance("SHA-256");
+		MessageDigest digest = MessageDigest.getInstance("md5");
 		byte[] hash = digest.digest((filename + attr.lastModifiedTime()).getBytes(StandardCharsets.UTF_8));
-		return DatatypeConverter.printHexBinary(hash);
+		return Utils.getIdFromHash(hash, ChordManager.getM() / 8);
 	}
 
 	/**

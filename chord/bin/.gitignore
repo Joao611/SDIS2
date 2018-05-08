@@ -1,9 +1,3 @@
-/communication/
-/database/
-/messages/
-/program/
-/runnableProtocols/
-/state_info/
-/subprotocols/
-/utils/
 /chord/
+/utils/
+/program/

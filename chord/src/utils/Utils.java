@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -67,7 +68,6 @@ public class Utils {
 			_value = _value.add(aux);
 		}
 		return ((_inf.compareTo(_value) < 0) && (_value.compareTo(_sup) <= 0));
-		
 	}
 	
 	public static void log(String message) {
@@ -123,4 +123,16 @@ public class Utils {
 			channel.write(src, 0, src, writter);
 		}
 	}
+	private static String byteArrayToHex(byte[] a) {
+		   StringBuilder sb = new StringBuilder(a.length * 2);
+		   for(byte b: a)
+		      sb.append(String.format("%02x", b));
+		   return sb.toString();
+	}
+	
+	public static String getIdFromHash(byte[] hash, int length) {
+		byte[] slice = Arrays.copyOf(hash, length);
+		return byteArrayToHex(slice);
+	}
+	
 }

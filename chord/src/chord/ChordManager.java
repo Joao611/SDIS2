@@ -11,8 +11,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.bind.DatatypeConverter;
-
 import communication.Client;
 import database.Database;
 import messages.MessageFactory;
@@ -26,7 +24,7 @@ import utils.Utils;
  */
 public class ChordManager implements Runnable {
 
-	private static final int M = 32;
+	private static final int M = 32; // 32bits - 4 bytes
 	private PeerInfo peerInfo;
 	private ArrayList<PeerInfo> fingerTable = new ArrayList<PeerInfo>();
 	private AbstractPeerInfo predecessor;
@@ -49,14 +47,14 @@ public class ChordManager implements Runnable {
 
 		MessageDigest digest;
 		try {
-			digest = MessageDigest.getInstance("SHA-256");
+			digest = MessageDigest.getInstance("md5");
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 			return;
 		}
 
 		byte[] hash = digest.digest(("" + addr + port).getBytes(StandardCharsets.ISO_8859_1));
-		String id = DatatypeConverter.printHexBinary(hash);
+		String id = Utils.getIdFromHash(hash, M/8);
 		this.setPeerInfo(new PeerInfo(id, addr, port));
 		
 		ASK_MESSAGE = MessageFactory.getFirstLine(MessageType.ASK, "1.0", this.getPeerInfo().getId());
@@ -64,7 +62,6 @@ public class ChordManager implements Runnable {
 
 		for (int i = 0; i < getM(); i++) {
 			getFingerTable().add(getPeerInfo());
-			// TODO: null design pattern
 		}
 		predecessor = new NullPeerInfo();
 
