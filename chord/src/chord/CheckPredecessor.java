@@ -14,12 +14,12 @@ public class CheckPredecessor implements Runnable {
 	@Override
 	public void run() {
 		if (predecessor.isNull()) {
-			Utils.log("Predecessor not set yet");
+			Utils.LOGGER.finest("Predecessor not set yet");
 			return;
 		} 
 		String response = Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), "status", true);
 		if (response == null) {
-			Utils.log("Could not establish connection with predecessor");
+			Utils.LOGGER.finest("Could not establish connection with predecessor");
 			predecessor = new NullPeerInfo();
 		}
 	}
