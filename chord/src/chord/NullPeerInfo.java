@@ -22,8 +22,8 @@ public class NullPeerInfo extends AbstractPeerInfo{
 	}
 
 	@Override
-	public short getId() {
-		return -1;
+	public String getId() {
+		return null;
 	}
 
 	@Override

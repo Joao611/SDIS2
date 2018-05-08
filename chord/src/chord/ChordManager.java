@@ -12,6 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.bind.DatatypeConverter;
+
 import communication.Client;
 import database.DBUtils;
 import database.Database;
@@ -58,7 +60,7 @@ public class ChordManager implements Runnable {
 		}
 
 		byte[] hash = digest.digest(("" + addr + port).getBytes(StandardCharsets.ISO_8859_1));
-		UnsignedByte id = new UnsignedByte(ByteBuffer.wrap(hash).getShort());
+		String id = DatatypeConverter.printHexBinary(hash);
 		this.setPeerInfo(new PeerInfo(id, addr, port));
 		
 		ASK_MESSAGE = MessageFactory.getFirstLine(MessageType.ASK, "1.0", this.getPeerInfo().getId());
@@ -114,15 +116,15 @@ public class ChordManager implements Runnable {
 	 *            a procurar
 	 * @return
 	 */
-	public String lookup(UnsignedByte key) {
-		if (Utils.inBetween(this.predecessor.getId(), this.getPeerInfo().getId(), key.get())) {
+	public String lookup(String key) {
+		if (Utils.inBetween(this.predecessor.getId(), this.getPeerInfo().getId(), key)) {
 			return MessageFactory.appendLine(SUCCESSOR_MESSAGE, this.getPeerInfo().asArray());
 		}
-		if (Utils.inBetween(this.getPeerInfo().getId(), this.getFingerTable().get(0).getId(), key.get())) {
+		if (Utils.inBetween(this.getPeerInfo().getId(), this.getFingerTable().get(0).getId(), key)) {
 			return MessageFactory.appendLine(SUCCESSOR_MESSAGE, this.getFingerTable().get(0).asArray());
 		}
 		for (int i = getM() - 1; i > 0; i--) {
-			if (Utils.inBetween(this.getPeerInfo().getId(), key.get(), this.getFingerTable().get(i).getId())) {
+			if (Utils.inBetween(this.getPeerInfo().getId(), key, this.getFingerTable().get(i).getId())) {
 				return MessageFactory.appendLine(ASK_MESSAGE, this.getFingerTable().get(i).asArray());
 			}
 		}
@@ -157,7 +159,7 @@ public class ChordManager implements Runnable {
 		}
 	}
 
-	public PeerInfo getChunkOwner(short key) {
+	public PeerInfo getChunkOwner(String key) {
 
 		if (Utils.inBetween(this.predecessor.getId(), this.getPeerInfo().getId(), key)) {
 			return this.peerInfo;

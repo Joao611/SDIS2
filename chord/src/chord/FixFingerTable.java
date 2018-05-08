@@ -3,6 +3,8 @@
  */
 package chord;
 
+import java.math.BigInteger;
+
 import communication.Client;
 import messages.MessageFactory;
 import messages.MessageType;
@@ -34,9 +36,9 @@ public class FixFingerTable implements Runnable {
 	public void fix_fingerTable() {
 		
 		for(int i = 0; i < ChordManager.getM(); i++) {
-			short keyToLookup = (short) ((chord.getPeerInfo().getId() + Math.pow(2, i))% Math.pow(2, ChordManager.getM()));
+			String keyToLookup = getKeyToLookUp(chord.getPeerInfo().getId(), i);
 			String lookupMessage = MessageFactory.getLookup(chord.getPeerInfo().getId(), keyToLookup);
-			String response = chord.lookup(new UnsignedByte(keyToLookup));
+			String response = chord.lookup(keyToLookup);
 			response = response.trim();
 			PeerInfo info = new PeerInfo(response);
 			while(response.startsWith(MessageType.ASK.getType())) {
@@ -46,6 +48,16 @@ public class FixFingerTable implements Runnable {
 			}
 			chord.getFingerTable().set(i, info);
 		}
+	}
+
+	private String getKeyToLookUp(String id, int i) {
+		
+		BigInteger _id = new BigInteger(id, 16);
+		BigInteger add =  new BigInteger((Math.pow(2, i)+"").getBytes());
+		BigInteger mod =  new BigInteger((Math.pow(2, ChordManager.getM())+"").getBytes());
+			
+		BigInteger res = _id.add(add).mod(mod);
+		return res.toString(16);
 	}
 
 	public FixFingerTable(ChordManager chord) {

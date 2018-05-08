@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
@@ -52,14 +53,20 @@ public class Utils {
 	 * @param value
 	 * @return True if value is inbetween limits.
 	 */
-	public static boolean inBetween(short inf, short sup, short value) {
-		if(sup <= inf) { //procura no meio do circulo todo
-			sup  = (short) (sup + Math.pow(2, ChordManager.getM()));
+	public static boolean inBetween(String inf, String sup, String value) {
+		BigInteger _inf = new BigInteger(inf,16);
+		BigInteger _sup = new BigInteger(sup,16);
+		BigInteger _value = new BigInteger(value,16);
+
+		BigInteger aux = new BigInteger((Math.pow(2, ChordManager.getM())+"").getBytes());
+		
+		if(_sup.compareTo(_inf) <= 0) { //procura no meio do circulo todo
+			_sup  = _sup.add(aux);
 		}
-		if(value < inf) {
-			value = (short) (value + Math.pow(2, ChordManager.getM()));
+		if(_value.compareTo(_inf) < 0) {
+			_value = _value.add(aux);
 		}
-		return ((inf < value) && (value <= sup));
+		return ((_inf.compareTo(_value) < 0) && (_value.compareTo(_sup) <= 0));
 		
 	}
 	

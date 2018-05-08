@@ -121,7 +121,7 @@ public class Peer {
 	 * Creates (if necessary) the directory where the chunks are stored
 	 * @param id
 	 */
-	public static void generatePath(short id) {
+	public static void generatePath(String id) {
 		setPath(Paths.get("peer_" + id));
 		if(!Files.exists(getPath())) {
 			try {
@@ -155,6 +155,8 @@ public class Peer {
 		}
 		int chunkNo = 0;
 		
+//		TODO: por ciclo
+		byte[] body = null;
 		SendPutChunk th = new SendPutChunk(this.getChordManager().getPeerInfo().getId(),
 				fileID, chunkNo, degree, body, this.getChordManager());
 		SingletonThreadPoolExecutor.getInstance().get().execute(th);

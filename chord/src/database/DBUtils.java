@@ -14,7 +14,7 @@ public class DBUtils {
 	private static final String insertChunkStored = "INSERT INTO CHUNKSSTORED "
 			+ "(chunk_id,file_id) VALUES (?,?)";
 	private static final String getFileById = "SELECT * FROM FILESSTORED "
-			+ "WHERE id=?";
+			+ "WHERE file_id = ?";
 
 	public static void insertStoredFile(Connection conn, FileStoredInfo fileInfo) {
 		String peerRequesting = fileInfo.getPeerRequesting();
@@ -58,10 +58,10 @@ public class DBUtils {
 		}
 	}
 	
-	public static boolean amIResponsible(Connection conn, Integer fileId) {
+	public static boolean amIResponsible(Connection conn, String fileId) {
 		try {
 			PreparedStatement p = conn.prepareStatement(getFileById);
-			p.setInt(1, fileId);
+			p.setString(1, fileId);
 			ResultSet result = p.executeQuery();
 			if (result.first()) {
 				return result.getBoolean("i_am_responsible");

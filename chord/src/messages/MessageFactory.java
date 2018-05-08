@@ -11,11 +11,11 @@ public class MessageFactory {
 	private static String END_HEADER = "\r\n\r\n";
 	private static String NEW_LINE = "\r\n";
 	
-	public static String getFirstLine(MessageType messageType, String version, short senderId) {
-		return messageType.getType() + " " + version + " " + senderId + " " + NEW_LINE;
+	public static String getFirstLine(MessageType messageType, String version, String id) {
+		return messageType.getType() + " " + version + " " + id + " " + NEW_LINE;
 	}
 	
-	public static String getHeader(MessageType messageType, String version, short senderId) {
+	public static String getHeader(MessageType messageType, String version, String senderId) {
 		return getFirstLine(messageType,version,senderId) + NEW_LINE;
 	}
 	
@@ -31,33 +31,34 @@ public class MessageFactory {
 		message += bodyStr;
 		return message;
 	}
-	public static String getLookup(short senderId, short lookupKey) {
+	public static String getLookup(String senderId, String key) {
 		String msg = getFirstLine(MessageType.LOOKUP,"1.0",senderId);
-		return appendLine(msg, new String[] {""+lookupKey});
+		return appendLine(msg, new String[] {""+key});
 	}
-	public static String getSuccessor(short senderId, PeerInfo peer) {
+	public static String getSuccessor(String senderId, PeerInfo peer) {
 		String msg = getFirstLine(MessageType.SUCCESSOR,"1.0",senderId);
 		return appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort()});
 	}
-	public static String getPredecessor(short senderId, PeerInfo peer) {
+	public static String getPredecessor(String senderId, PeerInfo peer) {
 		String msg = getFirstLine(MessageType.PREDECESSOR,"1.0",senderId);
 		return appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort()});
 	}
-	public static String getAsk(short senderId, PeerInfo peer) {
+	public static String getAsk(String senderId, PeerInfo peer) {
 		String msg = getFirstLine(MessageType.ASK,"1.0",senderId);
 		return appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort()});
 	}
-	public static String getPutChunk(short senderId, InetAddress addr, int port, String fileID, int chunkNo, int replicationDeg, byte[] body) {
-		String msg = getFirstLine(MessageType.PUTCHUNK,"1.0",senderId);
-		String msg2 = appendLine(msg, new Object[] {senderId, addr, port, fileID, chunkNo, replicationDeg});
+	public static String getPutChunk(String id, InetAddress addr, int port, String fileID, int chunkNo, int replicationDeg, byte[] body) {
+		String msg = getFirstLine(MessageType.PUTCHUNK,"1.0",id);
+		String msg2 = appendLine(msg, new Object[] {id, addr, port, fileID, chunkNo, replicationDeg});
 		try {
 			return appendBody(msg2, body);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
+			
 			return null;
 		}
 	}
-	public static String getKeepChunk(short senderId, InetAddress addr, int port, String fileID, int chunkNo, int replicationDeg, byte[] body) {
+	public static String getKeepChunk(String senderId, InetAddress addr, int port, String fileID, int chunkNo, int replicationDeg, byte[] body) {
 		String msg = getFirstLine(MessageType.KEEPCHUNK,"1.0",senderId);
 		String msg2 = appendLine(msg, new Object[] {senderId, addr, port, fileID, chunkNo, replicationDeg});
 		try {
@@ -67,13 +68,13 @@ public class MessageFactory {
 			return null;
 		}
 	}
-	public static String getStored(short senderId, String fileID, int chunkNo, int replicationDeg) {
+	public static String getStored(String senderId, String fileID, int chunkNo, int replicationDeg) {
 		String msg = getFirstLine(MessageType.STORED,"1.0",senderId);
 		String msg2 = appendLine(msg, new Object[] {fileID, chunkNo, replicationDeg});
 		return msg2;
 	}
 
-	public static String getConfirmStored(short senderId, String fileID, int chunkNo, int replicationDeg) {
+	public static String getConfirmStored(String senderId, String fileID, int chunkNo, int replicationDeg) {
 		String msg = getFirstLine(MessageType.CONFIRMSTORED,"1.0",senderId);
 		String msg2 = appendLine(msg, new Object[] {fileID, chunkNo, replicationDeg});
 		return msg2;

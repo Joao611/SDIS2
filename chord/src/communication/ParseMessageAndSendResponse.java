@@ -84,7 +84,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		switch (MessageType.valueOf(firstLine[0])) {
 		case LOOKUP:
 			if (secondLine != null) {
-				response = peer.getChordManager().lookup(new UnsignedByte(Short.valueOf((secondLine[0]))));
+				response = peer.getChordManager().lookup(secondLine[0]);
 			}else {
 				Utils.LOGGER.info("Invalid lookup message");
 			}
@@ -174,7 +174,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		ChordManager chordManager = peer.getChordManager();
 		byte [] body_bytes = body.getBytes();
 		
-		short id = Short.parseShort(header[0].trim());
+		String id = header[0].trim();
 		InetAddress addr = null;
 		try {
 			addr = InetAddress.getByName(header[1]);
@@ -189,7 +189,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		
 		Path filePath = Peer.getPath().resolve(fileID + "_" + chunkNo);
 		
-		PeerInfo peerThatRequestedBackup = new PeerInfo(new UnsignedByte(id),addr,port);
+		PeerInfo peerThatRequestedBackup = new PeerInfo(id,addr,port);
 		DBUtils.insertPeer(dbConnection, peerThatRequestedBackup);
 		FileStoredInfo fileInfo = new FileStoredInfo(id, true);
 		fileInfo.setPeerRequesting(peerThatRequestedBackup.getId());
@@ -232,7 +232,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		ChordManager chordManager = peer.getChordManager();
 		byte [] body_bytes = body.getBytes();
 		
-		short id = Short.parseShort(header[0].trim());
+		String id = header[0].trim();
 		InetAddress addr = null;
 		try {
 			addr = InetAddress.getByName(header[1]);
@@ -242,7 +242,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		int port = Integer.parseInt(header[2].trim());
 		
 		String fileID = header[3];
-		Integer fileId_Integer = Integer.parseInt(fileID,16);
+//		String fileId_Integer = Integer.parseInt(fileID,16);
 		int chunkNo = Integer.parseInt(header[4]);
 		int replicationDegree = Integer.parseInt(header[5]);
 		
@@ -253,14 +253,14 @@ public class ParseMessageAndSendResponse implements Runnable {
 			Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
 			return;
 		}
-		if(DBUtils.amIResponsible(dbConnection, fileId_Integer)) {//a mensagem ja deu uma volta completa. repDeg nao vai ser o desejado
+		if(DBUtils.amIResponsible(dbConnection, fileID)) {//a mensagem ja deu uma volta completa. repDeg nao vai ser o desejado
 			//enviar STORE para o predecessor
 			String message = MessageFactory.getStored(chordManager.getPeerInfo().getId(), fileID, chunkNo, 0);//porque enviar o nosso id???
 			Client.sendMessage(chordManager.getPredecessor().getAddr(), chordManager.getPredecessor().getPort(), message, false);
 			return;
 		}
 		if(!Peer.capacityExceeded(body_bytes.length)) { //tem espaco para fazer o backup
-			DBUtils.insertStoredChunk(dbConnection, new ChunkInfo(chunkNo,fileId_Integer));
+			DBUtils.insertStoredChunk(dbConnection, new ChunkInfo(chunkNo,fileID));
 			try {
 				Utils.writeToFile(filePath, body_bytes);
 			} catch (IOException e) {
@@ -287,7 +287,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 
 
 	private PeerInfo parseNotifyMsg(String[] firstLine, String[] secondLine) {
-		UnsignedByte id = new UnsignedByte(Short.parseShort(firstLine[2]));
+		String id = firstLine[2];
 		InetAddress addr = socket.getInetAddress();
 		int port = Integer.parseInt(secondLine[0].trim());
 		return new PeerInfo(id, addr, port);
