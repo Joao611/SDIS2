@@ -6,6 +6,8 @@ package communication;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.file.Path;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,8 +66,12 @@ public class ParseMessageAndSendResponse implements Runnable {
 		String[] lines = request.split("\r\n");
 		String[] firstLine = lines[0].split(" ");
 		String[] secondLine = null;
+		String thirdLine = null;//chunk body
 		if (lines.length > 1) {
 			secondLine = lines[1].split(" ");
+		}
+		if (lines.length > 2) {
+			thirdLine = lines[3];
 		}
 		String response = new String();
 
@@ -85,6 +91,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			response = MessageFactory.getHeader(MessageType.OK, "1.0", chordManager.getPeerInfo().getId());
 			break;
 		case PUTCHUNK:
+			parsePutChunkMsg(secondLine, thirdLine);
 			break;
 		case STABILIZE:
 			response = MessageFactory.getFirstLine(MessageType.PREDECESSOR, "1.0", chordManager.getPeerInfo().getId());
@@ -136,6 +143,113 @@ public class ParseMessageAndSendResponse implements Runnable {
 		Client.sendMessage(chordManager.getPredecessor().getAddr(),chordManager.getPredecessor().getPort(), message, false);
 		
 		return null;
+	}
+	
+	private void parsePutChunkMsg(String[] header, String body) {
+		byte [] body_bytes = body.getBytes();
+		
+		short id = Short.parseShort(header[0].trim());
+		InetAddress addr = null;
+		try {
+			addr = InetAddress.getByName(header[1]);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		int port = Integer.parseInt(header[2].trim());
+		
+		String fileID = header[3];
+		int chunkNo = Integer.parseInt(header[4]);
+		int replicationDegree = Integer.parseInt(header[5]);
+		
+		Path filePath = Peer.getPath().resolve(fileID + "_" + chunkNo);
+		
+		//TODO: guardar na DB que sou o key owner deste fileID
+		
+		if(addr.equals(chordManager.getPeerInfo().getAddr())) {//sou o dono do ficheiro que quero fazer backup...
+			//nao faz senido guardarmos um ficheiro com o chunk, visto que guardamos o ficheiro
+			//enviar o KEEPCHUNK
+			String message = MessageFactory.getKeepChunk(id, addr, port, fileID, chunkNo, replicationDegree, body_bytes);
+			Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
+			return;
+		}
+		
+		if(!Peer.capacityExceeded(body_bytes.length)) { //tem espaco para fazer o backup
+
+			try {
+				Utils.writeToFile(filePath, body_bytes);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if(replicationDegree == 1) {//sou o ultimo a guardar
+				//enviar STORE ao que pediu o backup
+				String message = MessageFactory.getStored(chordManager.getPeerInfo().getId(), fileID, chunkNo, 1);
+				Client.sendMessage(addr, port, message, false);
+				return;
+			} else {
+				//enivar KEEPCHUNK para o sucessor
+				String message = MessageFactory.getKeepChunk(id, addr, port, fileID, chunkNo, replicationDegree - 1, body_bytes);
+				Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
+			}
+		} else {
+			//enviar KEEPCHUNK para o seu sucessor
+			String message = MessageFactory.getKeepChunk(id, addr, port, fileID, chunkNo, replicationDegree, body_bytes);
+			Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
+		}
+	}
+	
+	private void parseKeepChunkMsg(String[] header, String body) {
+		byte [] body_bytes = body.getBytes();
+		
+		short id = Short.parseShort(header[0].trim());
+		InetAddress addr = null;
+		try {
+			addr = InetAddress.getByName(header[1]);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		int port = Integer.parseInt(header[2].trim());
+		
+		String fileID = header[3];
+		int chunkNo = Integer.parseInt(header[4]);
+		int replicationDegree = Integer.parseInt(header[5]);
+		
+		Path filePath = Peer.getPath().resolve(fileID + "_" + chunkNo);
+		if(addr.equals(chordManager.getPeerInfo().getAddr())) {//sou dono do ficheiro
+			//reencaminhar a mensagem para o proximo
+			String message = MessageFactory.getKeepChunk(id, addr, port, fileID, chunkNo, replicationDegree, body_bytes);
+			Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
+			return;
+		}
+		if(/* TODO: ver na DB se sou o key owner deste fileID */) {//a mensagem ja deu uma volta completa. repDeg nao vai ser o desejado
+			//enviar STORE para o predecessor
+			String message = MessageFactory.getStored(chordManager.getPeerInfo().getId(), fileID, chunkNo, 0);//porque enviar o nosso id???
+			Client.sendMessage(chordManager.getPredecessor().getAddr(), chordManager.getPredecessor().getPort(), message, false);
+			return;
+		}
+		if(!Peer.capacityExceeded(body_bytes.length)) { //tem espaco para fazer o backup
+			//TODO: guardar na DB info do chunk
+			try {
+				Utils.writeToFile(filePath, body_bytes);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if(replicationDegree == 1) {//sou o ultimo a guardar
+				//enviar STORE para o predecessor
+				String message = MessageFactory.getStored(chordManager.getPeerInfo().getId(), fileID, chunkNo, 1);
+				Client.sendMessage(chordManager.getPredecessor().getAddr(),chordManager.getPredecessor().getPort(), message, false);
+				
+			} else {
+				//enivar KEEPCHUNK para o sucessor
+				String message = MessageFactory.getKeepChunk(id, addr, port, fileID, chunkNo, replicationDegree - 1, body_bytes);
+				Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
+			}
+			return;
+		} else {
+			//reencaminhar KEEPCHUNK para o seu sucessor
+			String message = MessageFactory.getKeepChunk(id, addr, port, fileID, chunkNo, replicationDegree, body_bytes);
+			Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
+			return;
+		}
 	}
 
 

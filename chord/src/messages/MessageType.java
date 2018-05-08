@@ -4,6 +4,7 @@ public enum MessageType {
 
 	ASK("ASK"),
 	PUTCHUNK("PUTCHUNK"),
+	KEEPCHUNK("KEEPCHUNK"),
 	PING("PING"),
 	OK("OK"),
 	NOTIFY("NOTIFY"),

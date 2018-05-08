@@ -20,6 +20,7 @@ import javax.xml.bind.DatatypeConverter;
 import chord.ChordManager;
 import communication.Server;
 import database.Database;
+import initiator.Peer;
 import state_info.Chunk;
 import state_info.BackupFile;
 import state_info.LocalState;
@@ -33,12 +34,16 @@ public class Peer {
 	private ChordManager chordManager;
 	private Server server;
 	private Database database;
+	private static Path path;
+	private static int storageCapacity;
+	private static int usedStorage = 0;
 
 
-	public Peer(ChordManager chordManager, Server server, Database database) {
+	public Peer(ChordManager chordManager, Server server, Database database, int storageCapacity) {
 		this.chordManager = chordManager;
 		this.server = server;
 		this.database = database;
+		this.storageCapacity = storageCapacity;
 	}
 
 	public static void main(String[] args) {
@@ -49,6 +54,8 @@ public class Peer {
 		Integer port = Integer.valueOf(args[0]);
 		ChordManager chordManager = new ChordManager(port);
 
+		generatePath(chordManager.getPeerInfo().getId());
+		
 		Server server;
 		try {
 			server = new Server(new String[] {"TLS_DHE_RSA_WITH_AES_128_CBC_SHA"}, port, chordManager);
@@ -58,19 +65,19 @@ public class Peer {
 		}
 		Database database = new Database();
 
-		Peer peer = new Peer(chordManager,server, database);
+		Peer peer = new Peer(chordManager,server, database, Integer.valueOf(args[1]));
 
 		InetAddress addr = null;
 		port = null;
 
-		if(args.length >= 3) {
+		if(args.length >= 4) {
 			try {
-				addr = InetAddress.getByName(args[1]);
+				addr = InetAddress.getByName(args[2]);
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 				return;
 			}
-			port = Integer.valueOf(args[2]);
+			port = Integer.valueOf(args[3]);
 		}
 		chordManager.setDatabase(database);
 		peer.joinNetwork(addr, port);
@@ -92,61 +99,6 @@ public class Peer {
 		return this.chordManager;
 	}
 
-	public void backup(String fileName, int replicationDegree) throws NoSuchAlgorithmException, IOException {
-		
-		Path filePath = Paths.get(fileName);
-		if(!Files.exists(filePath)) { 
-			Utils.LOGGER.finest("Error: File "+fileName+" does not exist: ");
-			return;
-		}
-		Long numberOfChunks = null;
-		String fileID = this.getFileID(fileName);
-
-		numberOfChunks = (Math.floorDiv(Files.size(filePath), Utils.MAX_LENGTH_CHUNK))+1;
-		
-		int peerID = this.chordManager.getPeerInfo().getId();
-
-		LocalState.getInstance().getBackupFiles().put(fileID, new BackupFile(fileName, peerID, replicationDegree));
-		int chunkNo = 0;
-		while(chunkNo < numberOfChunks) {
-			AsynchronousFileChannel channel;
-			try {
-				channel = AsynchronousFileChannel.open(filePath);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				return;
-			}
-			ByteBuffer body = ByteBuffer.allocate(Utils.MAX_LENGTH_CHUNK);
-			int numberOfChunk = chunkNo;
-			CompletionHandler<Integer, ByteBuffer> reader =new CompletionHandler<Integer, ByteBuffer>() {
-				@Override
-				public void completed(Integer result, ByteBuffer buffer) {
-					buffer.flip();
-					byte[] data = new byte[buffer.limit()];
-					buffer.get(data);
-					buffer.clear();
-					System.out.println("Chegei Aqui");
-					
-					try {
-						backupChunk(numberOfChunk, replicationDegree, data, fileID, fileName);
-					} catch (UnsupportedEncodingException | InterruptedException e) {
-						e.printStackTrace();
-					} 
-
-				}
-
-				@Override
-				public void failed(Throwable arg0, ByteBuffer arg1) {
-					System.err.println("Error: Could not read!");
-
-				}
-
-			};
-			channel.read(body, Utils.MAX_LENGTH_CHUNK*chunkNo, body, reader);
-			chunkNo++;
-		}
-	}
-
 	/**
 	 * Generate a file ID
 	 * @param filename - the filename
@@ -160,31 +112,43 @@ public class Peer {
 		byte[] hash = digest.digest((filename + attr.lastModifiedTime()).getBytes(StandardCharsets.UTF_8));
 		return DatatypeConverter.printHexBinary(hash);
 	}
+	
+	/**
+	 * @return the p
+	 */
+	public static Path getPath() {
+		return path;
+	}
 
 	/**
-	 * @param chunkNo
-	 * @param replicationDegree
-	 * @param bodyOfTheChunk
-	 * @param fileID
-	 * @param filename
-	 * @param isEnhancement
-	 * @throws InterruptedException
-	 * @throws UnsupportedEncodingException
+	 * @param p the p to set
 	 */
-	public void backupChunk(int chunkNo, int replicationDegree, byte[] bodyOfTheChunk, String fileID, String fileName) throws InterruptedException, UnsupportedEncodingException {
-
-		int peerID = this.chordManager.getPeerInfo().getId();
-
-		//guardar chunk com replication degree a -1. assim quando o backup for feito e ele receber uma resposta com o replication degree atual do chunk, atualiza da hashmap
-		//		LocalState.getInstance().saveChunk(fileID, fileName, peerID, replicationDegree, chunk);
-		//		LocalState.getInstance().decreaseReplicationDegree(fileID, chunk.getID(), peerID, peerID);
-		
-
-		System.out.println("Chegei Aqui");
-		//enviar a mensagem de PUTCHUNK
-		SendPutChunk subprotocol = new SendPutChunk(peerID, fileID, fileName, chunkNo, replicationDegree, bodyOfTheChunk);
-		SingletonThreadPoolExecutor.getInstance().get().submit(subprotocol);
-		return;
+	public static void setPath(Path p) {
+		Peer.path = p;
+	}
+	
+	public static void generatePath(short id) {
+		setPath(Paths.get("peer_" + id));
+		if(!Files.exists(getPath())) {
+			try {
+				Files.createDirectory(getPath());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/*
+	 * Returns false if has space to store the chunk.
+	 * 
+	 * */
+	public static boolean capacityExceeded(int amount) {
+		if(usedStorage + amount > storageCapacity) {
+			return true;
+		}
+		//atualizar espaco usado
+		usedStorage += amount;
+		return false;
 	}
 
 }

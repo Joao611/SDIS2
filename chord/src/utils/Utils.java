@@ -1,9 +1,14 @@
 package utils;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Random;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -11,6 +16,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import chord.ChordManager;
+import initiator.Peer;
 
 public class Utils {
 	
@@ -82,4 +88,27 @@ public class Utils {
 		return new String(encoded, StandardCharsets.UTF_8);
 	}
 	
+	public static void writeToFile(Path filePath, byte[] body) throws IOException {
+		if(!Files.exists(filePath)) { //NOTE: O CHUNk nao Existe
+			Files.createFile(filePath);
+			AsynchronousFileChannel channel = AsynchronousFileChannel.open(filePath,StandardOpenOption.WRITE);
+			CompletionHandler<Integer, ByteBuffer> writter = new CompletionHandler<Integer, ByteBuffer>() {
+				@Override
+				public void completed(Integer result, ByteBuffer buffer) {
+					System.out.println("Finished writing!");
+				}
+	
+				@Override
+				public void failed(Throwable arg0, ByteBuffer arg1) {
+					System.err.println("Error: Could not write!");
+					
+				}
+				
+			};
+			ByteBuffer src = ByteBuffer.allocate(body.length);
+			src.put(body);
+			src.flip();
+			channel.write(src, 0, src, writter);
+		}
+	}
 }

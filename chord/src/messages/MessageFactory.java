@@ -1,6 +1,7 @@
 package messages;
 
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 
 import chord.PeerInfo;
 import utils.Utils;
@@ -46,9 +47,19 @@ public class MessageFactory {
 		String msg = getFirstLine(MessageType.ASK,"1.0",senderId);
 		return appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort()});
 	}
-	public static String getPutChunk(short senderId, PeerInfo peer, String fileID, int chunkNo, int replicationDeg, byte[] body) {
+	public static String getPutChunk(short senderId, InetAddress addr, int port, String fileID, int chunkNo, int replicationDeg, byte[] body) {
 		String msg = getFirstLine(MessageType.PUTCHUNK,"1.0",senderId);
-		String msg2 = appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort(), fileID, chunkNo, replicationDeg});
+		String msg2 = appendLine(msg, new Object[] {senderId, addr, port, fileID, chunkNo, replicationDeg});
+		try {
+			return appendBody(msg2, body);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public static String getKeepChunk(short senderId, InetAddress addr, int port, String fileID, int chunkNo, int replicationDeg, byte[] body) {
+		String msg = getFirstLine(MessageType.KEEPCHUNK,"1.0",senderId);
+		String msg2 = appendLine(msg, new Object[] {senderId, addr, port, fileID, chunkNo, replicationDeg});
 		try {
 			return appendBody(msg2, body);
 		} catch (UnsupportedEncodingException e) {
