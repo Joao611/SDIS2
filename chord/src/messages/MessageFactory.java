@@ -61,4 +61,10 @@ public class MessageFactory {
 		String msg2 = appendLine(msg, new Object[] {fileID, chunkNo, replicationDeg});
 		return msg2;
 	}
+
+	public static String getConfirmStored(short senderId, String fileID, int chunkNo, int replicationDeg) {
+		String msg = getFirstLine(MessageType.CONFIRMSTORED,"1.0",senderId);
+		String msg2 = appendLine(msg, new Object[] {fileID, chunkNo, replicationDeg});
+		return msg2;
+	}
 }
