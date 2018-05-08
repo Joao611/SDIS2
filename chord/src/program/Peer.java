@@ -1,32 +1,16 @@
 package program;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousFileChannel;
-import java.nio.channels.CompletionHandler;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
-import javax.xml.bind.DatatypeConverter;
-
 import chord.ChordManager;
 import communication.Server;
 import database.Database;
-import state_info.Chunk;
-import state_info.BackupFile;
-import state_info.LocalState;
-import subprotocols.SendPutChunk;
 import utils.ReadInput;
 import utils.SingletonThreadPoolExecutor;
-import utils.Utils;
 
 public class Peer {
 
@@ -90,7 +74,6 @@ public class Peer {
 		SingletonThreadPoolExecutor.getInstance().get().execute(server);
 		SingletonThreadPoolExecutor.getInstance().get().execute(chordManager);
 
-		//cyclo while
 		ReadInput.readInput(this);
 	}
 
@@ -98,20 +81,20 @@ public class Peer {
 		return this.chordManager;
 	}
 
-	/**
-	 * Generate a file ID
-	 * @param filename - the filename
-	 * @return Hexadecimal SHA-256 encoded fileID
-	 * @throws IOException, NoSuchAlgorithmException
-	 * */
-	public String getFileID(String filename) throws IOException, NoSuchAlgorithmException {
-		Path filePath = Paths.get(filename); //The filename, not FileID
-		BasicFileAttributes attr = Files.readAttributes(filePath, BasicFileAttributes.class);
-		MessageDigest digest = MessageDigest.getInstance("SHA-256");
-		byte[] hash = digest.digest((filename + attr.lastModifiedTime()).getBytes(StandardCharsets.UTF_8));
-		return DatatypeConverter.printHexBinary(hash);
-	}
-	
+//	/**
+//	 * Generate a file ID
+//	 * @param filename - the filename
+//	 * @return Hexadecimal SHA-256 encoded fileID
+//	 * @throws IOException, NoSuchAlgorithmException
+//	 * */
+//	public String getFileID(String filename) throws IOException, NoSuchAlgorithmException {
+//		Path filePath = Paths.get(filename); //The filename, not FileID
+//		BasicFileAttributes attr = Files.readAttributes(filePath, BasicFileAttributes.class);
+//		MessageDigest digest = MessageDigest.getInstance("SHA-256");
+//		byte[] hash = digest.digest((filename + attr.lastModifiedTime()).getBytes(StandardCharsets.UTF_8));
+//		return DatatypeConverter.printHexBinary(hash);
+//	}
+//	
 	/**
 	 * @return the p
 	 */
@@ -126,6 +109,10 @@ public class Peer {
 		Peer.path = p;
 	}
 	
+	/**
+	 * Creates (if necessary) the directory where the chunks are stored
+	 * @param id
+	 */
 	public static void generatePath(short id) {
 		setPath(Paths.get("peer_" + id));
 		if(!Files.exists(getPath())) {
@@ -137,7 +124,7 @@ public class Peer {
 		}
 	}
 	
-	/*
+	/**
 	 * Returns false if has space to store the chunk.
 	 * 
 	 * */
