@@ -118,7 +118,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		String fileID = lines[0];
 		Integer chunkNo = Integer.valueOf(lines[1]);
 		Integer repDegree = Integer.valueOf(lines[2]);
-
+		
 		PreparedStatement preparedStatement;
 		ResultSet result;
 		try {
@@ -168,6 +168,12 @@ public class ParseMessageAndSendResponse implements Runnable {
 	}
 	
 	private void parsePutChunkMsg(String[] header, String body) {
+		
+		for(int i = 0; i < header.length; i++) {
+
+			System.out.println(header[i]);
+		}
+		
 		ChordManager chordManager = peer.getChordManager();
 		byte [] body_bytes = body.getBytes();
 		

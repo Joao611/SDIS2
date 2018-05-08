@@ -1,27 +1,27 @@
 CREATE TABLE filesstored(
-	id INT NOT NULL,
-	file_id VARCHAR(32) NOT NULL,
+	id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+	file_id VARCHAR(64) NOT NULL,
 	i_am_responsible BOOLEAN DEFAULT false,
-	peer_requesting INT
+	peer_requesting VARCHAR(64)
 );
 
 CREATE TABLE peers(
-	id INT NOT NULL,
-	peer_id VARCHAR(32) NOT NULL,
+	id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+	peer_id VARCHAR(64) NOT NULL,
 	ip VARCHAR(15) NOT NULL,
 	port INT NOT NULL
 );
 
 CREATE TABLE backupsrequested(
-	id INT NOT NULL,
-	file_id VARCHAR(32) NOT NULL,
+	id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+	file_id VARCHAR(64) NOT NULL,
 	encrypt_key VARCHAR(256) 
 );
 
 CREATE TABLE chunksstored(
-	id INT NOT NULL,
+	id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
 	chunk_id INT NOT NULL,
-	file_id VARCHAR(32) NOT NULL
+	file_id VARCHAR(64) NOT NULL
 );
 
 ALTER TABLE chunksstored
@@ -48,9 +48,9 @@ ALTER TABLE backupsrequested
 
 ALTER TABLE filesstored
    ADD CONSTRAINT filesstored_FK Foreign Key (peer_requesting)
-   REFERENCES peers;
+   REFERENCES peers(peer_id);
 
 ALTER TABLE chunksstored
-   ADD CONSTRAINT chunksstored_FK Foreign Key (file_id) REFERENCES filesstored;
+   ADD CONSTRAINT chunksstored_FK Foreign Key (file_id) REFERENCES filesstored(file_id);
 
 

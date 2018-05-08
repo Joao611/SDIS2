@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -19,9 +20,11 @@ import database.Database;
 import runnableProtocols.SendPutChunk;
 import utils.ReadInput;
 import utils.SingletonThreadPoolExecutor;
+import utils.Utils;
 
 public class Peer {
 
+	private static final int LENGTH_OF_CHUNK = 64000;
 	private ChordManager chordManager;
 	private Server server;
 	private Database database;
@@ -47,7 +50,7 @@ public class Peer {
 		ChordManager chordManager = new ChordManager(port);
 
 		generatePath(chordManager.getPeerInfo().getId());
-		
+
 		Server server;
 		try {
 			server = new Server(new String[] {"TLS_DHE_RSA_WITH_AES_128_CBC_SHA"}, port);
@@ -56,7 +59,7 @@ public class Peer {
 			return;
 		}
 		chordManager.setDatabase(new Database(chordManager.getPeerInfo().getId()));
-		
+
 		Peer peer = new Peer(chordManager,server, chordManager.getDatabase());
 
 		InetAddress addr = null;
@@ -102,7 +105,7 @@ public class Peer {
 		byte[] hash = digest.digest((filename + attr.lastModifiedTime()).getBytes(StandardCharsets.UTF_8));
 		return DatatypeConverter.printHexBinary(hash);
 	}
-	
+
 	/**
 	 * @return the p
 	 */
@@ -116,7 +119,7 @@ public class Peer {
 	public static void setPath(Path p) {
 		Peer.path = p;
 	}
-	
+
 	/**
 	 * Creates (if necessary) the directory where the chunks are stored
 	 * @param id
@@ -131,7 +134,7 @@ public class Peer {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns false if has space to store the chunk.
 	 * 
@@ -154,14 +157,19 @@ public class Peer {
 			return;
 		}
 		int chunkNo = 0;
-		
-//		TODO: por ciclo
-		byte[] body = null;
+		byte[] file = Utils.readFile(filename).getBytes();
+		while(file.length > LENGTH_OF_CHUNK) {
+			byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, LENGTH_OF_CHUNK);
+			SendPutChunk th = new SendPutChunk(this.getChordManager().getPeerInfo().getId(),
+					fileID, chunkNo, degree, body, this.getChordManager());
+			SingletonThreadPoolExecutor.getInstance().get().execute(th);
+			chunkNo++;
+		}
+		byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, file.length);
 		SendPutChunk th = new SendPutChunk(this.getChordManager().getPeerInfo().getId(),
 				fileID, chunkNo, degree, body, this.getChordManager());
 		SingletonThreadPoolExecutor.getInstance().get().execute(th);
-		
-		
+
 	}
 
 }

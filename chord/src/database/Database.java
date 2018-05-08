@@ -75,12 +75,8 @@ public class Database {
 	}
 
 	public void loadDB() {
-		try {
-			String sqlScript = Utils.readFile(initScript);
-			runScript(sqlScript);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		String sqlScript = Utils.readFile(initScript);
+		runScript(sqlScript);
 	}
 
 	private void runScript(String sql) {

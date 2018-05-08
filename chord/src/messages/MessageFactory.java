@@ -49,7 +49,7 @@ public class MessageFactory {
 	}
 	public static String getPutChunk(String id, InetAddress addr, int port, String fileID, int chunkNo, int replicationDeg, byte[] body) {
 		String msg = getFirstLine(MessageType.PUTCHUNK,"1.0",id);
-		String msg2 = appendLine(msg, new Object[] {id, addr, port, fileID, chunkNo, replicationDeg});
+		String msg2 = appendLine(msg, new Object[] {id, addr.getHostAddress(), port, fileID, chunkNo, replicationDeg});
 		try {
 			return appendBody(msg2, body);
 		} catch (UnsupportedEncodingException e) {
@@ -60,7 +60,7 @@ public class MessageFactory {
 	}
 	public static String getKeepChunk(String senderId, InetAddress addr, int port, String fileID, int chunkNo, int replicationDeg, byte[] body) {
 		String msg = getFirstLine(MessageType.KEEPCHUNK,"1.0",senderId);
-		String msg2 = appendLine(msg, new Object[] {senderId, addr, port, fileID, chunkNo, replicationDeg});
+		String msg2 = appendLine(msg, new Object[] {senderId, addr.getHostName(), port, fileID, chunkNo, replicationDeg});
 		try {
 			return appendBody(msg2, body);
 		} catch (UnsupportedEncodingException e) {

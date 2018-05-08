@@ -89,8 +89,14 @@ public class Utils {
 //			FINEST
 	}
 	
-	public static String readFile(String filepath) throws IOException {
-		byte[] encoded = Files.readAllBytes(Paths.get(filepath));
+	public static String readFile(String filepath) {
+		byte[] encoded;
+		try {
+			encoded = Files.readAllBytes(Paths.get(filepath));
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 		return new String(encoded, StandardCharsets.UTF_8);
 	}
 	
