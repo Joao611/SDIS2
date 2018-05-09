@@ -153,6 +153,10 @@ public class Peer {
 		usedStorage += amount;
 		return false;
 	}
+	
+	public static void decreaseStorageUsed(int amount) {
+		usedStorage -= amount;
+	}
 
 	public void backup(String filename, Integer degree, String encryptKey) {
 		String fileID;

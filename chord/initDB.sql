@@ -27,7 +27,8 @@ CREATE TABLE chunksstored(
 	id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
 	chunk_id INT NOT NULL,
 	file_id VARCHAR(16) NOT NULL,
-	actual_rep_degree INTEGER
+	actual_rep_degree INTEGER,
+	size INTEGER NOT NULL
 );
 
 ALTER TABLE chunksstored
@@ -57,6 +58,6 @@ ALTER TABLE filesstored
    REFERENCES peers(peer_id);
 
 ALTER TABLE chunksstored
-   ADD CONSTRAINT chunksstored_FK Foreign Key (file_id) REFERENCES filesstored(file_id);
+   ADD CONSTRAINT chunksstored_FK Foreign Key (file_id) REFERENCES filesstored(file_id) ON DELETE CASCADE;
 
 

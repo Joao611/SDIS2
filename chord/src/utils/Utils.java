@@ -123,6 +123,15 @@ public class Utils {
 			channel.write(src, 0, src, writter);
 		}
 	}
+	
+	public static void deleteFile(Path filePath) {
+		try {
+			Files.deleteIfExists(filePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private static String byteArrayToHex(byte[] a) {
 		   StringBuilder sb = new StringBuilder(a.length * 2);
 		   for(byte b: a)

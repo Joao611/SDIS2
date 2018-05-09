@@ -24,6 +24,7 @@ public class SendInitDelete implements Runnable{
 		String message = MessageFactory.getInitDelete(senderId, fileId);
 		Utils.LOGGER.info("Sending DeleteInit for file: " + fileId);
 		Client.sendMessage(successor.getAddr(), successor.getPort(), message, false);
+		System.out.println("Sent request to delete file: " + fileId);
 	}
 	
 	

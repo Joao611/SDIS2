@@ -17,7 +17,7 @@ public class DBUtils {
 	private static final String insertPeer = "INSERT INTO PEERS "
 			+ "(peer_id,ip,port) VALUES (?,?,?)";
 	private static final String insertChunkStored = "INSERT INTO CHUNKSSTORED "
-			+ "(chunk_id,file_id) VALUES (?,?)";
+			+ "(chunk_id,file_id,size) VALUES (?,?,?)";
 	private static final String insertBackupRequested = "INSERT INTO BACKUPSREQUESTED "
 			+ "(file_id, filename, desired_rep_degree,encrypt_key,numberOfChunks) VALUES (?,?,?,?,?)";
 	private static final String getFileById = "SELECT * FROM FILESSTORED "
@@ -37,7 +37,10 @@ public class DBUtils {
 	private static final String getPeerWhichRequested = "SELECT peer_id,ip,port FROM PEERS "
 			+ "JOIN (SELECT peer_requesting FROM FILESSTORED WHERE file_id = ?) AS F ON PEER.id = F.peer_requesting";
 	private static final String getBackupRequested = "SELECT * FROM BACKUPSREQUESTED WHERE file_id = ?";
-	private static final String getFileStored = "SELECT file_id FROM FILESSTORED WHERE file_id = ?";
+	private static final String getFileStored = "SELECT file_id, desired_rep_degree FROM FILESSTORED WHERE file_id = ?";
+	private static final String getChunksOfFile = "SELECT chunk_id, file_id, size FROM CHUNKSSTORED WHERE file_id = ?";
+	private static final String deleteFileStored = "DELETE FROM FILESSTORED WHERE file_id = ?";
+	private static final String deleteFileRequested = "DELETE FROM BACKUPSREQUESTED WHERE file_id = ?";
 
 
 	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
@@ -119,8 +122,11 @@ public class DBUtils {
 			PreparedStatement p = conn.prepareStatement(insertChunkStored);
 			p.setInt(1, chunkInfo.getChunkId());
 			p.setString(2, chunkInfo.getFileId());
+			p.setInt(3, chunkInfo.getSize());
 			p.executeUpdate();
 			Utils.log("Chunk " + chunkInfo.getFileId() + ":" + chunkInfo.getChunkId() + " has been stored");
+		} catch (DerbySQLIntegrityConstraintViolationException e) {
+			Utils.LOGGER.info("Chunk " + chunkInfo.getFilename() + " has been stored before");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -284,19 +290,69 @@ public class DBUtils {
 		return null;
 	}
 	
-	private static boolean wasFileStoredBefore(Connection conn, String fileId) {
+	public static int getDesiredRepDegree(Connection conn, String fileId) {
 		PreparedStatement p;
 		try {
 			p = conn.prepareStatement(getFileStored);
 			p.setString(1, fileId);
 			ResultSet result =  p.executeQuery();
 			if (result.next()) {
-				return true;
+				return result.getInt(2);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return 0;
+	}
+	
+	public static boolean isFileStored(Connection conn, String fileId) {
+		PreparedStatement p;
+		try {
+			p = conn.prepareStatement(getFileStored);
+			p.setString(1, fileId);
+			ResultSet result =  p.executeQuery();
+			return result.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return false;
+	}
+	
+	public static ArrayList<ChunkInfo> getAllChunksOfFile(Connection conn, String fileId) {
+		PreparedStatement p;
+		ArrayList<ChunkInfo> chunksInfo = new ArrayList<ChunkInfo>();
+		try {
+			p = conn.prepareStatement(getChunksOfFile);
+			p.setString(1, fileId);
+			ResultSet result =  p.executeQuery();
+			while (result.next()) {
+				chunksInfo.add(new ChunkInfo(result.getInt(1), result.getString(2), result.getInt(3)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return chunksInfo;
+	}
+	
+	public static void deleteFile(Connection conn, String fileId) {
+		try {
+			PreparedStatement p = conn.prepareStatement(deleteFileStored);
+			p.setString(1, fileId);
+			p.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public static void deleteFileFromBackupsRequested(Connection conn, String fileId) {
+		try {
+			PreparedStatement p = conn.prepareStatement(deleteFileRequested);
+			p.setString(1, fileId);
+			p.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }

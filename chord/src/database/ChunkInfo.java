@@ -5,6 +5,13 @@ public class ChunkInfo {
 	private Integer chunkId;
 	private String fileId;
 	private Integer actualRepDegree;
+	private Integer size;
+	
+	public ChunkInfo(Integer chunkId,String fileId, Integer size) {
+		this.fileId = fileId;
+		this.chunkId = chunkId;
+		this.size = size;
+	}
 	
 	public ChunkInfo(Integer chunkId,String fileId) {
 		this.chunkId = chunkId;
@@ -26,6 +33,15 @@ public class ChunkInfo {
 	public void setActualRepDegree(Integer actualRepDegree) {
 		this.actualRepDegree = actualRepDegree;
 	}
-	
+	public String getFilename() {
+		return fileId + "_" + chunkId;
+	}
+
+	public void setSize(Integer size) {
+		this.size = size;
+	}
+	public Integer getSize() {
+		return size;
+	}
 	
 }

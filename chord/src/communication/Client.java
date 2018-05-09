@@ -15,6 +15,7 @@ public class Client {
 	
 	public static String sendMessage(InetAddress addr, int port, String message, boolean waitForResponse) {
 
+		String response = null;
 		SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
 		
@@ -33,9 +34,14 @@ public class Client {
 		send(message, socket);
 
 		if(waitForResponse) {
-			return getResponse(socket);//fica bloqueado a espera de resposta
+			response = getResponse(socket);//fica bloqueado a espera de resposta
 		}
-		return null;
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return response;
 	}
 
 	/**
