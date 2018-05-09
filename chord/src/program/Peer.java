@@ -162,10 +162,11 @@ public class Peer {
 			e.printStackTrace();
 			return;
 		}
-		BackupRequest backupRequest = new BackupRequest(fileID,filename,encryptKey);
+		byte[] file = Utils.readFile(filename).getBytes();
+		int n = Math.floorDiv(file.length,LENGTH_OF_CHUNK) + 1;
+		BackupRequest backupRequest = new BackupRequest(fileID,filename,encryptKey,n);
 		DBUtils.insertBackupRequested(database.getConnection(), backupRequest);
 		int chunkNo = 0;
-		byte[] file = Utils.readFile(filename).getBytes();
 		while(file.length > (chunkNo+1)*LENGTH_OF_CHUNK) {
 			byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, LENGTH_OF_CHUNK);
 			SendPutChunk th = new SendPutChunk(this.getChordManager().getPeerInfo().getId(),
@@ -178,6 +179,23 @@ public class Peer {
 				fileID, chunkNo, degree, body, this.getChordManager());
 		SingletonThreadPoolExecutor.getInstance().get().execute(th);
 
+	}
+
+	public void restore(BackupRequest backupRequest) {
+		// TODO Auto-generated method stub
+	
+//		------------------------------------------
+			
+//			String fileID = getFileID(filename);
+//			Integer chunkNo = 0;
+//			long fileSize = (Long) Files.getAttribute(Paths.get(filename), "size");
+//			int totalNumChunks = (int) (Math.floorDiv(fileSize, Utils.MAX_LENGTH_CHUNK) + 1);//numero total de chunks que o file vai ter
+//			for(int i = 0; i < totalNumChunks; i++) {
+//				LocalState.getInstance().getBackupFiles().get(fileID).getChunks().get(chunkNo).setRestoreMode(State.RECEIVE);
+//				sendGetChunk(fileID, chunkNo,isEnhancement);
+//				chunkNo++;
+//			}
+		
 	}
 
 }

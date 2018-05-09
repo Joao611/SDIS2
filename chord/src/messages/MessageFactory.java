@@ -73,10 +73,26 @@ public class MessageFactory {
 		String msg2 = appendLine(msg, new Object[] {fileID, chunkNo, replicationDeg});
 		return msg2;
 	}
-
 	public static String getConfirmStored(String senderId, String fileID, int chunkNo, int replicationDeg) {
 		String msg = getFirstLine(MessageType.CONFIRMSTORED,"1.0",senderId);
 		String msg2 = appendLine(msg, new Object[] {fileID, chunkNo, replicationDeg});
 		return msg2;
 	}
+	public static String getGetChunk(String senderId, InetAddress addr, int port, String fileID, int chunkNo) {
+		String msg = getFirstLine(MessageType.GETCHUNK,"1.0",senderId);
+		String msg2 = appendLine(msg, new Object[] {addr.getHostAddress(), port, fileID, chunkNo});
+		return msg2;
+	}
+	public static String getChunk(String senderId, String fileID, int chunkNo, byte[] body) {
+		String msg = getFirstLine(MessageType.CHUNK,"1.0",senderId);
+		String msg2 = appendLine(msg, new Object[] {fileID, chunkNo});
+		try {
+			return appendBody(msg2, body);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			
+			return null;
+		}
+	}
+
 }

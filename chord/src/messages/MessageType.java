@@ -12,17 +12,20 @@ public enum MessageType {
 	PREDECESSOR("PREDECESSOR"),
 	STABILIZE("STABILIZE"),
 	SUCCESSOR("SUCCESSOR"),
-	STORED("STORED"), CONFIRMSTORED("CONFIRMSTORED");
-	
-	
+	STORED("STORED"),
+	CONFIRMSTORED("CONFIRMSTORED"),
+	GETCHUNK("GETCHUNK"),
+	CHUNK("CHUNK");
+
+
 	private String type;
-	 
+
 	MessageType(String type) {
-        this.type = type;
-    }
-	
+		this.type = type;
+	}
+
 	public String getType() {
 		return type;
 	}
-	 
+
 }

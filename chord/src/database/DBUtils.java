@@ -19,7 +19,7 @@ public class DBUtils {
 	private static final String insertChunkStored = "INSERT INTO CHUNKSSTORED "
 			+ "(chunk_id,file_id) VALUES (?,?)";
 	private static final String insertBackupRequested = "INSERT INTO BACKUPSREQUESTED "
-			+ "(file_id, filename, encrypt_key) VALUES (?,?,?)";
+			+ "(file_id, filename, encrypt_key,numberOfChunks) VALUES (?,?,?,?)";
 	private static final String getFileById = "SELECT * FROM FILESSTORED "
 			+ "WHERE file_id = ?";
 	private static final String updatePeer = "UPDATE PEERS " + 
@@ -112,11 +112,13 @@ public class DBUtils {
 			PreparedStatement p = conn.prepareStatement(insertBackupRequested);
 			p.setString(1, backupRequest.getFileId());
 			p.setString(2, backupRequest.getFilename());
+			
 			if (backupRequest.getEncryptKey() != null) {
 				p.setString(3, backupRequest.getEncryptKey());
 			}else {
 				p.setNull(3, Types.VARCHAR);
 			}
+			p.setInt(4, backupRequest.getNumberOfChunks());
 			p.executeUpdate();
 			Utils.log("BackupRequest for file " + backupRequest.getFilename() + " has been stored");
 		} catch (SQLException e) {
