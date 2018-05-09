@@ -11,15 +11,13 @@ import utils.Utils;
 public class DBUtils {
 	
 	private static final String insertFileStored = "INSERT INTO FILESSTORED "
-			+ "(file_id, i_am_responsible, peer_requesting) VALUES (?,?,?)";
+			+ "(file_id, i_am_responsible, peer_requesting, desired_rep_degree) VALUES (?,?,?,?)";
 	private static final String insertPeer = "INSERT INTO PEERS "
 					+ "(peer_id,ip,port) VALUES (?,?,?)";
-	
-	
 	private static final String insertChunkStored = "INSERT INTO CHUNKSSTORED "
 			+ "(chunk_id,file_id) VALUES (?,?)";
 	private static final String insertBackupRequested = "INSERT INTO BACKUPSREQUESTED "
-			+ "(file_id, filename, encrypt_key) VALUES (?,?,?)";
+			+ "(file_id, filename, desired_rep_degree, encrypt_key) VALUES (?,?,?,?)";
 	private static final String getFileById = "SELECT * FROM FILESSTORED "
 			+ "WHERE file_id = ?";
 	private static final String updatePeer = "UPDATE PEERS " + 
@@ -28,6 +26,8 @@ public class DBUtils {
 	private static final String updateFileStored = "UPDATE FILESSTORED "
 			+ "SET i_am_responsible = ?, peer_requesting = ? "
 			+ "WHERE file_id = ?";
+	private static final String updateChunkStoredRepDegree = "UPDATE CHUNKSSTORED "
+			+ "SET actual_rep_degree = ? WHERE chunk_id = ? AND file_id = ?";
 	
 	
 	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
@@ -59,6 +59,7 @@ public class DBUtils {
 	}
 	public static void insertStoredFile(Connection conn, FileStoredInfo fileInfo) {
 		String peerRequesting = fileInfo.getPeerRequesting();
+		Integer desiredRepDegree = fileInfo.getDesiredRepDegree();
 		try {
 			PreparedStatement p = conn.prepareStatement(insertFileStored);
 			p.setString(1, fileInfo.getFileId());
@@ -67,6 +68,11 @@ public class DBUtils {
 				p.setNull(3, Types.VARCHAR);
 			} else {
 				p.setString(3, peerRequesting);
+			}
+			if (desiredRepDegree == null){
+				p.setNull(4, Types.INTEGER);
+			}else {
+				p.setInt(4, desiredRepDegree);
 			}
 			p.executeUpdate();
 			Utils.log("File " + fileInfo.getFileId() + " has been stored");
@@ -112,10 +118,11 @@ public class DBUtils {
 			PreparedStatement p = conn.prepareStatement(insertBackupRequested);
 			p.setString(1, backupRequest.getFileId());
 			p.setString(2, backupRequest.getFilename());
+			p.setInt(3, backupRequest.getDesiredRepDegree());
 			if (backupRequest.getEncryptKey() != null) {
-				p.setString(3, backupRequest.getEncryptKey());
+				p.setString(4, backupRequest.getEncryptKey());
 			}else {
-				p.setNull(3, Types.VARCHAR);
+				p.setNull(4, Types.VARCHAR);
 			}
 			p.executeUpdate();
 			Utils.log("BackupRequest for file " + backupRequest.getFilename() + " has been stored");
@@ -141,9 +148,9 @@ public class DBUtils {
 		ArrayList<BackupRequest> array = new ArrayList<BackupRequest>();
 		try {
 			Statement stmt = conn.createStatement();
-			ResultSet res = stmt.executeQuery("SELECT file_id, filename FROM BACKUPSREQUESTED");
+			ResultSet res = stmt.executeQuery("SELECT file_id, filename, desired_rep_degree FROM BACKUPSREQUESTED");
 			while (res.next()) {
-				BackupRequest currentBackupRequest = new BackupRequest(res.getString(1), res.getString(2));
+				BackupRequest currentBackupRequest = new BackupRequest(res.getString(1), res.getString(2), res.getInt(3));
 			    array.add(currentBackupRequest);
 			}
 		} catch (SQLException e) {

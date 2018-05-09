@@ -79,4 +79,8 @@ public class MessageFactory {
 		String msg2 = appendLine(msg, new Object[] {fileID, chunkNo, replicationDeg});
 		return msg2;
 	}
+	public static String getInitDelete(String senderId, String fileId) {
+		String msg = getFirstLine(MessageType.DELETE, "1.0",senderId);
+		return appendLine(msg, new Object[] {fileId});
+	}
 }

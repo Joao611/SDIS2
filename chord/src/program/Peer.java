@@ -13,13 +13,12 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.util.Arrays;
 
-import javax.xml.bind.DatatypeConverter;
-
 import chord.ChordManager;
 import communication.Server;
 import database.BackupRequest;
 import database.DBUtils;
 import database.Database;
+import runnableProtocols.SendInitDelete;
 import runnableProtocols.SendPutChunk;
 import utils.ReadInput;
 import utils.SingletonThreadPoolExecutor;
@@ -164,22 +163,25 @@ public class Peer {
 			e.printStackTrace();
 			return;
 		}
-		BackupRequest backupRequest = new BackupRequest(fileID,filename,encryptKey);
+		BackupRequest backupRequest = new BackupRequest(fileID,filename,encryptKey, degree);
 		DBUtils.insertBackupRequested(database.getConnection(), backupRequest);
 		int chunkNo = 0;
 		byte[] file = Utils.readFile(filename).getBytes();
 		while(file.length > (chunkNo+1)*LENGTH_OF_CHUNK) {
 			byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, LENGTH_OF_CHUNK);
-			SendPutChunk th = new SendPutChunk(this.getChordManager().getPeerInfo().getId(),
-					fileID, chunkNo, degree, body, this.getChordManager());
+			SendPutChunk th = new SendPutChunk(fileID, chunkNo, degree, body, this.getChordManager());
 			SingletonThreadPoolExecutor.getInstance().get().execute(th);
 			chunkNo++;
 		}
 		byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, file.length);
-		SendPutChunk th = new SendPutChunk(this.getChordManager().getPeerInfo().getId(),
-				fileID, chunkNo, degree, body, this.getChordManager());
+		SendPutChunk th = new SendPutChunk(fileID, chunkNo, degree, body, this.getChordManager());
 		SingletonThreadPoolExecutor.getInstance().get().execute(th);
 
+	}
+	
+	public void delete(String fileID) {
+		SendInitDelete th = new SendInitDelete(fileID,this.getChordManager());
+		SingletonThreadPoolExecutor.getInstance().get().execute(th);
 	}
 
 }

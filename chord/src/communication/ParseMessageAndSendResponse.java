@@ -51,8 +51,9 @@ public class ParseMessageAndSendResponse implements Runnable {
 	@Override
 	public void run() {
 		String response = parseMessage(readData);
-
-		sendResponse(socket, response);
+		if (response != null) {
+			sendResponse(socket, response);
+		}
 
 	}
 
@@ -76,14 +77,17 @@ public class ParseMessageAndSendResponse implements Runnable {
 		if (lines.length > 2) {
 			thirdLine = lines[3];
 		}
-		String response = new String();
+		String response = null;
 
 		switch (MessageType.valueOf(firstLine[0])) {
+		case INITDELETE:
+			parseInitDelete(secondLine);
+			break;
 		case LOOKUP:
 			if (secondLine != null) {
 				response = peer.getChordManager().lookup(secondLine[0]);
 			}else {
-				Utils.LOGGER.info("Invalid lookup message");
+				Utils.LOGGER.warning("Invalid lookup message");
 			}
 			break;
 		case PING:
@@ -102,7 +106,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 		case STABILIZE:
 			response = MessageFactory.getFirstLine(MessageType.PREDECESSOR, "1.0", peer.getChordManager().getPeerInfo().getId());
 			response = MessageFactory.appendLine(response, peer.getChordManager().getPredecessor().asArray());
-//			System.err.println(response);
 			break;
 		case STORED: {
 			response = parseStoredMsg(secondLine);
@@ -113,6 +116,12 @@ public class ParseMessageAndSendResponse implements Runnable {
 		}
 		return response;
 	}
+
+	private void parseInitDelete(String[] secondLine) {
+		String fileToDelete = secondLine[0];
+				
+	}
+
 
 	private String parseStoredMsg(String[] lines) {
 		String fileID = lines[0];
@@ -196,6 +205,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		DBUtils.insertPeer(dbConnection, peerThatRequestedBackup);
 		FileStoredInfo fileInfo = new FileStoredInfo(id, true);
 		fileInfo.setPeerRequesting(peerThatRequestedBackup.getId());
+		fileInfo.setDesiredRepDegree(replicationDegree);
 		DBUtils.insertStoredFile(dbConnection, fileInfo);
 		
 		

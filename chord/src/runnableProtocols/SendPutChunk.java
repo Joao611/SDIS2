@@ -15,8 +15,8 @@ public class SendPutChunk implements Runnable {
 	private byte[] body = null;
 	private ChordManager chord = null;
 	
-	public SendPutChunk (String senderID, String fileID, int chunkNo, int replicationDeg, byte[] body, ChordManager chord) {
-		this.senderID = senderID;
+	public SendPutChunk (String fileID, int chunkNo, int replicationDeg, byte[] body, ChordManager chord) {
+		this.senderID = chord.getPeerInfo().getId();
 		this.fileID = fileID;
 		this.chunkNo = chunkNo;
 		this.replicationDeg = replicationDeg;

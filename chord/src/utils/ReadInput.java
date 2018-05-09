@@ -55,6 +55,7 @@ public class ReadInput {
 					scanner.nextLine();
 				}
 			} while(option < 0 && option >= allRequests.size());
+			peer.delete(allRequests.get(option).getFileId());
 			
 		} else {
 			System.out.println("You need to backup files before deleting");
