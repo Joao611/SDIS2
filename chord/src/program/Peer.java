@@ -16,6 +16,8 @@ import javax.xml.bind.DatatypeConverter;
 
 import chord.ChordManager;
 import communication.Server;
+import database.BackupRequest;
+import database.DBUtils;
 import database.Database;
 import runnableProtocols.SendPutChunk;
 import utils.ReadInput;
@@ -95,7 +97,7 @@ public class Peer {
 	/**
 	 * Generate a file ID
 	 * @param filename - the filename
-	 * @return Hexadecimal SHA-256 encoded fileID
+	 * @return Hexadecimal md5 encoded fileID
 	 * @throws IOException, NoSuchAlgorithmException
 	 * */
 	public String getFileID(String filename) throws IOException, NoSuchAlgorithmException {
@@ -148,7 +150,7 @@ public class Peer {
 		return false;
 	}
 
-	public void backup(String filename, Integer degree, boolean encript) {
+	public void backup(String filename, Integer degree, String encryptKey) {
 		String fileID;
 		try {
 			fileID = this.getFileID(filename);
@@ -158,6 +160,8 @@ public class Peer {
 			e.printStackTrace();
 			return;
 		}
+		BackupRequest backupRequest = new BackupRequest(fileID,filename,encryptKey);
+		DBUtils.insertBackupRequested(database.getConnection(), backupRequest);
 		int chunkNo = 0;
 		byte[] file = Utils.readFile(filename).getBytes();
 		while(file.length > (chunkNo+1)*LENGTH_OF_CHUNK) {
