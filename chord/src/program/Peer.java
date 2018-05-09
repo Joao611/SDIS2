@@ -13,8 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.util.Arrays;
 
-import javax.xml.bind.DatatypeConverter;
-
 import chord.ChordManager;
 import communication.Server;
 import database.BackupRequest;
