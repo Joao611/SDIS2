@@ -2,7 +2,8 @@ CREATE TABLE filesstored(
 	id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
 	file_id VARCHAR(16) NOT NULL,
 	i_am_responsible BOOLEAN DEFAULT false,
-	peer_requesting VARCHAR(16)
+	peer_requesting VARCHAR(16),
+	desired_rep_degree INTEGER
 );
 
 CREATE TABLE peers(
@@ -16,14 +17,20 @@ CREATE TABLE backupsrequested(
 	id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
 	file_id VARCHAR(16) NOT NULL,
 	filename VARCHAR(128) NOT NULL,
+<<<<<<< HEAD
 	encrypt_key VARCHAR(256),
 	numberOfChunks INTEGER NOT NULL
+=======
+	desired_rep_degree INTEGER NOT NULL,
+	encrypt_key VARCHAR(256) 
+>>>>>>> branch 'master' of https://github.com/Joao611/SDIS2.git
 );
 
 CREATE TABLE chunksstored(
 	id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
 	chunk_id INT NOT NULL,
-	file_id VARCHAR(16) NOT NULL
+	file_id VARCHAR(16) NOT NULL,
+	actual_rep_degree INTEGER
 );
 
 ALTER TABLE chunksstored

@@ -3,6 +3,7 @@ package messages;
 public enum MessageType {
 
 	ASK("ASK"),
+	DELETE("DELETE"), INITDELETE("INITDELETE"),
 	PUTCHUNK("PUTCHUNK"),
 	KEEPCHUNK("KEEPCHUNK"),
 	PING("PING"),

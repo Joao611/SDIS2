@@ -95,4 +95,8 @@ public class MessageFactory {
 		}
 	}
 
+	public static String getInitDelete(String senderId, String fileId) {
+		String msg = getFirstLine(MessageType.DELETE, "1.0",senderId);
+		return appendLine(msg, new Object[] {fileId});
+	}
 }

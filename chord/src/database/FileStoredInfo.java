@@ -5,6 +5,7 @@ public class FileStoredInfo {
 	private String fileId;
 	private Boolean iAmResponsible;
 	private String peerRequesting;
+	private Integer desiredRepDegree;
 	
 	public FileStoredInfo(String fileId, Boolean iAmResponsible){
 		this.fileId = fileId;
@@ -27,6 +28,13 @@ public class FileStoredInfo {
 		this.peerRequesting = peerId;
 	}
 
+	public void setDesiredRepDegree(int desiredRepDegree) {
+		this.desiredRepDegree = desiredRepDegree;
+	}
+	
+	public Integer getDesiredRepDegree() {
+		return this.desiredRepDegree;
+	}
 
 	
 	
