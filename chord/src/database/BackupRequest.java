@@ -16,7 +16,9 @@ public class BackupRequest {
 		this.desiredRepDegree = desiredRepDegree;
 	}
 	
-	public BackupRequest(String fileId, String filename, String encryptKey, Integer desiredRepDegree, Integer numberOfChunks) {
+	public BackupRequest(String fileId, String filename, 
+			String encryptKey, Integer desiredRepDegree, 
+			Integer numberOfChunks) {
 		this.fileId = fileId;
 		this.filename = filename;
 		this.encryptKey = encryptKey;

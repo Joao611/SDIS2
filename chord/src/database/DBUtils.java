@@ -11,11 +11,11 @@ import chord.PeerInfo;
 import utils.Utils;
 
 public class DBUtils {
-	
+
 	private static final String insertFileStored = "INSERT INTO FILESSTORED "
 			+ "(file_id, i_am_responsible, peer_requesting, desired_rep_degree) VALUES (?,?,?,?)";
 	private static final String insertPeer = "INSERT INTO PEERS "
-					+ "(peer_id,ip,port) VALUES (?,?,?)";
+			+ "(peer_id,ip,port) VALUES (?,?,?)";
 	private static final String insertChunkStored = "INSERT INTO CHUNKSSTORED "
 			+ "(chunk_id,file_id) VALUES (?,?)";
 	private static final String insertBackupRequested = "INSERT INTO BACKUPSREQUESTED "
@@ -38,8 +38,8 @@ public class DBUtils {
 			+ "JOIN (SELECT peer_requesting FROM FILESSTORED WHERE file_id = ?) AS F ON PEER.id = F.peer_requesting";
 	private static final String getBackupRequested = "SELECT file_id FROM BACKUPSREQUESTED WHERE file_id = ?";
 	private static final String getFileStored = "SELECT file_id FROM FILESSTORED WHERE file_id = ?";
-	
-	
+
+
 	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
 		try {
 			PreparedStatement p = conn.prepareStatement(insertPeer);
@@ -93,8 +93,8 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	public static void updateStoredFile(Connection conn, FileStoredInfo fileInfo) {
 		String peerRequesting = fileInfo.getPeerRequesting();
 		try {
@@ -112,8 +112,8 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	public static void insertStoredChunk(Connection conn, ChunkInfo chunkInfo) {
 		try {
 			PreparedStatement p = conn.prepareStatement(insertChunkStored);
@@ -125,10 +125,10 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void updateStoredChunkRepDegree(Connection conn, ChunkInfo chunkInfo) {
 		//"UPDATE CHUNKSSTORED SET actual_rep_degree = ? WHERE file_id = ? AND chunk_id = ?"
-				
+
 		try {
 			PreparedStatement p = conn.prepareStatement(updateChunkStoredRepDegree);
 			p.setInt(1, chunkInfo.getActualRepDegree());
@@ -140,7 +140,7 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static void updateBackupRequested(Connection conn, BackupRequest backupReq) {
 		try {
 			PreparedStatement p = conn.prepareStatement(updateBackupRequested);
@@ -152,7 +152,7 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void insertBackupRequested(Connection conn, BackupRequest backupRequest) {
 		Boolean wasRequested = wasBackupRequestedBefore(conn, backupRequest.getFileId());
 		if (!wasRequested) {
@@ -177,9 +177,9 @@ public class DBUtils {
 			// Update old
 			updateBackupRequested(conn,backupRequest);
 		}
-		
+
 	}
-	
+
 	public static boolean amIResponsible(Connection conn, String fileId) {
 		try {
 			PreparedStatement p = conn.prepareStatement(getFileById);
@@ -193,7 +193,7 @@ public class DBUtils {
 		}
 		return false;
 	}
-	
+
 	public static boolean checkStoredChunk(Connection conn, ChunkInfo chunkInfo) {
 		try {
 			PreparedStatement p = conn.prepareStatement(checkStoredChunk);
@@ -208,22 +208,26 @@ public class DBUtils {
 		}
 		return false;
 	}
-	
+
 	public static ArrayList<BackupRequest> getBackupsRequested(Connection conn){
 		ArrayList<BackupRequest> array = new ArrayList<BackupRequest>();
 		try {
 			Statement stmt = conn.createStatement();
-			ResultSet res = stmt.executeQuery("SELECT file_id, filename, desired_rep_degree FROM BACKUPSREQUESTED");
+			ResultSet res = stmt.executeQuery("SELECT file_id, filename, desired_rep_degree,encrypt_key, numberOfChunks FROM BACKUPSREQUESTED");
 			while (res.next()) {
-				BackupRequest currentBackupRequest = new BackupRequest(res.getString(1), res.getString(2), res.getInt(3));
-			    array.add(currentBackupRequest);
+				BackupRequest currentBackupRequest = new BackupRequest(res.getString(1),
+						res.getString(2),
+						res.getString("encrypt_key"),
+						res.getInt(3), 
+						res.getInt("numberOfChunks"));
+				array.add(currentBackupRequest);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return array;
 	}
-	
+
 	public static PeerInfo getPeerWhichRequestedBackup(Connection conn, String fileId) {
 		try {
 			PreparedStatement p = conn.prepareStatement(getPeerWhichRequested);
@@ -244,7 +248,7 @@ public class DBUtils {
 		}
 		return null;
 	}
-	
+
 	private static boolean wasBackupRequestedBefore(Connection conn, String fileId) {
 		PreparedStatement p;
 		try {
@@ -259,7 +263,7 @@ public class DBUtils {
 		}
 		return false;
 	}
-	
+
 	private static boolean wasFileStoredBefore(Connection conn, String fileId) {
 		PreparedStatement p;
 		try {

@@ -114,6 +114,10 @@ public class ParseMessageAndSendResponse implements Runnable {
 			response = parseGetChunkMsg(secondLine);
 			break;
 		}
+		case CHUNK: {
+			System.err.println("ESTOU A RECEBER O CHUNK");
+			break;
+		}
 		default:
 			break;
 		}
