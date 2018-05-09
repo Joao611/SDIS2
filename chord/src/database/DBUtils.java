@@ -2,6 +2,8 @@ package database;
 
 import java.sql.*;
 
+import org.apache.derby.shared.common.error.DerbySQLIntegrityConstraintViolationException;
+
 import chord.PeerInfo;
 import utils.Utils;
 
@@ -9,12 +11,8 @@ public class DBUtils {
 	
 	private static final String insertFileStored = "INSERT INTO FILESSTORED "
 			+ "(file_id, i_am_responsible, peer_requesting) VALUES (?,?,?)";
-//	private static final String insertPeer = "INSERT INTO PEERS "
-//			+ "(peer_id,ip,port) VALUES (?,?,?)";
 	private static final String insertPeer = "INSERT INTO PEERS "
-			+ "(peer_id,ip,port) VALUES (?,?,?) "
-			+ "WHERE NOT EXISTS (SELECT * FROM peers WHERE peer_id = ?)";
-	
+					+ "(peer_id,ip,port) VALUES (?,?,?)";
 	
 	
 	private static final String insertChunkStored = "INSERT INTO CHUNKSSTORED "
@@ -23,7 +21,41 @@ public class DBUtils {
 			+ "(file_id, filename, encrypt_key) VALUES (?,?,?)";
 	private static final String getFileById = "SELECT * FROM FILESSTORED "
 			+ "WHERE file_id = ?";
-
+	private static final String updatePeer = "UPDATE PEERS " + 
+			"SET ip = ?, port = ? " + 
+			"WHERE peer_id = ?";
+	private static final String updateFileStored = "UPDATE FILESSTORED "
+			+ "SET i_am_responsible = ?, peer_requesting = ? "
+			+ "WHERE file_id = ?";
+	
+	
+	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
+		try {
+			PreparedStatement p = conn.prepareStatement(insertPeer);
+			p.setString(1, peerInfo.getId());
+			p.setString(2, peerInfo.getAddr().getHostAddress());
+			p.setInt(3, peerInfo.getPort());
+			p.executeUpdate();
+			Utils.log("Peer " + peerInfo.getId() + " has been stored");
+		} catch (DerbySQLIntegrityConstraintViolationException e) {
+			Utils.LOGGER.info("Not a new INSERT, updating");
+			updatePeer(conn, peerInfo);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	private static void updatePeer(Connection conn, PeerInfo peerInfo) {
+		try {
+			PreparedStatement p = conn.prepareStatement(updatePeer);
+			p.setString(1, peerInfo.getAddr().getHostAddress());
+			p.setInt(2, peerInfo.getPort());
+			p.setString(3, peerInfo.getId());
+			p.executeUpdate();
+			Utils.log("Peer " + peerInfo.getId() + " has been updated");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 	public static void insertStoredFile(Connection conn, FileStoredInfo fileInfo) {
 		String peerRequesting = fileInfo.getPeerRequesting();
 		try {
@@ -37,23 +69,31 @@ public class DBUtils {
 			}
 			p.executeUpdate();
 			Utils.log("File " + fileInfo.getFileId() + " has been stored");
+		} catch (DerbySQLIntegrityConstraintViolationException e) {
+			Utils.LOGGER.info("Not a new INSERT, updating");
+			updateStoredFile(conn, fileInfo);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
+	public static void updateStoredFile(Connection conn, FileStoredInfo fileInfo) {
+		String peerRequesting = fileInfo.getPeerRequesting();
 		try {
-			PreparedStatement p = conn.prepareStatement(insertPeer);
-			p.setString(1, peerInfo.getId());
-			p.setString(4, peerInfo.getId());
-			p.setString(2, peerInfo.getAddr().getHostAddress());
-			p.setInt(3, peerInfo.getPort());
+			PreparedStatement p = conn.prepareStatement(updateFileStored);
+			p.setBoolean(1, fileInfo.getiAmResponsible());
+			if (peerRequesting == null) {
+				p.setNull(2, Types.VARCHAR);
+			} else {
+				p.setString(2, peerRequesting);
+			}
+			p.setString(3, fileInfo.getFileId());
 			p.executeUpdate();
-			Utils.log("Peer " + peerInfo.getId() + " has been stored");
+			Utils.log("File " + fileInfo.getFileId() + " has been updated");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
+	
 	
 	public static void insertStoredChunk(Connection conn, ChunkInfo chunkInfo) {
 		try {
