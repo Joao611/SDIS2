@@ -40,7 +40,6 @@ public class ChordManager implements Runnable {
 		try {
 			addr = InetAddress.getLocalHost();
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
@@ -65,7 +64,7 @@ public class ChordManager implements Runnable {
 		}
 		predecessor = new NullPeerInfo();
 
-		System.err.println(MessageFactory.appendLine(SUCCESSOR_MESSAGE, this.getPeerInfo().asArray()));
+//		System.err.println(MessageFactory.appendLine(SUCCESSOR_MESSAGE, this.getPeerInfo().asArray()));
 
 	}
 

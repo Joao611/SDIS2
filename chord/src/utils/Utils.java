@@ -32,7 +32,7 @@ public class Utils {
 		LOGGER.setUseParentHandlers(false);
 		LOGGER.setLevel(Level.ALL);
 		try {
-			FileHandler h = new FileHandler("backup_%g_log_%u.txt", true);
+			FileHandler h = new FileHandler("backup_%g_log_%u.log", true);
 			h.setFormatter(new SimpleFormatter());
 			LOGGER.addHandler(h);
 		} catch (SecurityException e) {

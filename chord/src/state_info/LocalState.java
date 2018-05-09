@@ -353,14 +353,13 @@ public class LocalState {
 		return this.backupFiles.get(fileName).isReplicationDegreeZero();
 	}
 
-	public boolean amIResponsavel(String fileID) {
-		// TODO Auto-generated method stub
-		BackupFile f= getBackupFiles().get(fileID);
-		if(f == null) {
-			return false;
-		}
-		return f.isReponsavel();
-	}
+//	public boolean amIResponsavel(String fileID) {
+//		BackupFile f= getBackupFiles().get(fileID);
+//		if(f == null) {
+//			return false;
+//		}
+//		return f.isReponsavel();
+//	}
 	
 //	public boolean isStoringChunk(String fileID, int chunkID) {
 //		return backupFiles.get(fileID).isStoringChunk(chunkID);

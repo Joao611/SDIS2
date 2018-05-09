@@ -1,3 +1,7 @@
-/chord/
-/utils/
 /program/
+/runnableProtocols/
+/state_info/
+/utils/
+/chord/
+/communication/
+/database/

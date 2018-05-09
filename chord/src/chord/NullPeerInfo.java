@@ -11,13 +11,11 @@ public class NullPeerInfo extends AbstractPeerInfo{
 
 	@Override
 	public InetAddress getAddr() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Integer getPort() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

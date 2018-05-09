@@ -63,7 +63,7 @@ public class DBUtils {
 			PreparedStatement p = conn.prepareStatement(getFileById);
 			p.setString(1, fileId);
 			ResultSet result = p.executeQuery();
-			if (result.first()) {
+			if (result.next()) {
 				return result.getBoolean("i_am_responsible");
 			}
 		} catch (SQLException e) {

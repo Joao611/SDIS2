@@ -102,7 +102,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		case STABILIZE:
 			response = MessageFactory.getFirstLine(MessageType.PREDECESSOR, "1.0", peer.getChordManager().getPeerInfo().getId());
 			response = MessageFactory.appendLine(response, peer.getChordManager().getPredecessor().asArray());
-			System.err.println(response);
+//			System.err.println(response);
 			break;
 		case STORED: {
 			response = parseStoredMsg(secondLine);
@@ -199,7 +199,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		DBUtils.insertStoredFile(dbConnection, fileInfo);
 		
 		
-		if(addr.equals(peer.getChordManager().getPeerInfo().getAddr())) {//sou o dono do ficheiro que quero fazer backup...
+		if(id.equals(peer.getChordManager().getPeerInfo().getId())) {//sou o dono do ficheiro que quero fazer backup...
 			//nao faz senido guardarmos um ficheiro com o chunk, visto que guardamos o ficheiro
 			//enviar o KEEPCHUNK
 			System.out.println("SOU O DONO");
@@ -238,36 +238,36 @@ public class ParseMessageAndSendResponse implements Runnable {
 		ChordManager chordManager = peer.getChordManager();
 		byte [] body_bytes = body.getBytes();
 		
-		String id = header[0].trim();
-		InetAddress addr = null;
+		String id_request = header[0].trim();
+		InetAddress addr_request = null;
 		try {
-			addr = InetAddress.getByName(header[1]);
+			addr_request = InetAddress.getByName(header[1]);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-		int port = Integer.parseInt(header[2].trim());
+		int port_request = Integer.parseInt(header[2].trim());
 		
 		String fileID = header[3];
-//		String fileId_Integer = Integer.parseInt(fileID,16);
 		int chunkNo = Integer.parseInt(header[4]);
 		int replicationDegree = Integer.parseInt(header[5]);
 		
 		Path filePath = Peer.getPath().resolve(fileID + "_" + chunkNo);
-		if(addr.equals(chordManager.getPeerInfo().getAddr())) {//sou dono do ficheiro
-			System.out.println("SOU DONO");
-			//reencaminhar a mensagem para o proximo
-			//TODO: Reencaminhar esta mal
-			String message = MessageFactory.getKeepChunk(id, addr, port, fileID, chunkNo, replicationDegree, body_bytes);
-			Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
-			return;
-		}
 		if(DBUtils.amIResponsible(dbConnection, fileID)) {//a mensagem ja deu uma volta completa. repDeg nao vai ser o desejado
 			//enviar STORE para o predecessor
-			System.out.println("SOU RESPONSAVEL");
+			System.out.println("SOU RESPONSAVEL_KEEP ");
 			String message = MessageFactory.getStored(chordManager.getPeerInfo().getId(), fileID, chunkNo, 0);//porque enviar o nosso id???
 			Client.sendMessage(chordManager.getPredecessor().getAddr(), chordManager.getPredecessor().getPort(), message, false);
 			return;
 		}
+		if(id_request.equals(chordManager.getPeerInfo().getId())) {//I AM ASKING FOR THE BACKUP sou dono do ficheiro
+			System.out.println("SOU DONO");
+			//reencaminhar a mensagem para o proximo
+			//TODO: Reencaminhar esta mal
+			String message = MessageFactory.getKeepChunk(id_request, addr_request, port_request, fileID, chunkNo, replicationDegree, body_bytes); //TODO: check
+			Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
+			return;
+		}
+		
 		if(!Peer.capacityExceeded(body_bytes.length)) { //tem espaco para fazer o backup
 			System.out.println("VOU GUARDAR");
 			DBUtils.insertStoredChunk(dbConnection, new ChunkInfo(chunkNo,fileID));
@@ -283,14 +283,14 @@ public class ParseMessageAndSendResponse implements Runnable {
 				
 			} else {
 				//enivar KEEPCHUNK para o sucessor
-				String message = MessageFactory.getKeepChunk(id, addr, port, fileID, chunkNo, replicationDegree - 1, body_bytes);
+				String message = MessageFactory.getKeepChunk(id_request, addr_request, port_request, fileID, chunkNo, replicationDegree - 1, body_bytes);
 				Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
 			}
 			return;
 		} else {
 			System.out.println("NAO ESPACO");
 			//reencaminhar KEEPCHUNK para o seu sucessor
-			String message = MessageFactory.getKeepChunk(id, addr, port, fileID, chunkNo, replicationDegree, body_bytes);
+			String message = MessageFactory.getKeepChunk(id_request, addr_request, port_request, fileID, chunkNo, replicationDegree, body_bytes);
 			Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
 			return;
 		}
