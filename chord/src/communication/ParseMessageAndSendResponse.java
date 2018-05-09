@@ -269,6 +269,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		
 		if(!Peer.capacityExceeded(body_bytes.length)) { //tem espaco para fazer o backup
 			System.out.println("VOU GUARDAR");
+			DBUtils.insertStoredFile(dbConnection, new FileStoredInfo(fileID, false));
 			DBUtils.insertStoredChunk(dbConnection, new ChunkInfo(chunkNo,fileID));
 			try {
 				Utils.writeToFile(filePath, body_bytes);
