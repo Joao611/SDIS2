@@ -42,13 +42,18 @@ public class ReadInput {
 	private static void deleteOption(Scanner scanner, Peer peer) {
 		ArrayList<BackupRequest> allRequests = DBUtils.getBackupsRequested(peer.getConnection());
 		if (allRequests.size() > 0) {
-			int option;
+			int option = -1;
 			do {
 				System.out.println("Select a file to delete:");
 				for (int i = 0; i < allRequests.size(); i++) {
 					System.out.println(i + ". " + allRequests.get(i).getFilename() + " -> " + allRequests.get(i).getFileId());
 				}
-				option = scanner.nextInt();
+				try {
+					option = scanner.nextInt();
+				}catch(InputMismatchException e) {
+					System.out.println("Invalid Input");
+					scanner.nextLine();
+				}
 			} while(option < 0 && option >= allRequests.size());
 			
 		} else {
