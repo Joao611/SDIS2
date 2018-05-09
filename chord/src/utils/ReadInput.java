@@ -22,7 +22,7 @@ public class ReadInput {
 				op = Integer.valueOf(in.readLine());
 			} catch (NumberFormatException e) {
 				System.out.println("Error: not a valid input!");
-							continue;
+				continue;
 			} catch (IOException e) {
 				e.printStackTrace();
 				return;
@@ -36,13 +36,18 @@ public class ReadInput {
 				break;
 			}
 			case 3:{
+				ReadInput.deleteOption(in, peer);
 				break;
 			}
 			default: {
 				System.out.println("Error: not a valid input!");
-							continue;
+				continue;
 			}
 			}}
+	}
+	private static void deleteOption(BufferedReader in, Peer peer) {
+		System.out.println("You have stored these files in the network:");
+
 	}
 
 	private static void backupOption(BufferedReader in, Peer peer) {
@@ -71,7 +76,7 @@ public class ReadInput {
 			System.out.println("Error: Invalid Input!");
 			return;
 		}
-		peer.backup(filename, degree,true);
+		peer.backup(filename, degree,null);
 		System.out.println("Called Backup!");
 	}
 
