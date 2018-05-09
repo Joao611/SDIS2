@@ -26,7 +26,7 @@ public class DBUtils {
 			"SET ip = ?, port = ? " + 
 			"WHERE peer_id = ?";
 	private static final String updateFileStored = "UPDATE FILESSTORED "
-			+ "SET i_am_responsible = ?, peer_requesting = ? "
+			+ "SET last_time_stored = CURRENT_TIMESTAMP, i_am_responsible = ?, peer_requesting = ? "
 			+ "WHERE file_id = ?";
 	private static final String updateChunkStoredRepDegree = "UPDATE CHUNKSSTORED "
 			+ "SET actual_rep_degree = ? WHERE chunk_id = ? AND file_id = ?";
@@ -37,6 +37,7 @@ public class DBUtils {
 	private static final String getPeerWhichRequested = "SELECT peer_id,ip,port FROM PEERS "
 			+ "JOIN (SELECT peer_requesting FROM FILESSTORED WHERE file_id = ?) AS F ON PEER.id = F.peer_requesting";
 	private static final String getBackupRequested = "SELECT file_id FROM BACKUPSREQUESTED WHERE file_id = ?";
+	private static final String getFileStored = "SELECT file_id FROM FILESSTORED WHERE file_id = ?";
 	
 	
 	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
@@ -92,6 +93,8 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
+	
+	
 	public static void updateStoredFile(Connection conn, FileStoredInfo fileInfo) {
 		String peerRequesting = fileInfo.getPeerRequesting();
 		try {
@@ -255,7 +258,21 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 		return false;
-		
+	}
+	
+	private static boolean wasFileStoredBefore(Connection conn, String fileId) {
+		PreparedStatement p;
+		try {
+			p = conn.prepareStatement(getFileStored);
+			p.setString(1, fileId);
+			ResultSet result =  p.executeQuery();
+			if (result.next()) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 }
