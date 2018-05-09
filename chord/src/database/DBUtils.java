@@ -9,8 +9,14 @@ public class DBUtils {
 	
 	private static final String insertFileStored = "INSERT INTO FILESSTORED "
 			+ "(file_id, i_am_responsible, peer_requesting) VALUES (?,?,?)";
+//	private static final String insertPeer = "INSERT INTO PEERS "
+//			+ "(peer_id,ip,port) VALUES (?,?,?)";
 	private static final String insertPeer = "INSERT INTO PEERS "
-			+ "(peer_id,ip,port) VALUES (?,?,?)";
+			+ "(peer_id,ip,port) VALUES (?,?,?) "
+			+ "WHERE NOT EXISTS (SELECT * FROM peers WHERE peer_id = ?)";
+	
+	
+	
 	private static final String insertChunkStored = "INSERT INTO CHUNKSSTORED "
 			+ "(chunk_id,file_id) VALUES (?,?)";
 	private static final String getFileById = "SELECT * FROM FILESSTORED "
@@ -37,6 +43,7 @@ public class DBUtils {
 		try {
 			PreparedStatement p = conn.prepareStatement(insertPeer);
 			p.setString(1, peerInfo.getId());
+			p.setString(4, peerInfo.getId());
 			p.setString(2, peerInfo.getAddr().getHostAddress());
 			p.setInt(3, peerInfo.getPort());
 			p.executeUpdate();

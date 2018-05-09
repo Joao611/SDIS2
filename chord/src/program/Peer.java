@@ -152,13 +152,15 @@ public class Peer {
 		String fileID;
 		try {
 			fileID = this.getFileID(filename);
+			Utils.LOGGER.severe(filename + " - " + fileID);
+			System.err.println(filename + " - " + fileID);
 		} catch (NoSuchAlgorithmException | IOException e) {
 			e.printStackTrace();
 			return;
 		}
 		int chunkNo = 0;
 		byte[] file = Utils.readFile(filename).getBytes();
-		while(file.length > LENGTH_OF_CHUNK) {
+		while(file.length > (chunkNo+1)*LENGTH_OF_CHUNK) {
 			byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, LENGTH_OF_CHUNK);
 			SendPutChunk th = new SendPutChunk(this.getChordManager().getPeerInfo().getId(),
 					fileID, chunkNo, degree, body, this.getChordManager());
