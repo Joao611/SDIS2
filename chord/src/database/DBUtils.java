@@ -30,10 +30,13 @@ public class DBUtils {
 			+ "WHERE file_id = ?";
 	private static final String updateChunkStoredRepDegree = "UPDATE CHUNKSSTORED "
 			+ "SET actual_rep_degree = ? WHERE chunk_id = ? AND file_id = ?";
+	private static final String updateBackupRequested = "UPDATE BACKUPSREQUESTED "
+			+ "SET desired_rep_degree = ? WHERE file_id = ?";
 	private static final String checkStoredChunk = "SELECT * FROM CHUNKSSTORED "
 			+ "WHERE file_id = ? AND chunk_id = ?";
 	private static final String getPeerWhichRequested = "SELECT peer_id,ip,port FROM PEERS "
 			+ "JOIN (SELECT peer_requesting FROM FILESSTORED WHERE file_id = ?) AS F ON PEER.id = F.peer_requesting";
+	private static final String getBackupRequested = "SELECT file_id FROM BACKUPSREQUESTED WHERE file_id = ?";
 	
 	
 	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
@@ -135,22 +138,42 @@ public class DBUtils {
 		}
 	}
 	
-	public static void insertBackupRequested(Connection conn, BackupRequest backupRequest) {
+	private static void updateBackupRequested(Connection conn, BackupRequest backupReq) {
 		try {
-			PreparedStatement p = conn.prepareStatement(insertBackupRequested);
-			p.setString(1, backupRequest.getFileId());
-			p.setString(2, backupRequest.getFilename());
-			p.setInt(3, backupRequest.getDesiredRepDegree());
-			if (backupRequest.getEncryptKey() != null) {
-				p.setString(4, backupRequest.getEncryptKey());
-			}else {
-				p.setNull(4, Types.VARCHAR);
-			}
+			PreparedStatement p = conn.prepareStatement(updateBackupRequested);
+			p.setInt(1, backupReq.getDesiredRepDegree());
+			p.setString(2, backupReq.getFileId());
 			p.executeUpdate();
-			Utils.log("BackupRequest for file " + backupRequest.getFilename() + " has been stored");
+			Utils.log("BackupRequest: " + backupReq.getFileId() + " has been updated");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void insertBackupRequested(Connection conn, BackupRequest backupRequest) {
+		Boolean wasRequested = wasBackupRequestedBefore(conn, backupRequest.getFileId());
+		if (!wasRequested) {
+			// Create New
+			try {
+				PreparedStatement p = conn.prepareStatement(insertBackupRequested);
+				p.setString(1, backupRequest.getFileId());
+				p.setString(2, backupRequest.getFilename());
+				p.setInt(3, backupRequest.getDesiredRepDegree());
+				if (backupRequest.getEncryptKey() != null) {
+					p.setString(4, backupRequest.getEncryptKey());
+				}else {
+					p.setNull(4, Types.VARCHAR);
+				}
+				p.executeUpdate();
+				Utils.log("BackupRequest for file " + backupRequest.getFilename() + " has been stored");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} else {
+			// Update old
+			updateBackupRequested(conn,backupRequest);
+		}
+		
 	}
 	
 	public static boolean amIResponsible(Connection conn, String fileId) {
@@ -216,6 +239,22 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	private static boolean wasBackupRequestedBefore(Connection conn, String fileId) {
+		PreparedStatement p;
+		try {
+			p = conn.prepareStatement(getBackupRequested);
+			p.setString(1, fileId);
+			ResultSet result =  p.executeQuery();
+			if (result.next()) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+		
 	}
 
 }

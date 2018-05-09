@@ -3,7 +3,7 @@ CREATE TABLE filesstored(
 	file_id VARCHAR(16) NOT NULL,
 	i_am_responsible BOOLEAN DEFAULT false,
 	peer_requesting VARCHAR(16),
-	desired_rep_degree INTEGER,
+	desired_rep_degree INTEGER
 );
 
 CREATE TABLE peers(
