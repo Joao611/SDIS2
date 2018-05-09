@@ -18,6 +18,7 @@ import communication.Server;
 import database.BackupRequest;
 import database.DBUtils;
 import database.Database;
+import runnableProtocols.SendGetChunk;
 import runnableProtocols.SendInitDelete;
 import runnableProtocols.SendPutChunk;
 import utils.ReadInput;
@@ -186,20 +187,13 @@ public class Peer {
 	}
 
 	public void restore(BackupRequest backupRequest) {
-		// TODO Auto-generated method stub
-	
-//		------------------------------------------
-			
-//			String fileID = getFileID(filename);
-//			Integer chunkNo = 0;
-//			long fileSize = (Long) Files.getAttribute(Paths.get(filename), "size");
-//			int totalNumChunks = (int) (Math.floorDiv(fileSize, Utils.MAX_LENGTH_CHUNK) + 1);//numero total de chunks que o file vai ter
-//			for(int i = 0; i < totalNumChunks; i++) {
-//				LocalState.getInstance().getBackupFiles().get(fileID).getChunks().get(chunkNo).setRestoreMode(State.RECEIVE);
-//				sendGetChunk(fileID, chunkNo,isEnhancement);
-//				chunkNo++;
-//			}
+		Integer totalNumChunks = backupRequest.getNumberOfChunks();
+		for(int i = 0; i < totalNumChunks; i++) {
+			SendGetChunk th = new SendGetChunk(backupRequest, i,this.getChordManager());
+			SingletonThreadPoolExecutor.getInstance().get().execute(th);
+		}
 		
+
 	}
 
 }

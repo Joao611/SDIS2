@@ -47,7 +47,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 		this.dbConnection = peer.getChordManager().getDatabase().getConnection();
 	}
 
-
 	@Override
 	public void run() {
 		String response = parseMessage(readData);
@@ -111,10 +110,41 @@ public class ParseMessageAndSendResponse implements Runnable {
 			response = parseStoredMsg(secondLine);
 			break;
 		}
+		case GETCHUNK: {
+			response = parseGetChunkMsg(secondLine);
+			break;
+		}
 		default:
 			break;
 		}
 		return response;
+	}
+
+	private String parseGetChunkMsg(String[] secondLine) {
+		InetAddress addr;
+		try {
+			addr = InetAddress.getByName(secondLine[0]);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return null;
+		}
+		Integer port = Integer.valueOf(secondLine[1]);
+		String fileID = secondLine[2];
+		Integer chunkNo = Integer.valueOf(secondLine[3]);
+
+		ChunkInfo chunkInfo = new ChunkInfo(chunkNo, fileID);
+		if(DBUtils.checkStoredChunk(dbConnection, chunkInfo )) { //Tenho o chunk
+			String body = Utils.readFile(Peer.getPath().resolve(fileID+"_"+chunkNo).toString());
+			String message = MessageFactory.getChunk(this.peer.getChordManager().getPeerInfo().getId(),
+					fileID, chunkNo, body.getBytes());
+			Client.sendMessage(addr, port, message, false);
+		} else { //ReSend GETCHUNK to successor
+			String message = MessageFactory.getGetChunk(this.peer.getChordManager().getPeerInfo().getId(),
+					addr, port, fileID, chunkNo);
+			Client.sendMessage(this.peer.getChordManager().getSuccessor(0).getAddr(),
+					this.peer.getChordManager().getSuccessor(0).getPort(), message, false);
+		}
+		return null;
 	}
 
 	private void parseInitDelete(String[] secondLine) {
