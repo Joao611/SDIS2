@@ -1,11 +1,10 @@
 package utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 import database.BackupRequest;
 import database.DBUtils;
@@ -19,27 +18,19 @@ public class ReadInput {
 			System.out.println("\t1. Backup");
 			System.out.println("\t2. Restore");
 			System.out.println("\t3. Delete");
-			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+			Scanner scanner = new Scanner(System.in);
 			Integer op = null;
-			try {
-				op = Integer.valueOf(in.readLine());
-			} catch (NumberFormatException e) {
-				System.out.println("Error: not a valid input!");
-				continue;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
+			op = scanner.nextInt();
 			switch (op) {
 			case 1:{
-				ReadInput.backupOption(in, peer);
+				ReadInput.backupOption(scanner, peer);
 				break;
 			}
 			case 2:{
 				break;
 			}
 			case 3:{
-				ReadInput.deleteOption(in, peer);
+				ReadInput.deleteOption(scanner, peer);
 				break;
 			}
 			default: {
@@ -48,41 +39,44 @@ public class ReadInput {
 			}
 			}}
 	}
-	private static void deleteOption(BufferedReader in, Peer peer) {
+	private static void deleteOption(Scanner scanner, Peer peer) {
 		ArrayList<BackupRequest> allRequests = DBUtils.getBackupsRequested(peer.getConnection());
-		System.out.println("Select a file to delete:");
-		for (int i = 0; i < allRequests.size(); i++) {
-			System.out.println(i + ". " + allRequests.get(i).getFilename() + " -> " + allRequests.get(i).getFileId());
+		if (allRequests.size() > 0) {
+			int option;
+			do {
+				System.out.println("Select a file to delete:");
+				for (int i = 0; i < allRequests.size(); i++) {
+					System.out.println(i + ". " + allRequests.get(i).getFilename() + " -> " + allRequests.get(i).getFileId());
+				}
+				option = scanner.nextInt();
+			} while(option < 0 && option >= allRequests.size());
+			
+		} else {
+			System.out.println("You need to backup files before deleting");
 		}
+		
 
 	}
 
-	private static void backupOption(BufferedReader in, Peer peer) {
+	private static void backupOption(Scanner in, Peer peer) {
 		System.out.println("FileName:");
 		String filename;
-		try {
-			filename = in.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
+		filename = in.next();
 		if(!Files.exists(Paths.get(filename))) {
 			System.out.println("Error: file does not exist!");
 			return;
 		}
-
-		System.out.println("Replication Degree:");
-		Integer degree = null;
-		try {
-			degree = Integer.valueOf(in.readLine());
-		} catch (NumberFormatException | IOException e) {
-			System.out.println("Error: Invalid Input!");
-			return;
-		}
-		if((degree < 1) || (degree > 9)) {
-			System.out.println("Error: Invalid Input!");
-			return;
-		}
+		Integer degree = 0;
+		do {
+			System.out.println("Replication Degree (1-9):");
+			try {
+				degree = in.nextInt();
+			}catch(InputMismatchException e) {
+				System.out.println("Invalid Input");
+				in.nextLine();
+			}
+		} while((degree < 1) || (degree > 9));
+			
 		peer.backup(filename, degree,null);
 		System.out.println("Called Backup!");
 	}
