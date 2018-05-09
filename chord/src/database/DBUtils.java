@@ -164,6 +164,7 @@ public class DBUtils {
 				}else {
 					p.setNull(4, Types.VARCHAR);
 				}
+				p.setInt(5, backupRequest.getNumberOfChunks());
 				p.executeUpdate();
 				Utils.log("BackupRequest for file " + backupRequest.getFilename() + " has been stored");
 			} catch (SQLException e) {
