@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.util.Arrays;
 
 import javax.xml.bind.DatatypeConverter;
@@ -92,6 +93,9 @@ public class Peer {
 
 	public ChordManager getChordManager() {
 		return this.chordManager;
+	}
+	public Connection getConnection() {
+		return this.database.getConnection();
 	}
 
 	/**

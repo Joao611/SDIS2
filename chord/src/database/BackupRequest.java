@@ -6,6 +6,12 @@ public class BackupRequest {
 	private String filename;
 	private String encryptKey;
 
+	public BackupRequest(String fileId, String filename) {
+		this.fileId = fileId;
+		this.filename = filename;
+		this.encryptKey = null;
+	}
+	
 	public BackupRequest(String fileId, String filename, String encryptKey) {
 		this.fileId = fileId;
 		this.filename = filename;

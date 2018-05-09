@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
+import database.BackupRequest;
+import database.DBUtils;
 import program.Peer;
 
 public class ReadInput {
@@ -46,7 +49,11 @@ public class ReadInput {
 			}}
 	}
 	private static void deleteOption(BufferedReader in, Peer peer) {
-		System.out.println("You have stored these files in the network:");
+		ArrayList<BackupRequest> allRequests = DBUtils.getBackupsRequested(peer.getConnection());
+		System.out.println("Select a file to delete:");
+		for (int i = 0; i < allRequests.size(); i++) {
+			System.out.println(i + ". " + allRequests.get(i).getFilename() + " -> " + allRequests.get(i).getFileId());
+		}
 
 	}
 

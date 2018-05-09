@@ -1,6 +1,7 @@
 package database;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 import chord.PeerInfo;
 import utils.Utils;
@@ -88,6 +89,20 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	public static ArrayList<BackupRequest> getBackupsRequested(Connection conn){
+		ArrayList<BackupRequest> array = new ArrayList<BackupRequest>();
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet res = stmt.executeQuery("SELECT file_id, filename FROM BACKUPSREQUESTED");
+			while (res.next()) {
+				BackupRequest currentBackupRequest = new BackupRequest(res.getString(1), res.getString(2));
+			    array.add(currentBackupRequest);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return array;
 	}
 
 }
