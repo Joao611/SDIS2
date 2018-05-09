@@ -36,7 +36,7 @@ public class DBUtils {
 			+ "WHERE file_id = ? AND chunk_id = ?";
 	private static final String getPeerWhichRequested = "SELECT peer_id,ip,port FROM PEERS "
 			+ "JOIN (SELECT peer_requesting FROM FILESSTORED WHERE file_id = ?) AS F ON PEER.id = F.peer_requesting";
-	private static final String getBackupRequested = "SELECT file_id FROM BACKUPSREQUESTED WHERE file_id = ?";
+	private static final String getBackupRequested = "SELECT * FROM BACKUPSREQUESTED WHERE file_id = ?";
 	private static final String getFileStored = "SELECT file_id FROM FILESSTORED WHERE file_id = ?";
 
 
@@ -264,6 +264,26 @@ public class DBUtils {
 		return false;
 	}
 
+	public static BackupRequest getBackupRequested(Connection conn, String fileId) {
+		PreparedStatement p;
+		try {
+			p = conn.prepareStatement(getBackupRequested);
+			p.setString(1, fileId);
+			ResultSet result =  p.executeQuery();
+			if (result.next()) {
+				
+				return new BackupRequest(result.getString("file_id"),
+						result.getString("filename"),
+						result.getString("encrypt_key"),
+						result.getInt("desired_rep_degree"),
+						result.getInt("numberOfChunks"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	private static boolean wasFileStoredBefore(Connection conn, String fileId) {
 		PreparedStatement p;
 		try {
