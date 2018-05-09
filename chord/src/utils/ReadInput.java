@@ -27,6 +27,7 @@ public class ReadInput {
 				break;
 			}
 			case 2:{
+				ReadInput.restoreOption(scanner, peer);
 				break;
 			}
 			case 3:{
@@ -39,6 +40,28 @@ public class ReadInput {
 			}
 			}}
 	}
+	private static void restoreOption(Scanner scanner, Peer peer) {
+		ArrayList<BackupRequest> allRequests = DBUtils.getBackupsRequested(peer.getConnection());
+		if (allRequests.size() > 0) {
+			int option = -1;
+			do {
+				System.out.println("Select a file to restore:");
+				for (int i = 0; i < allRequests.size(); i++) {
+					System.out.println(i + ". " + allRequests.get(i).getFilename() + " -> " + allRequests.get(i).getFileId());
+				}
+				try {
+					option = scanner.nextInt();
+				}catch(InputMismatchException e) {
+					System.out.println("Invalid Input");
+					scanner.nextLine();
+				}
+			} while(option < 0 && option >= allRequests.size());
+			peer.restore(allRequests.get(option));
+		} else {
+			System.out.println("You need to backup files before restoring");
+		}
+	}
+	
 	private static void deleteOption(Scanner scanner, Peer peer) {
 		ArrayList<BackupRequest> allRequests = DBUtils.getBackupsRequested(peer.getConnection());
 		if (allRequests.size() > 0) {

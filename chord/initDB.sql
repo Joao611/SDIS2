@@ -18,6 +18,7 @@ CREATE TABLE backupsrequested(
 	id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
 	file_id VARCHAR(16) NOT NULL,
 	filename VARCHAR(128) NOT NULL,
+	numberOfChunks INTEGER NOT NULL,
 	desired_rep_degree INTEGER NOT NULL,
 	encrypt_key VARCHAR(256) 
 );
