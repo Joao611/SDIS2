@@ -1,5 +1,7 @@
 package database;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -28,6 +30,10 @@ public class DBUtils {
 			+ "WHERE file_id = ?";
 	private static final String updateChunkStoredRepDegree = "UPDATE CHUNKSSTORED "
 			+ "SET actual_rep_degree = ? WHERE chunk_id = ? AND file_id = ?";
+	private static final String checkStoredChunk = "SELECT * FROM CHUNKSSTORED "
+			+ "WHERE file_id = ? AND chunk_id = ?";
+	private static final String getPeerWhichRequested = "SELECT peer_id,ip,port FROM PEERS "
+			+ "JOIN (SELECT peer_requesting FROM FILESSTORED WHERE file_id = ?) AS F ON PEER.id = F.peer_requesting";
 	
 	
 	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
@@ -108,11 +114,27 @@ public class DBUtils {
 			p.setInt(1, chunkInfo.getChunkId());
 			p.setString(2, chunkInfo.getFileId());
 			p.executeUpdate();
-			Utils.log("Chunk " + chunkInfo.getChunkId() + " has been stored");
+			Utils.log("Chunk " + chunkInfo.getFileId() + ":" + chunkInfo.getChunkId() + " has been stored");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void updateStoredChunkRepDegree(Connection conn, ChunkInfo chunkInfo) {
+		//"UPDATE CHUNKSSTORED SET actual_rep_degree = ? WHERE file_id = ? AND chunk_id = ?"
+				
+		try {
+			PreparedStatement p = conn.prepareStatement(updateChunkStoredRepDegree);
+			p.setInt(1, chunkInfo.getActualRepDegree());
+			p.setString(2, chunkInfo.getFileId());
+			p.setInt(3, chunkInfo.getChunkId());
+			p.executeUpdate();
+			Utils.log("Chunk " + chunkInfo.getFileId() + ":" + chunkInfo.getChunkId() + " has been updated");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void insertBackupRequested(Connection conn, BackupRequest backupRequest) {
 		try {
 			PreparedStatement p = conn.prepareStatement(insertBackupRequested);
@@ -144,6 +166,22 @@ public class DBUtils {
 		}
 		return false;
 	}
+	
+	public static boolean checkStoredChunk(Connection conn, ChunkInfo chunkInfo) {
+		try {
+			PreparedStatement p = conn.prepareStatement(checkStoredChunk);
+			p.setString(1, chunkInfo.getFileId());
+			p.setInt(2, chunkInfo.getChunkId());
+			ResultSet result = p.executeQuery();
+			if (result.next()) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	public static ArrayList<BackupRequest> getBackupsRequested(Connection conn){
 		ArrayList<BackupRequest> array = new ArrayList<BackupRequest>();
 		try {
@@ -157,6 +195,27 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 		return array;
+	}
+	
+	public static PeerInfo getPeerWhichRequestedBackup(Connection conn, String fileId) {
+		try {
+			PreparedStatement p = conn.prepareStatement(getPeerWhichRequested);
+			p.setString(1, fileId);
+			ResultSet result = p.executeQuery();
+			if (result.next()) {
+				InetAddress address = null;
+				try {
+					address = InetAddress.getByName(result.getString(2));
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+					return null;
+				}
+				return new PeerInfo(result.getString(1),address,result.getInt(3));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

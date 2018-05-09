@@ -128,51 +128,27 @@ public class ParseMessageAndSendResponse implements Runnable {
 		Integer chunkNo = Integer.valueOf(lines[1]);
 		Integer repDegree = Integer.valueOf(lines[2]);
 		
-		PreparedStatement preparedStatement;
-		ResultSet result;
-		try {
-			preparedStatement = peer.getChordManager().getDatabase().getConnection().prepareStatement("SELECT * FROM filesstored WHERE id = ?;");
-			preparedStatement.setString(1, fileID); //STARTS AT 1 FOR SOME REASON
-			result = preparedStatement.executeQuery();
-			if(result.first()) { //Exists
-				int id = result.getInt("id");
-				boolean i_am_responsible = result.getBoolean("i_am_responsible");
-				int desired_rep_degree = result.getInt("desired_rep_degree");
-				int actual_rep_degree = result.getInt("actual_rep_degree");
-				int peer_which_requested = result.getInt("peer_which_requested");
-				
-				repDegree++; // I am also storing the chunk
-				
-				PreparedStatement p = peer.getChordManager().getDatabase().getConnection().prepareStatement("UPDATE filesstored SET actual_rep_degree = ? WHERE id = ?;");
-				p.setInt(1, repDegree);
-				p.setString(2, fileID);
-				p.executeUpdate();
-				
-				if(i_am_responsible) {
-					//TODO: send response to requesting peer
+		ChunkInfo chunkInfo = new ChunkInfo(chunkNo,fileID);
+		boolean chunkExists = DBUtils.checkStoredChunk(dbConnection, chunkInfo);
+		if(chunkExists) { //Exists
+			boolean iAmResponsible = DBUtils.amIResponsible(dbConnection, fileID);
+			repDegree++; // I am also storing the chunk
+			
+			if(iAmResponsible) {
+				chunkInfo.setActualRepDegree(repDegree);
+				DBUtils.updateStoredChunkRepDegree(dbConnection, chunkInfo);
+				PeerInfo peerWhichRequested = DBUtils.getPeerWhichRequestedBackup(dbConnection, fileID);
+				if(peerWhichRequested != null) {
 					String message = MessageFactory.getConfirmStored(peer.getChordManager().getPeerInfo().getId(), fileID, chunkNo, repDegree);
-					PreparedStatement k = peer.getChordManager().getDatabase().getConnection().prepareStatement("SELECT * FROM peer WHERE id = ?;");
-					k.setInt(1, peer_which_requested);
-					ResultSet peerRequest = k.executeQuery();
-					if(peerRequest.first()) {
-						InetAddress addr = InetAddress.getByName(peerRequest.getString("ip"));
-						int port = peerRequest.getInt("port");
-						Client.sendMessage(addr, port, message, false);
-					} else {
-						Utils.LOGGER.severe("ERROR: could not get peer whitch requested!");
-						return null;
-					}
-					return null;
+					Client.sendMessage(peerWhichRequested.getAddr(), peerWhichRequested.getPort(), message, false);
+				} else {
+					Utils.LOGGER.severe("ERROR: could not get peer whitch requested!");
 				}
+				return null;
 			}
-			result.close();
-		} catch (SQLException | UnknownHostException e1) {
-			e1.printStackTrace();
 		}
-		
 		String message = MessageFactory.getStored(peer.getChordManager().getPeerInfo().getId(), fileID, chunkNo, repDegree);
 		Client.sendMessage(peer.getChordManager().getPredecessor().getAddr(),peer.getChordManager().getPredecessor().getPort(), message, false);
-		
 		return null;
 	}
 	
