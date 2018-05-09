@@ -169,11 +169,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 	
 	private void parsePutChunkMsg(String[] header, String body) {
 		
-		for(int i = 0; i < header.length; i++) {
-
-			System.out.println(header[i]);
-		}
-		
 		ChordManager chordManager = peer.getChordManager();
 		byte [] body_bytes = body.getBytes();
 		
