@@ -213,6 +213,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 
 
 	private void deleteFile(String fileToDelete, int repDegree) {
+		System.out.println("Received Delete for file: " + fileToDelete + ". Rep Degree: " + repDegree);
 		boolean isFileStored = DBUtils.isFileStored(dbConnection, fileToDelete);
 		if (isFileStored) {
 			ArrayList<ChunkInfo> allChunks = DBUtils.getAllChunksOfFile(dbConnection, fileToDelete);
@@ -298,7 +299,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 
 		PeerInfo peerThatRequestedBackup = new PeerInfo(id,addr,port);
 		DBUtils.insertPeer(dbConnection, peerThatRequestedBackup);
-		FileStoredInfo fileInfo = new FileStoredInfo(id, true);
+		FileStoredInfo fileInfo = new FileStoredInfo(fileID, true);
 		fileInfo.setPeerRequesting(peerThatRequestedBackup.getId());
 		fileInfo.setDesiredRepDegree(replicationDegree);
 		DBUtils.insertStoredFile(dbConnection, fileInfo);
@@ -307,8 +308,9 @@ public class ParseMessageAndSendResponse implements Runnable {
 		if(id.equals(peerID)) {//sou o dono do ficheiro que quero fazer backup...
 			//nao faz senido guardarmos um ficheiro com o chunk, visto que guardamos o ficheiro
 			//enviar o KEEPCHUNK
+			PeerInfo nextPeer = chordManager.getSuccessor(0);
 			String message = MessageFactory.getKeepChunk(id, addr, port, fileID, chunkNo, replicationDegree, body_bytes);
-			Client.sendMessage(chordManager.getSuccessor(0).getAddr(),chordManager.getSuccessor(0).getPort(), message, false);
+			Client.sendMessage(nextPeer.getAddr(),nextPeer.getPort(), message, false);
 			return;
 		}
 
@@ -340,6 +342,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 	}
 
 	private void parseKeepChunkMsg(String[] header, String body) {
+		System.out.println("Received Keep Chunk");
 		ChordManager chordManager = peer.getChordManager();
 		byte [] body_bytes = body.getBytes(StandardCharsets.ISO_8859_1);
 
