@@ -5,9 +5,13 @@ package program;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
+import communication.Client;
+import database.BackupRequest;
 import database.ChunkInfo;
 import database.DBUtils;
+import messages.MessageFactory;
 import utils.Utils;
 
 /**
@@ -16,9 +20,12 @@ import utils.Utils;
  */
 public class Leases implements Runnable {
 
-	
+
+	public static final int HALF_LEASE_TIME = 1;
+	public static final int LEASE_TIME = 2*HALF_LEASE_TIME;
+	public static final TimeUnit LEASE_UNIT = TimeUnit.MINUTES;
 	Peer peer;
-	
+
 	public Leases(Peer peer) {
 		super();
 		this.peer = peer;
@@ -27,8 +34,33 @@ public class Leases implements Runnable {
 	@Override
 	public void run() {
 		Timestamp time = new Timestamp(System.currentTimeMillis());
+
+		deleteFiles(time);
+		updateFiles(time);
+
+	}
+
+	private void updateFiles(Timestamp time) {
+		ArrayList<BackupRequest> filesToUpdate = DBUtils.getFilesToUpdate(peer.getConnection());
+
+		for(int i = 0; i < filesToUpdate.size(); i++) {
+			
+			peer.backup(filesToUpdate.get(i).getFilename(),
+					filesToUpdate.get(i).getDesiredRepDegree(),
+					filesToUpdate.get(i).getEncryptKey());
+//			DBUtils.updateFile(peer.getConnection(), filesToUpdate.get(i));
+			System.out.println("Updated file: " + filesToUpdate.get(i));
+//			String message = MessageFactory.getUpdateTime(this.peer.getChordManager().getPeerInfo().getId(),filesToUpdate.get(i));
+//			Client.sendMessage(this.peer.getChordManager().getSuccessor(0).getAddr(),
+//					this.peer.getChordManager().getSuccessor(0).getPort(),
+//					message, false);
+		}
+
+	}
+
+	private void deleteFiles(Timestamp time) {
 		ArrayList<String> filesToDelete = DBUtils.getFilesToDelete(peer.getConnection(), time);
-		
+
 		String msg = new String();
 		for(int i = 0; i < filesToDelete.size(); i++) {
 			msg += filesToDelete.get(i) + "\n";
@@ -40,7 +72,7 @@ public class Leases implements Runnable {
 			DBUtils.deleteFile(peer.getConnection(), filesToDelete.get(i));
 			System.out.println("Deleted file: " + filesToDelete.get(i));
 		}
-		
+
 		System.err.println(msg);
 	}
 

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import org.apache.derby.shared.common.error.DerbySQLIntegrityConstraintViolationException;
 
 import chord.PeerInfo;
+import program.Leases;
 import utils.Utils;
 
 public class DBUtils {
@@ -42,8 +43,6 @@ public class DBUtils {
 	private static final String getActualRepDegree = "SELECT max(actual_rep_degree) FROM CHUNKSSTORED WHERE file_id = ?";
 	private static final String deleteFileStored = "DELETE FROM FILESSTORED WHERE file_id = ?";
 	private static final String deleteFileRequested = "DELETE FROM BACKUPSREQUESTED WHERE file_id = ?";
-
-	private static final String getFilesToDelete = "SELECT file_id FROM FILESSTORED WHERE { fn TIMESTAMPADD(SQL_TSI_MINUTE,2,last_time_stored)} < ?";
 //	TODO: Choose lease Time
 //	SQL_TSI_DAY
 //	SQL_TSI_FRAC_SECOND
@@ -54,6 +53,12 @@ public class DBUtils {
 //	SQL_TSI_SECOND
 //	SQL_TSI_WEEK
 //	SQL_TSI_YEAR
+	private static final String getFilesToDelete = "SELECT file_id FROM FILESSTORED WHERE { fn TIMESTAMPADD(SQL_TSI_MINUTE,?,last_time_stored)} < ?";
+	private static final String updateFile = "UPDATE FILESSTORED "
+			+ "SET last_time_stored = CURRENT_TIMESTAMP "
+			+ "WHERE file_id = ?";
+	private static final String getFilesToUpdate = "SELECT * FROM BACKUPSREQUESTED";
+
 
 	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
 		try {
@@ -373,10 +378,41 @@ public class DBUtils {
 		PreparedStatement p;
 		try {
 			p = conn.prepareStatement(getFilesToDelete);
-			p.setTimestamp(1, time);
+			System.out.println(Leases.LEASE_UNIT.toString());
+			//TODO: runTime
+			p.setInt(1, Leases.LEASE_TIME);
+			p.setTimestamp(2, time);
 			ResultSet result = p.executeQuery();
 			while (result.next()) {
 				res.add(result.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return res;
+	}
+	public static void updateFile(Connection conn, String fileId) {
+		try {
+			PreparedStatement p = conn.prepareStatement(updateFile);
+			p.setString(1, fileId);
+			p.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	public static ArrayList<BackupRequest> getFilesToUpdate(Connection conn) {
+		ArrayList<BackupRequest> res = new ArrayList<BackupRequest>();
+		PreparedStatement p;
+		try {
+			p = conn.prepareStatement(getFilesToUpdate);
+			ResultSet result = p.executeQuery();
+			while (result.next()) {
+				res.add(new BackupRequest(
+						result.getString("file_id"),
+						result.getString("filename"),
+						result.getInt("desired_rep_degree")
+						));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

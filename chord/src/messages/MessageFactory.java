@@ -104,4 +104,9 @@ public class MessageFactory {
 		String msg = getFirstLine(MessageType.DELETE, "1.0",senderId);
 		return appendLine(msg, new Object[] {fileId, repDegree});
 	}
+
+	public static String getUpdateTime(String senderId, String fileID) {
+		String msg = getFirstLine(MessageType.UPDATETIME, "1.0",senderId);
+		return appendLine(msg, new Object[] {fileID});
+	}
 }

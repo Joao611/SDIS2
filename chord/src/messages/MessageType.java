@@ -3,7 +3,8 @@ package messages;
 public enum MessageType {
 
 	ASK("ASK"),
-	DELETE("DELETE"), INITDELETE("INITDELETE"),
+	DELETE("DELETE"),
+	INITDELETE("INITDELETE"),
 	PUTCHUNK("PUTCHUNK"),
 	KEEPCHUNK("KEEPCHUNK"),
 	PING("PING"),
@@ -16,7 +17,8 @@ public enum MessageType {
 	STORED("STORED"),
 	CONFIRMSTORED("CONFIRMSTORED"),
 	GETCHUNK("GETCHUNK"),
-	CHUNK("CHUNK");
+	CHUNK("CHUNK"),
+	UPDATETIME("UPDATETIME");
 
 
 	private String type;

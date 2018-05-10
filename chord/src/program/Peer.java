@@ -85,11 +85,12 @@ public class Peer {
 		if(addr != null) {
 			chordManager.join(addr, port);
 		}
+		
 		SingletonThreadPoolExecutor.getInstance().get().execute(server);
 		SingletonThreadPoolExecutor.getInstance().get().execute(chordManager);
 
 		Leases l = new Leases(this);
-		SingletonThreadPoolExecutor.getInstance().get().execute(l);
+		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(l, 0, Leases.HALF_LEASE_TIME, Leases.LEASE_UNIT);
 		
 		ReadInput.readInput(this);
 	}
@@ -162,45 +163,28 @@ public class Peer {
 	}
 
 	public void backup(String filename, Integer degree, String encryptKey) {
-		System.err.println("GOT IN");
 		String fileID;
 		try {
 			fileID = this.getFileID(filename);
 			Utils.LOGGER.severe(filename + " - " + fileID);
-			System.err.println(filename + " - " + fileID);
 		} catch (NoSuchAlgorithmException | IOException e) {
 			e.printStackTrace();
 			return;
 		}
-		System.err.println("GoingToReadFile");
-
 		byte[] file = Utils.readFile(filename).getBytes(StandardCharsets.ISO_8859_1);
-		System.err.println("Read");
 		int n = Math.floorDiv(file.length,LENGTH_OF_CHUNK) + 1;
-		System.err.println("Create request");
 		BackupRequest backupRequest = new BackupRequest(fileID,filename,encryptKey, degree, n);
-		System.err.println("Insert in dataBase");
 		DBUtils.insertBackupRequested(database.getConnection(), backupRequest);
-		System.err.println("INSERTED");
 		int chunkNo = 0;
-		System.err.println("BEFOREWHILE");
 		while(file.length > (chunkNo+1)*LENGTH_OF_CHUNK) {
-			System.err.println("GOT IN");
 			byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, LENGTH_OF_CHUNK);
-			System.err.println("GOT IN");
 			SendPutChunk th = new SendPutChunk(fileID, chunkNo, degree, body, this.getChordManager());
-			System.err.println("GOT IN");
 			SingletonThreadPoolExecutor.getInstance().get().execute(th);
-			System.err.println("GOT IN");
 			chunkNo++;
 		}
-		System.err.println("AFTERWHILE");
 		byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, file.length);
-		System.err.println("COPY");
 		SendPutChunk th = new SendPutChunk(fileID, chunkNo, degree, body, this.getChordManager());
-		System.err.println("thread");
 		SingletonThreadPoolExecutor.getInstance().get().execute(th);
-		System.err.println("POLL");
 	}
 
 	public void delete(String fileID) {

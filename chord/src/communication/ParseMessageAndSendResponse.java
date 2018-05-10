@@ -130,12 +130,18 @@ public class ParseMessageAndSendResponse implements Runnable {
 			response = parseChunkMsg(secondLine,thirdLine);
 			break;
 		}
+//		case UPDATETIME: {
+//			response = parseUpdateTime(secondLine);
+//			break;
+//		}
 		default:
 			break;
 		}
 		return response;
 	}
 	
+	
+
 	private String parseStabilize(String[] firstLine) {
 		String response = MessageFactory.getFirstLine(MessageType.PREDECESSOR, "1.0", myPeerID);
 		return MessageFactory.appendLine(response, peer.getChordManager().getPredecessor().asArray());
