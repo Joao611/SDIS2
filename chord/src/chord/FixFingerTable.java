@@ -24,14 +24,16 @@ public class FixFingerTable implements Runnable {
 	 */
 	@Override
 	public void run() {
-		Utils.LOGGER.finest("Running fix finger table\n");
 		fix_fingerTable();
 		printFingerTable();
 	}
 
 	private void printFingerTable() {
-		Utils.LOGGER.finest("Tabela de dedos: "+chord.getPeerInfo().getId());
-			chord.getFingerTable().forEach((v) -> { Utils.LOGGER.finest("\t"+v.getId()); } );
+		String m = new String();
+		for (int i = 0; i < chord.getFingerTable().size(); i++) {
+			m += "\t" + chord.getFingerTable().get(i).getId() + "\n";
+		}
+		Utils.LOGGER.finest("Tabela de dedos: "+chord.getPeerInfo().getId()+"\n"+m);
 	}
 
 	public void fix_fingerTable() {

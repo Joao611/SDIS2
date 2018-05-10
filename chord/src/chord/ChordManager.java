@@ -89,7 +89,6 @@ public class ChordManager implements Runnable {
 		PeerInfo nextPeer = new PeerInfo(response);
 
 		while (response.startsWith("Ask")) {
-			Utils.LOGGER.finest("\t" + response);
 			response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), lookupMessage, true);
 			if (response == null) {
 				System.err.println("Could not join the network");
@@ -152,7 +151,7 @@ public class ChordManager implements Runnable {
 	}
 
 	public PeerInfo getChunkOwner(String key) {
-
+		//TODO: entra em ciclo??
 		if (Utils.inBetween(this.predecessor.getId(), this.getPeerInfo().getId(), key)) {
 			return this.peerInfo;
 		}
@@ -181,7 +180,6 @@ public class ChordManager implements Runnable {
 		PeerInfo owner = new PeerInfo(response);
 
 		while (response.startsWith("Ask")) {
-			Utils.LOGGER.finest("\t" + response);
 			response = Client.sendMessage(owner.getAddr(), owner.getPort(), lookupMessage, true);
 			if (response == null) {
 				System.err.println("Could not join the network");

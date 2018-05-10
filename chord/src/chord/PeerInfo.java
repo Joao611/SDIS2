@@ -25,11 +25,8 @@ public class PeerInfo extends AbstractPeerInfo {
 	}
 
 	public PeerInfo(String str) {
-		Utils.LOGGER.finest(str);
 		String[] attr = str.split("\r\n");
 
-		Utils.LOGGER.finest("----");
-		Utils.LOGGER.finest(attr[1]);
 		attr = attr[1].split(" ");
 		this.id = attr[0];
 
