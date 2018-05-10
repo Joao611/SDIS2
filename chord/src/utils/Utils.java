@@ -122,6 +122,8 @@ public class Utils {
 			src.put(body);
 			src.flip();
 			channel.write(src, 0, src, writter);
+		} else {
+			System.out.println("File already exists");
 		}
 	}
 	
