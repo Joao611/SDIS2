@@ -20,7 +20,13 @@ public class ReadInput {
 			System.out.println("\t3. Delete");
 			Scanner scanner = new Scanner(System.in);
 			Integer op = null;
-			op = scanner.nextInt();
+			try {
+				op = scanner.nextInt();
+			}catch(InputMismatchException e) {
+				System.out.println("Invalid Input");
+				scanner.nextLine();
+				continue;
+			}
 			switch (op) {
 			case 1:{
 				ReadInput.backupOption(scanner, peer);
@@ -38,7 +44,8 @@ public class ReadInput {
 				System.out.println("Error: not a valid input!");
 				continue;
 			}
-			}}
+			}
+		}
 	}
 	private static void restoreOption(Scanner scanner, Peer peer) {
 		ArrayList<BackupRequest> allRequests = DBUtils.getBackupsRequested(peer.getConnection());
