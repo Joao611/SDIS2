@@ -59,5 +59,6 @@ ALTER TABLE filesstored
 
 ALTER TABLE chunksstored
    ADD CONSTRAINT chunksstored_FK Foreign Key (file_id) REFERENCES filesstored(file_id) ON DELETE CASCADE;
+   
 
 

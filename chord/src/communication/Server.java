@@ -10,6 +10,7 @@ import javax.net.ssl.SSLSocket;
 
 import program.Peer;
 import utils.SingletonThreadPoolExecutor;
+import utils.Utils;
 
 public class Server implements Runnable {
 
@@ -38,6 +39,7 @@ public class Server implements Runnable {
 		SSLServerSocket serverSocket;
 		try {
 			serverSocket = (SSLServerSocket) serverFactory.createServerSocket(this.port_number);
+			Utils.LOGGER.info("Server listening on port " + this.port_number);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;

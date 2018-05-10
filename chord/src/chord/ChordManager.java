@@ -71,12 +71,13 @@ public class ChordManager implements Runnable {
 	@Override
 	public void run() {
 		CheckPredecessor checkPredecessorThread = new CheckPredecessor(predecessor);
-		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(checkPredecessorThread, 4000, 10000, TimeUnit.MILLISECONDS);
+		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(checkPredecessorThread, 100, 1000, TimeUnit.MILLISECONDS);
+		
 		FixFingerTable fixFingerTableThread = new FixFingerTable(this);
-		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(fixFingerTableThread, 2000, 10000, TimeUnit.MILLISECONDS);
+		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(fixFingerTableThread, 200, 1000, TimeUnit.MILLISECONDS);
 
 		Stabilize stabilizeThread = new Stabilize(this);
-		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(stabilizeThread, 0, 10000, TimeUnit.MILLISECONDS);
+		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(stabilizeThread, 0, 1000, TimeUnit.MILLISECONDS);
 
 	}
 
@@ -123,31 +124,28 @@ public class ChordManager implements Runnable {
 		return MessageFactory.appendLine(ASK_MESSAGE, this.getFingerTable().get(getM() - 1).asArray());
 	}
 
-	public boolean stabilize(PeerInfo predecessor) {
-
+	public void stabilize(AbstractPeerInfo x) {
+		if (x.isNull()) return;
 		PeerInfo successor = this.fingerTable.get(0);
 
-		if (Utils.inBetween(this.peerInfo.getId(), successor.getId(), predecessor.getId())) {
-			setSuccessor(0, predecessor);
-			return true;
+		if (Utils.inBetween(this.peerInfo.getId(), successor.getId(), x.getId())) {
+			setSuccessor(0, (PeerInfo) x);
 		}
-		return false;
+
 	}
 
 	/**
-	 * Notify newly found closer successor node that this node is now its predecessor.
+	 * Notify newly found closer successor node that I might be its predecessor
 	 * @param newSuccessorId Closer successor than previous successor.
 	 */
 	public void notify(PeerInfo newSuccessor) {
-		if (predecessor.isNull() || Utils.inBetween(predecessor.getId(), this.getPeerInfo().getId(), newSuccessor.getId())) {
-			String message = MessageFactory.getFirstLine(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
-			message = MessageFactory.appendLine(message, new String[] {"" + this.getPeerInfo().getPort()});
-			String response = Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message, true).trim();
-			String expectedResponse = MessageFactory.getHeader(MessageType.OK, "1.0", newSuccessor.getId()).trim();
-			if (!expectedResponse.equals(response)) {
-				System.err.println("Expected: " + expectedResponse);
-				System.err.println("ChordManager notify(): Error on NOTIFY message reply: " + response);
-			}
+		String message = MessageFactory.getFirstLine(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
+		message = MessageFactory.appendLine(message, new String[] {"" + this.getPeerInfo().getPort()});
+		String response = Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message, true).trim();
+		String expectedResponse = MessageFactory.getHeader(MessageType.OK, "1.0", newSuccessor.getId()).trim();
+		if (!expectedResponse.equals(response)) {
+			System.err.println("Expected: " + expectedResponse);
+			System.err.println("ChordManager notify(): Error on NOTIFY message reply: " + response);
 		}
 	}
 

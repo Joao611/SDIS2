@@ -27,19 +27,13 @@ public class Stabilize implements Runnable {
 	@Override
 	public void run() {
 		Utils.LOGGER.finest("Running Stabilize\n");
-		PeerInfo successor = this.chordManager.getSuccessor(0);
+		PeerInfo nextPeer = this.chordManager.getSuccessor(0);
 		String stabilizeMessage = MessageFactory.getHeader(MessageType.STABILIZE, "1.0", this.chordManager.getPeerInfo().getId());
-		String response = Client.sendMessage(successor.getAddr(), successor.getPort(), stabilizeMessage, true);
-		AbstractPeerInfo predecessor = parseResponse(response);
+		String response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), stabilizeMessage, true);
+		AbstractPeerInfo x = parseResponse(response);
 
-		if (predecessor.isNull()) {
-			this.chordManager.notify(successor);
-		} else {
-			if (this.chordManager.stabilize((PeerInfo)predecessor)) {
-				Utils.LOGGER.finest("Successor updated");
-				this.chordManager.notify((PeerInfo)predecessor);
-			}
-		}
+		this.chordManager.stabilize(x); //might update successor
+		this.chordManager.notify(this.chordManager.getSuccessor(0)); //notify my successor that I might be his predecessor
 
 
 

@@ -17,7 +17,7 @@ public class DBUtils {
 	private static final String insertPeer = "INSERT INTO PEERS "
 			+ "(peer_id,ip,port) VALUES (?,?,?)";
 	private static final String insertChunkStored = "INSERT INTO CHUNKSSTORED "
-			+ "(chunk_id,file_id,size) VALUES (?,?,?)";
+			+ "(chunk_id, file_id, actual_rep_degree, size) VALUES (?,?,?,?)";
 	private static final String insertBackupRequested = "INSERT INTO BACKUPSREQUESTED "
 			+ "(file_id, filename, desired_rep_degree,encrypt_key,numberOfChunks) VALUES (?,?,?,?,?)";
 	private static final String getFileById = "SELECT * FROM FILESSTORED "
@@ -35,10 +35,11 @@ public class DBUtils {
 	private static final String checkStoredChunk = "SELECT * FROM CHUNKSSTORED "
 			+ "WHERE file_id = ? AND chunk_id = ?";
 	private static final String getPeerWhichRequested = "SELECT peer_id,ip,port FROM PEERS "
-			+ "JOIN (SELECT peer_requesting FROM FILESSTORED WHERE file_id = ?) AS F ON PEER.id = F.peer_requesting";
+			+ "JOIN (SELECT peer_requesting FROM FILESSTORED WHERE file_id = ?) AS F ON PEERS.peer_id = F.peer_requesting";
 	private static final String getBackupRequested = "SELECT * FROM BACKUPSREQUESTED WHERE file_id = ?";
 	private static final String getFileStored = "SELECT file_id, desired_rep_degree FROM FILESSTORED WHERE file_id = ?";
 	private static final String getChunksOfFile = "SELECT chunk_id, file_id, size FROM CHUNKSSTORED WHERE file_id = ?";
+	private static final String getActualRepDegree = "SELECT max(actual_rep_degree) FROM CHUNKSSTORED WHERE file_id = ?";
 	private static final String deleteFileStored = "DELETE FROM FILESSTORED WHERE file_id = ?";
 	private static final String deleteFileRequested = "DELETE FROM BACKUPSREQUESTED WHERE file_id = ?";
 
@@ -122,7 +123,12 @@ public class DBUtils {
 			PreparedStatement p = conn.prepareStatement(insertChunkStored);
 			p.setInt(1, chunkInfo.getChunkId());
 			p.setString(2, chunkInfo.getFileId());
-			p.setInt(3, chunkInfo.getSize());
+			if (chunkInfo.getActualRepDegree() != null) {
+				p.setInt(3, chunkInfo.getActualRepDegree());
+			}else {
+				p.setNull(3, Types.INTEGER);
+			}
+			p.setInt(4, chunkInfo.getSize());
 			p.executeUpdate();
 			Utils.log("Chunk " + chunkInfo.getFileId() + ":" + chunkInfo.getChunkId() + " has been stored");
 		} catch (DerbySQLIntegrityConstraintViolationException e) {
@@ -207,7 +213,8 @@ public class DBUtils {
 			p.setInt(2, chunkInfo.getChunkId());
 			ResultSet result = p.executeQuery();
 			if (result.next()) {
-				return true;
+				int size = result.getInt(5);
+				return true && size > -1;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -298,6 +305,21 @@ public class DBUtils {
 			ResultSet result =  p.executeQuery();
 			if (result.next()) {
 				return result.getInt(2);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
+	public static int getMaxRepDegree(Connection conn, String fileId) {
+		PreparedStatement p;
+		try {
+			p = conn.prepareStatement(getActualRepDegree);
+			p.setString(1, fileId);
+			ResultSet result =  p.executeQuery();
+			if (result.next()) {
+				return result.getInt(1);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
