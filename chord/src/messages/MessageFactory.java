@@ -2,6 +2,7 @@ package messages;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 
 import chord.PeerInfo;
 import utils.Utils;
@@ -27,7 +28,7 @@ public class MessageFactory {
 		return message;
 	}
 	public static String appendBody(String message, byte [] body) throws UnsupportedEncodingException {
-		String bodyStr = new String(body, Utils.ENCODING_TYPE);
+		String bodyStr = new String(body, StandardCharsets.ISO_8859_1);
 		message += bodyStr;
 		return message;
 	}

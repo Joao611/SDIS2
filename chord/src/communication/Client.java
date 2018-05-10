@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -48,7 +49,7 @@ public class Client {
 	 * Write to the socket (send message)
 	 */
 	public static void send(String message, SSLSocket socket) {
-		byte[] sendData = message.getBytes();
+		byte[] sendData = message.getBytes(StandardCharsets.ISO_8859_1);
 
 		OutputStream sendStream;
 		try {
@@ -92,7 +93,7 @@ public class Client {
 			e.printStackTrace();
 			return null;
 		}
-		return new String(readData);
+		return new String(readData,StandardCharsets.ISO_8859_1);
 
 	}
 

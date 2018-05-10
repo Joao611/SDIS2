@@ -22,7 +22,8 @@ import chord.ChordManager;
 public class Utils {
 	
 	public static final int TIME_MAX_TO_SLEEP = 400;
-	public static final String ENCODING_TYPE = "ISO-8859-1";
+//	public static final String ENCODING_TYPE = "ISO-8859-1";
+//	USAR - StandardCharsets.ISO_8859_1
 	public static final int MAX_LENGTH_CHUNK = 64000;
 	public static final int BYTE_TO_KBYTE = 1000;
 	
@@ -97,7 +98,7 @@ public class Utils {
 			e.printStackTrace();
 			return null;
 		}
-		return new String(encoded, StandardCharsets.UTF_8);
+		return new String(encoded, StandardCharsets.ISO_8859_1);
 	}
 	
 	public static void writeToFile(Path filePath, byte[] body) throws IOException {

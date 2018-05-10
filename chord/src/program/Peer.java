@@ -168,7 +168,7 @@ public class Peer {
 			e.printStackTrace();
 			return;
 		}
-		byte[] file = Utils.readFile(filename).getBytes();
+		byte[] file = Utils.readFile(filename).getBytes(StandardCharsets.ISO_8859_1);
 		int n = Math.floorDiv(file.length,LENGTH_OF_CHUNK) + 1;
 		BackupRequest backupRequest = new BackupRequest(fileID,filename,encryptKey, degree, n);
 		DBUtils.insertBackupRequested(database.getConnection(), backupRequest);

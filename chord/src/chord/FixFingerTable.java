@@ -3,7 +3,9 @@
  */
 package chord;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 
 import communication.Client;
 import messages.MessageFactory;
@@ -52,7 +54,7 @@ public class FixFingerTable implements Runnable {
 	private String getKeyToLookUp(String id, int i) {
 		
 		BigInteger _id = new BigInteger(id, 16);
-		BigInteger add =  new BigInteger((Math.pow(2, i)+"").getBytes());
+		BigInteger add = new BigInteger((Math.pow(2, i)+"").getBytes());
 		BigInteger mod =  new BigInteger((Math.pow(2, ChordManager.getM())+"").getBytes());
 			
 		BigInteger res = _id.add(add).mod(mod);

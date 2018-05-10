@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,7 +71,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 	 * @return
 	 */
 	String parseMessage(byte[] readData) {
-		String request = new String(readData);
+		String request = new String(readData,StandardCharsets.ISO_8859_1);
 		Utils.LOGGER.finest("SSLServer: " + request);
 
 		request = request.trim();
@@ -138,7 +139,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 
 	private String parseChunkMsg(String[] secondLine, String body) {
 
-		byte [] body_bytes = body.getBytes();
+		byte [] body_bytes = body.getBytes(StandardCharsets.ISO_8859_1);
 
 		String file_id = secondLine[0].trim();
 		int chunkNo = Integer.parseInt(secondLine[1]);
@@ -199,7 +200,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		ChunkInfo chunkInfo = new ChunkInfo(chunkNo, fileID);
 		if(DBUtils.checkStoredChunk(dbConnection, chunkInfo )) { //Tenho o chunk
 			String body = Utils.readFile(Peer.getPath().resolve(chunkInfo.getFilename()).toString());
-			String message = MessageFactory.getChunk(this.peerID, fileID, chunkNo, body.getBytes());
+			String message = MessageFactory.getChunk(this.peerID, fileID, chunkNo, body.getBytes(StandardCharsets.ISO_8859_1));
 			Client.sendMessage(addr, port, message, false);
 		} else { //ReSend GETCHUNK to successor
 			String message = MessageFactory.getGetChunk(this.peerID, addr, port, fileID, chunkNo);
@@ -277,7 +278,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 	private void parsePutChunkMsg(String[] header, String body) {
 
 		ChordManager chordManager = peer.getChordManager();
-		byte [] body_bytes = body.getBytes();
+		byte [] body_bytes = body.getBytes(StandardCharsets.ISO_8859_1);
 
 		String id = header[0].trim();
 		InetAddress addr = null;
@@ -339,7 +340,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 
 	private void parseKeepChunkMsg(String[] header, String body) {
 		ChordManager chordManager = peer.getChordManager();
-		byte [] body_bytes = body.getBytes();
+		byte [] body_bytes = body.getBytes(StandardCharsets.ISO_8859_1);
 
 		String id_request = header[0].trim();
 		InetAddress addr_request = null;
@@ -421,7 +422,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			e.printStackTrace();
 			return;
 		}
-		byte[] sendData = response.getBytes();
+		byte[] sendData = response.getBytes(StandardCharsets.ISO_8859_1);
 		try {
 			sendStream.write(sendData);
 		} catch (IOException e) {
