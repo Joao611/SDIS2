@@ -172,17 +172,22 @@ public class Peer {
 			return;
 		}
 		byte[] file = Utils.readFile(filename).getBytes(StandardCharsets.ISO_8859_1);
+		System.err.println("FILE ZIZE "+file.length);
 		int n = Math.floorDiv(file.length,LENGTH_OF_CHUNK) + 1;
 		BackupRequest backupRequest = new BackupRequest(fileID,filename,encryptKey, degree, n);
 		DBUtils.insertBackupRequested(database.getConnection(), backupRequest);
 		int chunkNo = 0;
-		while(file.length > (chunkNo+1)*LENGTH_OF_CHUNK) {
-			byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, LENGTH_OF_CHUNK);
+		while(file.length > (chunkNo + 1)*LENGTH_OF_CHUNK) {
+			byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, (chunkNo + 1) *LENGTH_OF_CHUNK);
+			System.err.println("FILE 64000 "+body.length);
+				
 			SendPutChunk th = new SendPutChunk(fileID, chunkNo, degree, body, this.getChordManager());
 			SingletonThreadPoolExecutor.getInstance().get().execute(th);
 			chunkNo++;
 		}
 		byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, file.length);
+		System.err.println("FILE last "+body.length);
+		
 		SendPutChunk th = new SendPutChunk(fileID, chunkNo, degree, body, this.getChordManager());
 		SingletonThreadPoolExecutor.getInstance().get().execute(th);
 	}
