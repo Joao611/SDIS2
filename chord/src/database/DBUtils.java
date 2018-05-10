@@ -144,8 +144,8 @@ public class DBUtils {
 		try {
 			PreparedStatement p = conn.prepareStatement(updateChunkStoredRepDegree);
 			p.setInt(1, chunkInfo.getActualRepDegree());
-			p.setString(2, chunkInfo.getFileId());
-			p.setInt(3, chunkInfo.getChunkId());
+			p.setInt(2, chunkInfo.getChunkId());
+			p.setString(3, chunkInfo.getFileId());
 			p.executeUpdate();
 			Utils.log("Chunk " + chunkInfo.getFileId() + ":" + chunkInfo.getChunkId() + " has been updated");
 		} catch (SQLException e) {
