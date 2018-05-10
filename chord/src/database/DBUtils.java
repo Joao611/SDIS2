@@ -43,6 +43,17 @@ public class DBUtils {
 	private static final String deleteFileStored = "DELETE FROM FILESSTORED WHERE file_id = ?";
 	private static final String deleteFileRequested = "DELETE FROM BACKUPSREQUESTED WHERE file_id = ?";
 
+	private static final String getFilesToDelete = "SELECT file_id FROM FILESSTORED WHERE { fn TIMESTAMPADD(SQL_TSI_MINUTE,2,last_time_stored)} < ?";
+//	TODO: Choose lease Time
+//	SQL_TSI_DAY
+//	SQL_TSI_FRAC_SECOND
+//	SQL_TSI_HOUR
+//	SQL_TSI_MINUTE
+//	SQL_TSI_MONTH
+//	SQL_TSI_QUARTER
+//	SQL_TSI_SECOND
+//	SQL_TSI_WEEK
+//	SQL_TSI_YEAR
 
 	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
 		try {
@@ -97,8 +108,6 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
-
-
 	public static void updateStoredFile(Connection conn, FileStoredInfo fileInfo) {
 		String peerRequesting = fileInfo.getPeerRequesting();
 		try {
@@ -116,8 +125,6 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
-
-
 	public static void insertStoredChunk(Connection conn, ChunkInfo chunkInfo) {
 		try {
 			PreparedStatement p = conn.prepareStatement(insertChunkStored);
@@ -137,7 +144,6 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
-
 	public static void updateStoredChunkRepDegree(Connection conn, ChunkInfo chunkInfo) {
 		//"UPDATE CHUNKSSTORED SET actual_rep_degree = ? WHERE file_id = ? AND chunk_id = ?"
 
@@ -152,7 +158,6 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
-
 	private static void updateBackupRequested(Connection conn, BackupRequest backupReq) {
 		try {
 			PreparedStatement p = conn.prepareStatement(updateBackupRequested);
@@ -164,7 +169,6 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
-
 	public static void insertBackupRequested(Connection conn, BackupRequest backupRequest) {
 		Boolean wasRequested = wasBackupRequestedBefore(conn, backupRequest.getFileId());
 		if (!wasRequested) {
@@ -191,7 +195,6 @@ public class DBUtils {
 		}
 
 	}
-
 	public static boolean amIResponsible(Connection conn, String fileId) {
 		try {
 			PreparedStatement p = conn.prepareStatement(getFileById);
@@ -205,7 +208,6 @@ public class DBUtils {
 		}
 		return false;
 	}
-
 	public static boolean checkStoredChunk(Connection conn, ChunkInfo chunkInfo) {
 		try {
 			PreparedStatement p = conn.prepareStatement(checkStoredChunk);
@@ -221,7 +223,6 @@ public class DBUtils {
 		}
 		return false;
 	}
-
 	public static ArrayList<BackupRequest> getBackupsRequested(Connection conn){
 		ArrayList<BackupRequest> array = new ArrayList<BackupRequest>();
 		try {
@@ -240,7 +241,6 @@ public class DBUtils {
 		}
 		return array;
 	}
-
 	public static PeerInfo getPeerWhichRequestedBackup(Connection conn, String fileId) {
 		try {
 			PreparedStatement p = conn.prepareStatement(getPeerWhichRequested);
@@ -261,7 +261,6 @@ public class DBUtils {
 		}
 		return null;
 	}
-
 	private static boolean wasBackupRequestedBefore(Connection conn, String fileId) {
 		PreparedStatement p;
 		try {
@@ -276,7 +275,6 @@ public class DBUtils {
 		}
 		return false;
 	}
-
 	public static BackupRequest getBackupRequested(Connection conn, String fileId) {
 		PreparedStatement p;
 		try {
@@ -284,7 +282,7 @@ public class DBUtils {
 			p.setString(1, fileId);
 			ResultSet result =  p.executeQuery();
 			if (result.next()) {
-				
+
 				return new BackupRequest(result.getString("file_id"),
 						result.getString("filename"),
 						result.getString("encrypt_key"),
@@ -296,7 +294,6 @@ public class DBUtils {
 		}
 		return null;
 	}
-	
 	public static int getDesiredRepDegree(Connection conn, String fileId) {
 		PreparedStatement p;
 		try {
@@ -311,7 +308,6 @@ public class DBUtils {
 		}
 		return 0;
 	}
-	
 	public static int getMaxRepDegree(Connection conn, String fileId) {
 		PreparedStatement p;
 		try {
@@ -326,7 +322,6 @@ public class DBUtils {
 		}
 		return 0;
 	}
-	
 	public static boolean isFileStored(Connection conn, String fileId) {
 		PreparedStatement p;
 		try {
@@ -339,7 +334,6 @@ public class DBUtils {
 		}
 		return false;
 	}
-	
 	public static ArrayList<ChunkInfo> getAllChunksOfFile(Connection conn, String fileId) {
 		PreparedStatement p;
 		ArrayList<ChunkInfo> chunksInfo = new ArrayList<ChunkInfo>();
@@ -355,14 +349,12 @@ public class DBUtils {
 		}
 		return chunksInfo;
 	}
-	
 	public static void deleteFile(Connection conn, String fileId) {
 		try {
 			PreparedStatement p = conn.prepareStatement(deleteFileStored);
 			p.setString(1, fileId);
 			p.executeUpdate();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -374,7 +366,23 @@ public class DBUtils {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
+	}
+	public static ArrayList<String> getFilesToDelete(Connection conn, Timestamp time) {
+		ArrayList<String> res = new ArrayList<String>();
+		PreparedStatement p;
+		try {
+			p = conn.prepareStatement(getFilesToDelete);
+			p.setTimestamp(1, time);
+			ResultSet result = p.executeQuery();
+			while (result.next()) {
+				res.add(result.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return res;
 	}
 
 }

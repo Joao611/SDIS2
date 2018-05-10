@@ -88,6 +88,9 @@ public class Peer {
 		SingletonThreadPoolExecutor.getInstance().get().execute(server);
 		SingletonThreadPoolExecutor.getInstance().get().execute(chordManager);
 
+		Leases l = new Leases(this);
+		SingletonThreadPoolExecutor.getInstance().get().execute(l);
+		
 		ReadInput.readInput(this);
 	}
 
