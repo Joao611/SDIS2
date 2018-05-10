@@ -26,12 +26,9 @@ public class Stabilize implements Runnable {
 
 	@Override
 	public void run() {
-<<<<<<< HEAD
 		Utils.LOGGER.finest("Running Stabilize\n");
 		PeerInfo nextPeer = this.chordManager.getSuccessor(0);
-=======
-		PeerInfo successor = this.chordManager.getSuccessor(0);
->>>>>>> fa58d92247adcf62df4e42d114d0808e05a1cfcd
+
 		String stabilizeMessage = MessageFactory.getHeader(MessageType.STABILIZE, "1.0", this.chordManager.getPeerInfo().getId());
 		String response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), stabilizeMessage, true);
 		AbstractPeerInfo x = parseResponse(response);
