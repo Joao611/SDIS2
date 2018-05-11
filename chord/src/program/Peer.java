@@ -84,6 +84,7 @@ public class Peer {
 		server.closeConnection();
 		peer.getDatabase().closeConnection();
 		SingletonThreadPoolExecutor.getInstance().get().shutdownNow();
+		System.out.println("Program Terminated");
 	}
 
 	public void joinNetwork(InetAddress addr, Integer port) {

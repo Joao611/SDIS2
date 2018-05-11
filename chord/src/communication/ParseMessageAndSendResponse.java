@@ -92,7 +92,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 			
 		}
 		String response = null;
-		System.out.println("Received " + firstLine[0] + " request from " + firstLine[2]);
 
 		switch (MessageType.valueOf(firstLine[0])) {
 		case SUCCESSORS:
@@ -117,7 +116,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 		case NOTIFY:
 			parseNotifyMsg(firstLine,secondLine);
 			response = MessageFactory.getHeader(MessageType.OK, "1.0", myPeerID);
-			System.out.println("Notify sending response");
 			break;
 		case PUTCHUNK:
 			parsePutChunkMsg(secondLine, thirdLine);
@@ -127,7 +125,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 			break;
 		case STABILIZE:
 			response = parseStabilize(firstLine);
-			System.out.println("Stabilize sending response");
 			break;
 		case STORED:
 			response = parseStoredMsg(secondLine);
@@ -136,7 +133,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 			response = parseGetChunkMsg(secondLine);
 			break;
 		case CHUNK:
-			System.err.println("ESTOU A RECEBER O CHUNK");
 			response = parseChunkMsg(secondLine,thirdLine);
 			break;
 //		case UPDATETIME:
@@ -467,8 +463,10 @@ public class ParseMessageAndSendResponse implements Runnable {
 		PeerInfo potentialNewPredecessor = new PeerInfo(id, addr, port);
 		AbstractPeerInfo previousPredecessor = peer.getChordManager().getPredecessor();
 		if (previousPredecessor.isNull() || Utils.inBetween(previousPredecessor.getId(), myPeerID, potentialNewPredecessor.getId())) {
-			Utils.LOGGER.info("Updated predecessor to " + potentialNewPredecessor.getId());
-			this.peer.getChordManager().setPredecessor(potentialNewPredecessor);
+			PeerInfo newPredecessor = potentialNewPredecessor;
+			Utils.LOGGER.info("Updated predecessor to " + newPredecessor.getId());
+			this.peer.getChordManager().setPredecessor(newPredecessor);
+
 		}
 	}
 

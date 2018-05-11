@@ -46,9 +46,9 @@ public class MessageFactory {
 		Object[] objectArray = new Object[nextPeers.size() * 3];
 		for (int i = 0; i < nextPeers.size(); i++) {
 			PeerInfo nextPeer = nextPeers.get(i);
-			objectArray[i*4] = nextPeer.getId();
-			objectArray[i*4 + 1] = nextPeer.getAddr().getHostAddress();
-			objectArray[i*4 + 2] = nextPeer.getPort();
+			objectArray[i*3] = nextPeer.getId();
+			objectArray[i*3 + 1] = nextPeer.getAddr().getHostAddress();
+			objectArray[i*3 + 2] = nextPeer.getPort();
 		}
 		return appendLine(msg, objectArray);
 	}

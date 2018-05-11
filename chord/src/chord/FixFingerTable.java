@@ -3,9 +3,7 @@
  */
 package chord;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 
 import communication.Client;
 import messages.MessageFactory;
@@ -19,11 +17,13 @@ import utils.Utils;
 public class FixFingerTable implements Runnable {
 
 	private ChordManager chord;
+	private final String ERROR_MESSAGE;
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
 	public void run() {
+		Utils.LOGGER.info("Running fix finger table");
 		fix_fingerTable();
 		printFingerTable();
 	}
@@ -37,21 +37,24 @@ public class FixFingerTable implements Runnable {
 	}
 
 	public void fix_fingerTable() {
-		
-		for(int i = 0; i < ChordManager.getM(); i++) {
-			String keyToLookup = getKeyToLookUp(chord.getPeerInfo().getId(), i);
-			String lookupMessage = MessageFactory.getLookup(chord.getPeerInfo().getId(), keyToLookup);
-			String response = chord.lookup(keyToLookup);
-			response = response.trim();
-			PeerInfo info = new PeerInfo(response);
-			while(response.startsWith(MessageType.ASK.getType())) {
-				response = Client.sendMessage(info.getAddr(), info.getPort(), lookupMessage, true);
+		try {
+			for(int i = 0; i < ChordManager.getM(); i++) {
+				String keyToLookup = getKeyToLookUp(chord.getPeerInfo().getId(), i);
+				String lookupMessage = MessageFactory.getLookup(chord.getPeerInfo().getId(), keyToLookup);
+				String response = chord.lookup(keyToLookup);
 				response = response.trim();
-				info = new PeerInfo(response);
+				PeerInfo info = new PeerInfo(response);
+				while(response.startsWith(MessageType.ASK.getType())) {
+					response = Client.sendMessage(info.getAddr(), info.getPort(), lookupMessage, true);
+					if (response.equals(ERROR_MESSAGE)) return;
+					info = new PeerInfo(response);
+				}
+				chord.getFingerTable().set(i, info);
+				
+				
 			}
-			chord.getFingerTable().set(i, info);
-			
-			
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -67,5 +70,6 @@ public class FixFingerTable implements Runnable {
 
 	public FixFingerTable(ChordManager chord) {
 		this.chord = chord;
+		this.ERROR_MESSAGE = MessageFactory.getErrorMessage();
 	}
 }

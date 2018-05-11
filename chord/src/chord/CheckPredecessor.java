@@ -6,27 +6,33 @@ import utils.Utils;
 
 public class CheckPredecessor implements Runnable {
 
-	private AbstractPeerInfo predecessor;
-	private String myPeerId;
+	private ChordManager chordManager;
 	
-	CheckPredecessor(AbstractPeerInfo predecessor, String myPeerId){
-		this.predecessor = predecessor;
-		this.myPeerId = myPeerId;
+	CheckPredecessor(ChordManager chordManager){
+		this.chordManager =  chordManager;
 	}
 	
 	@Override
 	public void run() {
-		if (predecessor.isNull()) {
-			System.out.println("Predecessor not set");
-			return;
-		}
-		if (predecessor.getId().equals(myPeerId)) return;
-		String pingMessage = MessageFactory.getPing(myPeerId);
-		String response = Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), pingMessage, true);
-		if (response.equals(MessageFactory.getErrorMessage())) {
-			System.out.println("Predecessor is unreachable");
-			Utils.LOGGER.finest("Could not establish connection with predecessor");
-			predecessor = new NullPeerInfo();
+		try {
+			Utils.LOGGER.info("Running CheckPredecessor");
+			AbstractPeerInfo predecessor = chordManager.getPredecessor();
+			String myPeerId = chordManager.getPeerInfo().getId();
+			if (predecessor.isNull()) {
+				Utils.LOGGER.warning("Predecessor not set");
+				return;
+			}
+			Utils.LOGGER.info("My predecessor is " + predecessor.getId());
+			if (predecessor.getId().equals(myPeerId)) return;
+			String pingMessage = MessageFactory.getPing(myPeerId);
+			String response = Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), pingMessage, true);
+			if (response.equals(MessageFactory.getErrorMessage())) {
+				System.out.println("Predecessor dropped");
+				Utils.LOGGER.finest("Could not establish connection with predecessor");
+				chordManager.setPredecessor(new NullPeerInfo());
+			}	
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 

@@ -25,6 +25,7 @@ public class PeerInfo extends AbstractPeerInfo {
 	}
 
 	public PeerInfo(String str) {
+		str = str.trim();
 		String[] attr = str.split("\r\n");
 
 		attr = attr[1].split(" ");
