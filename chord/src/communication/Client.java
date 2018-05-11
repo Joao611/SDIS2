@@ -10,6 +10,8 @@ import java.util.Arrays;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import utils.Utils;
+
 public class Client {
 	private static ArrayList<String> cipher = new ArrayList<String>(Arrays.asList("TLS_DHE_RSA_WITH_AES_128_CBC_SHA"));
 
@@ -70,7 +72,7 @@ public class Client {
 	 * Receives the message's response
 	 */
 	public static String getResponse(SSLSocket socket) {
-		byte[] readData = new byte[1024];
+		byte[] readData = new byte[1024 + Utils.MAX_LENGTH_CHUNK];
 		InputStream readStream;
 		try {
 			readStream = socket.getInputStream();

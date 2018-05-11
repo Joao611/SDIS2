@@ -70,7 +70,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 	 */
 	String parseMessage(byte[] readData) {
 		String request = new String(readData,StandardCharsets.ISO_8859_1);
-//		request = request.trim();
 		Utils.LOGGER.finest("SSLServer: " + request);
 
 		request = request.trim();
@@ -86,7 +85,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 			for(int i = 3; i < lines.length; i++) {
 				thirdLine += lines[i];
 			}
-			
 		}
 		String response = null;
 

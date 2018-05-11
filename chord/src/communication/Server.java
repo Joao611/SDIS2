@@ -93,7 +93,7 @@ public class Server implements Runnable {
 			return null;
 		}
 
-		byte[] readData = new byte[1024];
+		byte[] readData = new byte[1024 + Utils.MAX_LENGTH_CHUNK];
 		try {
 			readStream.read(readData);
 		} catch (IOException e) {
