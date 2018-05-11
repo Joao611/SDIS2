@@ -30,6 +30,7 @@ import database.FileStoredInfo;
 import messages.MessageFactory;
 import messages.MessageType;
 import program.Peer;
+import utils.Confidentiallyty;
 import utils.Utils;
 
 /**
@@ -81,10 +82,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 			secondLine = lines[1].split(" ");
 		}
 		if (lines.length > 2) {
-//			thirdLine = new String();
-//			for(int i = 3; i < lines.length; i++) {
-//				thirdLine += lines[i];
-//			}
 			thirdLine = request.substring(request.indexOf("\r\n\r\n")+4, request.length());
 		}
 		String response = null;
@@ -159,6 +156,10 @@ public class ParseMessageAndSendResponse implements Runnable {
 
 		BackupRequest b = DBUtils.getBackupRequested(dbConnection, file_id);
 
+		
+		Confidentiallyty c = new Confidentiallyty(b.getEncryptKey());
+		
+		body_bytes = c.dencript(body_bytes);
 		Path filepath = Peer.getPath().resolve("restoreFile-" + b.getFilename());
 
 		try {

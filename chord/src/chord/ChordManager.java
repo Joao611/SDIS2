@@ -63,9 +63,6 @@ public class ChordManager implements Runnable {
 			getFingerTable().add(getPeerInfo());
 		}
 		predecessor = new NullPeerInfo();
-
-//		System.err.println(MessageFactory.appendLine(SUCCESSOR_MESSAGE, this.getPeerInfo().asArray()));
-
 	}
 
 	@Override

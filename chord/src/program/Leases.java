@@ -48,12 +48,7 @@ public class Leases implements Runnable {
 			peer.backup(filesToUpdate.get(i).getFilename(),
 					filesToUpdate.get(i).getDesiredRepDegree(),
 					filesToUpdate.get(i).getEncryptKey());
-//			DBUtils.updateFile(peer.getConnection(), filesToUpdate.get(i));
 			System.out.println("Updated file: " + filesToUpdate.get(i));
-//			String message = MessageFactory.getUpdateTime(this.peer.getChordManager().getPeerInfo().getId(),filesToUpdate.get(i));
-//			Client.sendMessage(this.peer.getChordManager().getSuccessor(0).getAddr(),
-//					this.peer.getChordManager().getSuccessor(0).getPort(),
-//					message, false);
 		}
 
 	}
