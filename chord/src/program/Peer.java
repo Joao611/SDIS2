@@ -97,8 +97,6 @@ public class Peer {
 
 		Leases l = new Leases(this);
 		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(l, 0, Leases.HALF_LEASE_TIME, Leases.LEASE_UNIT);
-		
-		ReadInput.readInput(this);
 	}
 
 	public ChordManager getChordManager() {
