@@ -16,7 +16,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.sql.Connection;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 
 import javax.net.ssl.SSLSocket;
 
@@ -85,8 +88,12 @@ public class ParseMessageAndSendResponse implements Runnable {
 			thirdLine = lines[3];
 		}
 		String response = null;
+		System.out.println("Received " + firstLine[0] + " request from " + firstLine[2]);
 
 		switch (MessageType.valueOf(firstLine[0])) {
+		case SUCCESSORS:
+			parseSuccessors(secondLine);
+			break;
 		case DELETE:
 			parseDelete(secondLine);
 			break;
@@ -106,6 +113,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		case NOTIFY:
 			parseNotifyMsg(firstLine,secondLine);
 			response = MessageFactory.getHeader(MessageType.OK, "1.0", myPeerID);
+			System.out.println("Notify sending response");
 			break;
 		case PUTCHUNK:
 			parsePutChunkMsg(secondLine, thirdLine);
@@ -115,27 +123,42 @@ public class ParseMessageAndSendResponse implements Runnable {
 			break;
 		case STABILIZE:
 			response = parseStabilize(firstLine);
-			
+			System.out.println("Stabilize sending response");
 			break;
-		case STORED: {
+		case STORED:
 			response = parseStoredMsg(secondLine);
 			break;
-		}
-		case GETCHUNK: {
+		case GETCHUNK: 
 			response = parseGetChunkMsg(secondLine);
 			break;
-		}
-		case CHUNK: {
+		case CHUNK:
 			System.err.println("ESTOU A RECEBER O CHUNK");
 			response = parseChunkMsg(secondLine,thirdLine);
 			break;
-		}
 		default:
+			System.err.println("Unexpected message received: " + request);
 			break;
 		}
 		return response;
 	}
 	
+	private void parseSuccessors(String[] secondLine) {
+		Deque<PeerInfo> peersReceived = new ArrayDeque<PeerInfo>();
+		int numberOfSuccessorsReceived = secondLine.length / 3;
+		for (int i = 0; i < numberOfSuccessorsReceived; i++) {
+			String peerId = secondLine[i*3];
+			InetAddress peerAddr = null;
+			try {
+				peerAddr = InetAddress.getByName(secondLine[i*3+1]);
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
+			Integer port = Integer.parseInt(secondLine[i*3+2]);
+			peersReceived.add(new PeerInfo(peerId,peerAddr,port));
+		}
+		peer.getChordManager().updateNextPeers(peersReceived);
+	}
+
 	private String parseStabilize(String[] firstLine) {
 		String response = MessageFactory.getFirstLine(MessageType.PREDECESSOR, "1.0", myPeerID);
 		return MessageFactory.appendLine(response, peer.getChordManager().getPredecessor().asArray());

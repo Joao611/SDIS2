@@ -78,6 +78,12 @@ public class Peer {
 			port = Integer.valueOf(args[2]);
 		}
 		peer.joinNetwork(addr, port);
+		
+		ReadInput readInputThread = new ReadInput(peer);
+		readInputThread.run();
+		server.closeConnection();
+		peer.getDatabase().closeConnection();
+		SingletonThreadPoolExecutor.getInstance().get().shutdownNow();
 	}
 
 	public void joinNetwork(InetAddress addr, Integer port) {
@@ -87,8 +93,6 @@ public class Peer {
 		}
 		SingletonThreadPoolExecutor.getInstance().get().execute(server);
 		SingletonThreadPoolExecutor.getInstance().get().execute(chordManager);
-
-		ReadInput.readInput(this);
 	}
 
 	public ChordManager getChordManager() {
@@ -211,8 +215,10 @@ public class Peer {
 			SendGetChunk th = new SendGetChunk(backupRequest, i,this.getChordManager());
 			SingletonThreadPoolExecutor.getInstance().get().execute(th);
 		}
-
-
+	}
+	
+	public Database getDatabase() {
+		return database;
 	}
 
 }

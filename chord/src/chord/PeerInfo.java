@@ -49,7 +49,7 @@ public class PeerInfo extends AbstractPeerInfo {
 
 	@Override
 	public String[] asArray() {
-		return new String[]{id.toString(),addr.getHostAddress(),port.toString()}; 
+		return new String[]{id,addr.getHostAddress(),port.toString()}; 
 	}
 
 	/**
@@ -96,6 +96,17 @@ public class PeerInfo extends AbstractPeerInfo {
 		return false;
 	}
 	
+	@Override
+	public boolean equals(Object other){
+	    if (other == null) return false;
+	    if (other == this) return true;
+	    if (!(other instanceof PeerInfo))return false;
+	    PeerInfo otherPeer = (PeerInfo)other;
+	    if (otherPeer.getId().equals(this.id)) {
+	    	return true;
+	    }
+	    return false;
+	}
 	
 
 }

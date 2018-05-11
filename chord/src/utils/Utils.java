@@ -71,6 +71,17 @@ public class Utils {
 		return ((_inf.compareTo(_value) < 0) && (_value.compareTo(_sup) <= 0));
 	}
 	
+	public static String highestId(String id1, String id2) {
+		if (id1 == null) return id2;
+		if (id2 == null) return id1;
+		BigInteger _id1 = new BigInteger(id1,16);
+		BigInteger _id2 = new BigInteger(id2,16);
+		if (_id1.compareTo(_id2) > 0) { //_id1 bigger than _id2
+			return id1;
+		}
+		return id2;
+	}
+	
 	public static void log(String message) {
 		LOGGER.info(message);
 //		The following lists the Log Levels in descending order:

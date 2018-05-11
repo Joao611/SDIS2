@@ -10,11 +10,18 @@ import database.BackupRequest;
 import database.DBUtils;
 import program.Peer;
 
-public class ReadInput {
+public class ReadInput{
 
-	public static void readInput(Peer peer) {
+	private Peer peer;
+	
+	public ReadInput(Peer peer){
+		this.peer = peer;
+	}
+	
+	public void run() {
 		while(true) {
 			System.out.println("Choose an option: ");
+			System.out.println("\t0. Exit");
 			System.out.println("\t1. Backup");
 			System.out.println("\t2. Restore");
 			System.out.println("\t3. Delete");
@@ -28,6 +35,11 @@ public class ReadInput {
 				continue;
 			}
 			switch (op) {
+			case 0:{
+				scanner.close();
+				Thread.currentThread().interrupt();
+				return;
+			}
 			case 1:{
 				ReadInput.backupOption(scanner, peer);
 				break;
@@ -46,7 +58,9 @@ public class ReadInput {
 			}
 			}
 		}
+		
 	}
+	
 	private static void restoreOption(Scanner scanner, Peer peer) {
 		ArrayList<BackupRequest> allRequests = DBUtils.getBackupsRequested(peer.getConnection());
 		if (allRequests.size() > 0) {
@@ -117,5 +131,6 @@ public class ReadInput {
 		peer.backup(filename, degree,null);
 		System.out.println("Called Backup!");
 	}
+	
 
 }

@@ -10,6 +10,8 @@ import java.util.Arrays;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import messages.MessageFactory;
+
 public class Client {
 	private static ArrayList<String> cipher = new ArrayList<String>(Arrays.asList("TLS_DHE_RSA_WITH_AES_128_CBC_SHA"));
 
@@ -24,17 +26,18 @@ public class Client {
 		SSLSocket socket;
 		try {
 			socket = (SSLSocket) socketFactory.createSocket(addr, port);
-			socket.setSoTimeout(25000);
+			socket.setSoTimeout(5000);
 		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
+			System.err.println("Connection refused");
+			return MessageFactory.getErrorMessage();
 		}
 
 		socket.setEnabledCipherSuites(cipher.toArray(new String[0]));
 
 		send(message, socket);
-
+		System.out.println("Sent: " + message);
 		if(waitForResponse) {
+			System.out.println("Waiting for response on: " + message);
 			response = getResponse(socket);//fica bloqueado a espera de resposta
 		}
 		try {

@@ -9,6 +9,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 import communication.Client;
@@ -25,13 +31,15 @@ import utils.Utils;
 public class ChordManager implements Runnable {
 
 	private static final int M = 32; // 32bits - 4 bytes
+	private static final int NEXT_PEERS_SIZE = 5;
 	private PeerInfo peerInfo;
 	private ArrayList<PeerInfo> fingerTable = new ArrayList<PeerInfo>();
 	private AbstractPeerInfo predecessor;
-
+	
+	private Deque<PeerInfo> nextPeers; //this is an enhancement to the protocol
+	
 	private String ASK_MESSAGE;
 	private String SUCCESSOR_MESSAGE;
-	private String LOOKUP_MESSAGE;
 	private Database database;
 
 	public ChordManager(Integer port) {
@@ -58,11 +66,13 @@ public class ChordManager implements Runnable {
 		
 		ASK_MESSAGE = MessageFactory.getFirstLine(MessageType.ASK, "1.0", this.getPeerInfo().getId());
 		SUCCESSOR_MESSAGE = MessageFactory.getFirstLine(MessageType.SUCCESSOR, "1.0", this.getPeerInfo().getId());
-
+		nextPeers = new ConcurrentLinkedDeque<PeerInfo>();
+		
 		for (int i = 0; i < getM(); i++) {
 			getFingerTable().add(getPeerInfo());
 		}
-		predecessor = new NullPeerInfo();
+		nextPeers.push(getPeerInfo());
+		predecessor = getPeerInfo();
 
 //		System.err.println(MessageFactory.appendLine(SUCCESSOR_MESSAGE, this.getPeerInfo().asArray()));
 
@@ -70,14 +80,14 @@ public class ChordManager implements Runnable {
 
 	@Override
 	public void run() {
-		CheckPredecessor checkPredecessorThread = new CheckPredecessor(predecessor);
-		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(checkPredecessorThread, 100, 1000, TimeUnit.MILLISECONDS);
+		CheckPredecessor checkPredecessorThread = new CheckPredecessor(predecessor,peerInfo.getId());
+		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(checkPredecessorThread, 1000, 5000, TimeUnit.MILLISECONDS);
 		
 		FixFingerTable fixFingerTableThread = new FixFingerTable(this);
-		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(fixFingerTableThread, 200, 1000, TimeUnit.MILLISECONDS);
+		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(fixFingerTableThread, 2000, 5000, TimeUnit.MILLISECONDS);
 
 		Stabilize stabilizeThread = new Stabilize(this);
-		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(stabilizeThread, 0, 1000, TimeUnit.MILLISECONDS);
+		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(stabilizeThread, 0, 5000, TimeUnit.MILLISECONDS);
 
 	}
 
@@ -99,6 +109,7 @@ public class ChordManager implements Runnable {
 			nextPeer = new PeerInfo(response);
 		}
 		this.getFingerTable().set(0, nextPeer);
+		this.nextPeers.push(nextPeer);
 	}
 
 	/**
@@ -115,22 +126,51 @@ public class ChordManager implements Runnable {
 		if (Utils.inBetween(this.getPeerInfo().getId(), this.getFingerTable().get(0).getId(), key)) {
 			return MessageFactory.appendLine(SUCCESSOR_MESSAGE, this.getFingerTable().get(0).asArray());
 		}
+		String closestPrecedingNode = closestPrecedingNode(key);
+		if (closestPrecedingNode != null) return closestPrecedingNode;
+		return MessageFactory.appendLine(ASK_MESSAGE, this.getFingerTable().get(getM() - 1).asArray());
+	}
+	
+	public String closestPrecedingNode(String key) {
+		String fingersMsg = null;
+		String nextPeersMsg = null;
+		String fingerTableHighestId = null;
+		String nextPeersHighestId = null;
+		Iterator<PeerInfo> it = nextPeers.iterator();
+		PeerInfo currentPeer;
 		for (int i = getM() - 1; i > 0; i--) {
-			if (Utils.inBetween(this.getPeerInfo().getId(), key, this.getFingerTable().get(i).getId())) {
-				return MessageFactory.appendLine(ASK_MESSAGE, this.getFingerTable().get(i).asArray());
+			currentPeer = this.getFingerTable().get(i);
+			if (Utils.inBetween(this.getPeerInfo().getId(), key, currentPeer.getId())) {
+				fingerTableHighestId = currentPeer.getId();
+				fingersMsg = MessageFactory.appendLine(ASK_MESSAGE, currentPeer.asArray());
+				break;
 			}
 		}
-		return MessageFactory.appendLine(ASK_MESSAGE, this.getFingerTable().get(getM() - 1).asArray());
+		//TEST ME
+		while(it.hasNext()) {
+			currentPeer = it.next();
+			if (Utils.inBetween(this.getPeerInfo().getId(), key, currentPeer.getId())) {
+				nextPeersHighestId = currentPeer.getId();
+				nextPeersMsg = MessageFactory.appendLine(ASK_MESSAGE, currentPeer.asArray());
+				break;
+			}
+		}
+		if (fingerTableHighestId != null || nextPeersHighestId != null) {
+			String highestId = Utils.highestId(fingerTableHighestId, nextPeersHighestId);
+			if (highestId == fingerTableHighestId) return fingersMsg;
+			return nextPeersMsg;
+		}
+		return null;
 	}
 
 	public void stabilize(AbstractPeerInfo x) {
 		if (x.isNull()) return;
-		PeerInfo successor = this.fingerTable.get(0);
+		PeerInfo successor = getNextPeer();
 
 		if (Utils.inBetween(this.peerInfo.getId(), successor.getId(), x.getId())) {
 			setSuccessor(0, (PeerInfo) x);
+			this.nextPeers.push((PeerInfo) x);
 		}
-
 	}
 
 	/**
@@ -141,6 +181,7 @@ public class ChordManager implements Runnable {
 		String message = MessageFactory.getFirstLine(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
 		message = MessageFactory.appendLine(message, new String[] {"" + this.getPeerInfo().getPort()});
 		String response = Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message, true).trim();
+		System.out.println("Received notify response");
 		String expectedResponse = MessageFactory.getHeader(MessageType.OK, "1.0", newSuccessor.getId()).trim();
 		if (!expectedResponse.equals(response)) {
 			System.err.println("Expected: " + expectedResponse);
@@ -188,6 +229,25 @@ public class ChordManager implements Runnable {
 		}
 
 		return owner;
+	}
+	
+	public List<PeerInfo> getNextPeers() {
+		List<PeerInfo> nextPeersArray = new ArrayList<PeerInfo>();
+		int i = 0;
+		nextPeers.forEach(p -> {
+			if (i < NEXT_PEERS_SIZE - 2) {
+				nextPeersArray.add(p);
+			}
+		});
+		return nextPeersArray;
+	}
+	
+	public void popNextPeer() {
+		nextPeers.pop();
+	}
+	
+	public PeerInfo getNextPeer() {
+		return nextPeers.peek();
 	}
 
 	/**
@@ -255,5 +315,12 @@ public class ChordManager implements Runnable {
 	 */
 	public void setDatabase(Database database) {
 		this.database = database;
+	}
+
+	public void updateNextPeers(Deque<PeerInfo> peersReceived) {
+		PeerInfo nextPeer = nextPeers.pop();
+		nextPeers.clear();
+		nextPeers = peersReceived;
+		nextPeers.push(nextPeer);		
 	}
 }

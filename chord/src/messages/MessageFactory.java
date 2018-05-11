@@ -3,9 +3,9 @@ package messages;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import chord.PeerInfo;
-import utils.Utils;
 
 public class MessageFactory {
 
@@ -40,6 +40,19 @@ public class MessageFactory {
 		String msg = getFirstLine(MessageType.SUCCESSOR,"1.0",senderId);
 		return appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort()});
 	}
+	
+	public static String getSuccessors(String senderId, List<PeerInfo> nextPeers) {
+		String msg = getFirstLine(MessageType.SUCCESSORS,"2.0",senderId);
+		Object[] objectArray = new Object[nextPeers.size() * 3];
+		for (int i = 0; i < nextPeers.size(); i++) {
+			PeerInfo nextPeer = nextPeers.get(i);
+			objectArray[i*4] = nextPeer.getId();
+			objectArray[i*4 + 1] = nextPeer.getAddr().getHostAddress();
+			objectArray[i*4 + 2] = nextPeer.getPort();
+		}
+		return appendLine(msg, objectArray);
+	}
+	
 	public static String getPredecessor(String senderId, PeerInfo peer) {
 		String msg = getFirstLine(MessageType.PREDECESSOR,"1.0",senderId);
 		return appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort()});
@@ -104,4 +117,13 @@ public class MessageFactory {
 		String msg = getFirstLine(MessageType.DELETE, "1.0",senderId);
 		return appendLine(msg, new Object[] {fileId, repDegree});
 	}
+	
+	public static String getPing(String senderId) {
+		return getHeader(MessageType.PING,"1.0",senderId);
+	}
+	
+	public static String getErrorMessage() {
+		return "error";
+	}
+
 }

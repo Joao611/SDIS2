@@ -33,7 +33,7 @@ public class FixFingerTable implements Runnable {
 		for (int i = 0; i < chord.getFingerTable().size(); i++) {
 			m += "\t" + chord.getFingerTable().get(i).getId() + "\n";
 		}
-		Utils.LOGGER.finest("Tabela de dedos: "+chord.getPeerInfo().getId()+"\n"+m);
+		Utils.LOGGER.finest("Tabela de dedos: " + chord.getPeerInfo().getId() + "\n" + m);
 	}
 
 	public void fix_fingerTable() {
@@ -50,6 +50,8 @@ public class FixFingerTable implements Runnable {
 				info = new PeerInfo(response);
 			}
 			chord.getFingerTable().set(i, info);
+			
+			
 		}
 	}
 

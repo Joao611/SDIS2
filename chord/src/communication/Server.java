@@ -19,6 +19,7 @@ public class Server implements Runnable {
 	private ArrayList<String> cipher_list;
 	private int port_number;
 	private Peer peer = null;
+	private SSLServerSocket serverSocket;
 	
 	public Server(String[] cipher_suite, int port) throws Exception {
 		
@@ -36,7 +37,7 @@ public class Server implements Runnable {
 	@Override
 	public void run() {
 		SSLServerSocketFactory serverFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-		SSLServerSocket serverSocket;
+		
 		try {
 			serverSocket = (SSLServerSocket) serverFactory.createServerSocket(this.port_number);
 			Utils.LOGGER.info("Server listening on port " + this.port_number);
@@ -55,7 +56,7 @@ public class Server implements Runnable {
 			try {
 				socket = (SSLSocket) serverSocket.accept();
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("Socket closed");
 				return;
 			}
 			try {
@@ -72,6 +73,14 @@ public class Server implements Runnable {
 			SingletonThreadPoolExecutor.getInstance().get().execute(p);	
 		}
 
+	}
+	
+	public void closeConnection() {
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void setSystemProperties() {

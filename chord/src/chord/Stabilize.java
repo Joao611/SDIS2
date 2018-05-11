@@ -26,17 +26,38 @@ public class Stabilize implements Runnable {
 
 	@Override
 	public void run() {
+		String myPeerId = this.chordManager.getPeerInfo().getId();
 		Utils.LOGGER.finest("Running Stabilize\n");
-		PeerInfo nextPeer = this.chordManager.getSuccessor(0);
-
-		String stabilizeMessage = MessageFactory.getHeader(MessageType.STABILIZE, "1.0", this.chordManager.getPeerInfo().getId());
+		PeerInfo nextPeer = this.chordManager.getNextPeer();
+		String stabilizeMessage = MessageFactory.getHeader(MessageType.STABILIZE, "1.0", myPeerId);
 		String response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), stabilizeMessage, true);
+		System.out.println("Received stabilize response");
+		if(response.equals(MessageFactory.getErrorMessage())) {
+			System.err.println("Next peer dropped");
+			chordManager.popNextPeer();
+			nextPeer = this.chordManager.getNextPeer();
+			return;
+		}
+		
 		AbstractPeerInfo x = parseResponse(response);
 
 		this.chordManager.stabilize(x); //might update successor
-		this.chordManager.notify(this.chordManager.getSuccessor(0)); //notify my successor that I might be his predecessor
-
-
+		nextPeer = this.chordManager.getNextPeer();
+		this.chordManager.notify(nextPeer); //notify my successor that I might be his predecessor
+	
+		
+		
+		// send my nextPeers to my predecessor.
+		AbstractPeerInfo predecessor = chordManager.getPredecessor();
+		if (myPeerId.equals(predecessor.getId())) return; //do not send to myself
+		
+		if (!predecessor.isNull()) {
+			String successorsMsg = MessageFactory.getSuccessors(myPeerId, this.chordManager.getNextPeers());
+			Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), successorsMsg, false);
+		}else {
+			System.out.println("Predecessor is null");
+		}
+		
 
 	}
 }
