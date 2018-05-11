@@ -81,10 +81,11 @@ public class ParseMessageAndSendResponse implements Runnable {
 			secondLine = lines[1].split(" ");
 		}
 		if (lines.length > 2) {
-			thirdLine = new String();
-			for(int i = 3; i < lines.length; i++) {
-				thirdLine += lines[i];
-			}
+//			thirdLine = new String();
+//			for(int i = 3; i < lines.length; i++) {
+//				thirdLine += lines[i];
+//			}
+			thirdLine = request.substring(request.indexOf("\r\n\r\n")+4, request.length());
 		}
 		String response = null;
 

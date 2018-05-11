@@ -2,6 +2,7 @@ package communication;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -15,14 +16,14 @@ import utils.Utils;
 public class Client {
 	private static ArrayList<String> cipher = new ArrayList<String>(Arrays.asList("TLS_DHE_RSA_WITH_AES_128_CBC_SHA"));
 
-	
+
 	public static String sendMessage(InetAddress addr, int port, String message, boolean waitForResponse) {
 
 		String response = null;
 		SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
-		
-//      AsynchronousSocketChannel client = AsynchronousSocketChannel.open();
+
+		//      AsynchronousSocketChannel client = AsynchronousSocketChannel.open();
 		SSLSocket socket;
 		try {
 			socket = (SSLSocket) socketFactory.createSocket(addr, port);
@@ -52,7 +53,7 @@ public class Client {
 	 */
 	public static void send(String message, SSLSocket socket) {
 		byte[] sendData = message.getBytes(StandardCharsets.ISO_8859_1);
-
+		sendData = encode(sendData);
 		OutputStream sendStream;
 		try {
 			sendStream = socket.getOutputStream();
@@ -62,10 +63,34 @@ public class Client {
 		}
 		try {
 			sendStream.write(sendData);
+			sendStream.write('\t');
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
+	}
+
+	private static byte[] encode(byte[] sendData) {
+		ArrayList<Byte> res = new ArrayList<Byte>();
+		for(int i = 0; i < sendData.length; i++) {
+			if(sendData[i]=='\t') {
+				res.add((byte) '\f');
+				res.add((byte) '\t');
+			} else {
+				if(sendData[i]=='\f') {
+					res.add((byte) '\f');
+					res.add((byte) '\f');
+				
+				}else {
+					res.add(sendData[i]);
+				}
+			}
+		}
+		byte[] a = new byte[res.size()];
+		for (int i = 0; i < res.size(); i++) {
+			a[i] = res.get(i);
+		}
+		return a;
 	}
 
 	/**
