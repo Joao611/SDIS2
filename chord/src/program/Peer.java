@@ -21,6 +21,7 @@ import database.Database;
 import runnableProtocols.SendGetChunk;
 import runnableProtocols.SendInitDelete;
 import runnableProtocols.SendPutChunk;
+import utils.Confidentiallyty;
 import utils.ReadInput;
 import utils.SingletonThreadPoolExecutor;
 import utils.Utils;
@@ -179,20 +180,27 @@ public class Peer {
 		byte[] file = Utils.readFile(filename).getBytes(StandardCharsets.ISO_8859_1);
 		System.err.println("FILE ZIZE "+file.length);
 		int n = Math.floorDiv(file.length,LENGTH_OF_CHUNK) + 1;
+		Confidentiallyty c;
+		if(encryptKey == null) {
+			c = new Confidentiallyty();
+		} else {
+			c = new Confidentiallyty(encryptKey);
+		}
+		encryptKey = new String(c.getKey(), StandardCharsets.ISO_8859_1);
 		BackupRequest backupRequest = new BackupRequest(fileID,filename,encryptKey, degree, n);
 		DBUtils.insertBackupRequested(database.getConnection(), backupRequest);
 		int chunkNo = 0;
 		while(file.length > (chunkNo + 1)*LENGTH_OF_CHUNK) {
 			byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, (chunkNo + 1) *LENGTH_OF_CHUNK);
 			System.err.println("FILE 64000 "+body.length);
-				
+			body = c.encript(body);
 			SendPutChunk th = new SendPutChunk(fileID, chunkNo, degree, body, this.getChordManager());
 			SingletonThreadPoolExecutor.getInstance().get().execute(th);
 			chunkNo++;
 		}
 		byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, file.length);
 		System.err.println("FILE last "+body.length);
-		
+		body = c.encript(body);
 		SendPutChunk th = new SendPutChunk(fileID, chunkNo, degree, body, this.getChordManager());
 		SingletonThreadPoolExecutor.getInstance().get().execute(th);
 	}

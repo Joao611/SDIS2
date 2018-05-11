@@ -102,9 +102,21 @@ public class Server implements Runnable {
 			return null;
 		}
 
-		byte[] readData = new byte[1024];
+		byte[] readData = new byte[1024 + Utils.MAX_LENGTH_CHUNK];
 		try {
-			readStream.read(readData);
+			int p = 0;
+			byte l = 'a';
+			while(l != '\t') {
+				l = (byte) readStream.read();
+				if(l == '\f') {
+					l = (byte) readStream.read();
+					readData[p] = l;
+					l='a';
+				} else {
+					readData[p] = l;
+				}
+				p++;
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
