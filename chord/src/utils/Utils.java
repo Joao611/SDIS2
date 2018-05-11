@@ -20,15 +20,15 @@ import java.util.logging.SimpleFormatter;
 import chord.ChordManager;
 
 public class Utils {
-//	TODO: pedido DNS para descobrir o addrs e port to servidor?
+	//	TODO: pedido DNS para descobrir o addrs e port to servidor?
 	public static final int TIME_MAX_TO_SLEEP = 400;
-//	public static final String ENCODING_TYPE = "ISO-8859-1";
-//	USAR - StandardCharsets.ISO_8859_1
+	//	public static final String ENCODING_TYPE = "ISO-8859-1";
+	//	USAR - StandardCharsets.ISO_8859_1
 	public static final int MAX_LENGTH_CHUNK = 64000;
 	public static final int BYTE_TO_KBYTE = 1000;
-	
+
 	public static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-	
+
 	static {
 		LOGGER.setUseParentHandlers(false);
 		LOGGER.setLevel(Level.ALL);
@@ -42,7 +42,7 @@ public class Utils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void randonSleep(int time) throws InterruptedException {
 		Random r = new Random();
 		Thread.sleep(r.nextInt(time));
@@ -61,7 +61,7 @@ public class Utils {
 		BigInteger _value = new BigInteger(value,16);
 
 		BigInteger aux = new BigInteger((Math.pow(2, ChordManager.getM())+"").getBytes());
-		
+
 		if(_sup.compareTo(_inf) <= 0) { //procura no meio do circulo todo
 			_sup  = _sup.add(aux);
 		}
@@ -84,23 +84,23 @@ public class Utils {
 	
 	public static void log(String message) {
 		LOGGER.info(message);
-//		The following lists the Log Levels in descending order:
-//
-//			SEVERE (highest)
-//
-//			WARNING
-//
-//			INFO
-//
-//			CONFIG
-//
-//			FINE
-//
-//			FINER
-//
-//			FINEST
+		//		The following lists the Log Levels in descending order:
+		//
+		//			SEVERE (highest)
+		//
+		//			WARNING
+		//
+		//			INFO
+		//
+		//			CONFIG
+		//
+		//			FINE
+		//
+		//			FINER
+		//
+		//			FINEST
 	}
-	
+
 	public static String readFile(String filepath) {
 		byte[] encoded;
 		try {
@@ -111,7 +111,7 @@ public class Utils {
 		}
 		return new String(encoded, StandardCharsets.ISO_8859_1);
 	}
-	
+
 	public static void writeToFile(Path filePath, byte[] body) throws IOException {
 		if(!Files.exists(filePath)) { //NOTE: O CHUNk nao Existe
 			Files.createFile(filePath);
@@ -121,13 +121,13 @@ public class Utils {
 				public void completed(Integer result, ByteBuffer buffer) {
 					System.out.println("Finished writing!");
 				}
-	
+
 				@Override
 				public void failed(Throwable arg0, ByteBuffer arg1) {
 					System.err.println("Error: Could not write!");
-					
+
 				}
-				
+
 			};
 			ByteBuffer src = ByteBuffer.allocate(body.length);
 			src.put(body);
@@ -137,7 +137,7 @@ public class Utils {
 			System.out.println("File already exists");
 		}
 	}
-	
+
 	public static void deleteFile(Path filePath) {
 		try {
 			Files.deleteIfExists(filePath);
@@ -145,17 +145,17 @@ public class Utils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static String byteArrayToHex(byte[] a) {
-		   StringBuilder sb = new StringBuilder(a.length * 2);
-		   for(byte b: a)
-		      sb.append(String.format("%02x", b));
-		   return sb.toString();
+		StringBuilder sb = new StringBuilder(a.length * 2);
+		for(byte b: a)
+			sb.append(String.format("%02x", b));
+		return sb.toString();
 	}
-	
+
 	public static String getIdFromHash(byte[] hash, int length) {
 		byte[] slice = Arrays.copyOf(hash, length);
 		return byteArrayToHex(slice);
 	}
-	
+
 }

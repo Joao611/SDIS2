@@ -73,7 +73,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 	 */
 	String parseMessage(byte[] readData) {
 		String request = new String(readData,StandardCharsets.ISO_8859_1);
-		request = request.trim();
+//		request = request.trim();
 		Utils.LOGGER.finest("SSLServer: " + request);
 
 		request = request.trim();
@@ -85,7 +85,11 @@ public class ParseMessageAndSendResponse implements Runnable {
 			secondLine = lines[1].split(" ");
 		}
 		if (lines.length > 2) {
-			thirdLine = lines[3];
+			thirdLine = new String();
+			for(int i = 3; i < lines.length; i++) {
+				thirdLine += lines[i];
+			}
+			
 		}
 		String response = null;
 		System.out.println("Received " + firstLine[0] + " request from " + firstLine[2]);
@@ -135,6 +139,9 @@ public class ParseMessageAndSendResponse implements Runnable {
 			System.err.println("ESTOU A RECEBER O CHUNK");
 			response = parseChunkMsg(secondLine,thirdLine);
 			break;
+//		case UPDATETIME:
+//			response = parseUpdateTime(secondLine);
+//			break;
 		default:
 			System.err.println("Unexpected message received: " + request);
 			break;
@@ -426,6 +433,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			System.out.println("VOU GUARDAR");
 			DBUtils.insertStoredFile(dbConnection, new FileStoredInfo(fileID, false));
 			DBUtils.insertStoredChunk(dbConnection, new ChunkInfo(chunkNo,fileID, body_bytes.length));
+			System.out.println(body_bytes.length);
 			try {
 				Utils.writeToFile(filePath, body_bytes);
 			} catch (IOException e) {
