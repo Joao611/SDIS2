@@ -201,30 +201,48 @@ public class DBUtils {
 
 	}
 	public static boolean amIResponsible(Connection conn, String fileId) {
+		PreparedStatement p = null;
 		try {
-			PreparedStatement p = conn.prepareStatement(getFileById);
+			p = conn.prepareStatement(getFileById);
 			p.setString(1, fileId);
 			ResultSet result = p.executeQuery();
+			conn.setAutoCommit(false);
 			if (result.next()) {
 				return result.getBoolean("i_am_responsible");
 			}
+
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally{
+			try {
+				p.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return false;
 	}
 	public static boolean checkStoredChunk(Connection conn, ChunkInfo chunkInfo) {
+		PreparedStatement p = null;
 		try {
-			PreparedStatement p = conn.prepareStatement(checkStoredChunk);
+			
+			p = conn.prepareStatement(checkStoredChunk);
 			p.setString(1, chunkInfo.getFileId());
 			p.setInt(2, chunkInfo.getChunkId());
 			ResultSet result = p.executeQuery();
+			conn.setAutoCommit(false);
 			if (result.next()) {
 				int size = result.getInt(5);
 				return true && size > -1;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				p.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return false;
 	}
