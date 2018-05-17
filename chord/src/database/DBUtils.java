@@ -45,16 +45,6 @@ public class DBUtils {
 	private static final String getActualRepDegree = "SELECT max(actual_rep_degree) FROM CHUNKSSTORED WHERE file_id = ?";
 	private static final String deleteFileStored = "DELETE FROM FILESSTORED WHERE file_id = ?";
 	private static final String deleteFileRequested = "DELETE FROM BACKUPSREQUESTED WHERE file_id = ?";
-//	TODO: Choose lease Time
-//	SQL_TSI_DAY
-//	SQL_TSI_FRAC_SECOND
-//	SQL_TSI_HOUR
-//	SQL_TSI_MINUTE
-//	SQL_TSI_MONTH
-//	SQL_TSI_QUARTER
-//	SQL_TSI_SECOND
-//	SQL_TSI_WEEK
-//	SQL_TSI_YEAR
 	private static final String getFilesToDelete = "SELECT file_id FROM FILESSTORED WHERE { fn TIMESTAMPADD(SQL_TSI_MINUTE,?,last_time_stored)} < ?";
 	private static final String updateFile = "UPDATE FILESSTORED "
 			+ "SET last_time_stored = CURRENT_TIMESTAMP "
@@ -414,8 +404,6 @@ public class DBUtils {
 		PreparedStatement p;
 		try {
 			p = conn.prepareStatement(getFilesToDelete);
-			System.out.println(Leases.LEASE_UNIT.toString());
-			//TODO: runTime
 			p.setInt(1, Leases.LEASE_TIME);
 			p.setTimestamp(2, time);
 			ResultSet result = p.executeQuery();

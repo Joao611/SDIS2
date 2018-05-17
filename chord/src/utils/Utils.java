@@ -20,7 +20,6 @@ import java.util.logging.SimpleFormatter;
 import chord.ChordManager;
 
 public class Utils {
-	//	TODO: pedido DNS para descobrir o addrs e port to servidor?
 	public static final int TIME_MAX_TO_SLEEP = 400;
 	//	public static final String ENCODING_TYPE = "ISO-8859-1";
 	//	USAR - StandardCharsets.ISO_8859_1

@@ -209,7 +209,6 @@ public class ChordManager implements Runnable {
 	}
 
 	public PeerInfo getChunkOwner(String key) {
-		//TODO: entra em ciclo??
 		if (Utils.inBetween(this.predecessor.getId(), this.getPeerInfo().getId(), key)) {
 			return this.peerInfo;
 		}

@@ -132,7 +132,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			response = parseChunkMsg(secondLine,thirdLine);
 			break;
 		case RESPONSIBLE:
-			response = parseResponsible(lines);
+			response = parseResponsible(secondLine);
 			break;
 		default:
 			System.err.println("Unexpected message received: " + request);
@@ -141,16 +141,13 @@ public class ParseMessageAndSendResponse implements Runnable {
 		return response;
 	}
 	
-	private String parseResponsible(String[] lines) {
-		for(int i=1;i<lines.length-1;i++) {
-			String[] currentLine = lines[i].split(" ");
-			String fileID = currentLine[0];
-			int degree = Integer.valueOf(currentLine[2]);
-			FileStoredInfo fileInfo = new FileStoredInfo(fileID, true);
-			fileInfo.setDesiredRepDegree(degree);
-			DBUtils.insertStoredFile(dbConnection, fileInfo);
-		}
-		
+	private String parseResponsible(String[] input) {
+		String fileID = input[0];
+		String peerRequesting = input[1];
+		int degree = Integer.valueOf(input[2]);
+		FileStoredInfo fileInfo = new FileStoredInfo(fileID, true);
+
+		DBUtils.insertStoredFile(dbConnection, fileInfo);
 
 		return null;
 	}
@@ -432,9 +429,9 @@ public class ParseMessageAndSendResponse implements Runnable {
 		if(id_request.equals(myPeerID)) {//I AM ASKING FOR THE BACKUP sou dono do ficheiro
 			System.out.println("SOU DONO");
 			//reencaminhar a mensagem para o proximo
-			//TODO: Reencaminhar esta mal
+			
 			PeerInfo nextPeer = chordManager.getSuccessor(0);
-			String message = MessageFactory.getKeepChunk(id_request, addr_request, port_request, fileID, chunkNo, replicationDegree, body_bytes); //TODO: check
+			String message = MessageFactory.getKeepChunk(id_request, addr_request, port_request, fileID, chunkNo, replicationDegree, body_bytes);
 			Client.sendMessage(nextPeer.getAddr(),nextPeer.getPort(), message, false);
 			return;
 		}
@@ -480,6 +477,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			PeerInfo newPredecessor = potentialNewPredecessor;
 			Utils.LOGGER.info("Updated predecessor to " + newPredecessor.getId());
 			this.peer.getChordManager().setPredecessor(newPredecessor);
+
 			peer.sendResponsability();
 		}
 	}
