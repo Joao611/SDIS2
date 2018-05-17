@@ -33,6 +33,8 @@ public class DBUtils {
 			+ "SET actual_rep_degree = ? WHERE chunk_id = ? AND file_id = ?";
 	private static final String updateBackupRequested = "UPDATE BACKUPSREQUESTED "
 			+ "SET desired_rep_degree = ? WHERE file_id = ?";
+	private static final String updateResponsible = "UPDATE FILESSTORED "
+			+ "SET i_am_responsible = ? WHERE file_id = ?";
 	private static final String checkStoredChunk = "SELECT * FROM CHUNKSSTORED "
 			+ "WHERE file_id = ? AND chunk_id = ?";
 	private static final String getPeerWhichRequested = "SELECT peer_id,ip,port FROM PEERS "
@@ -177,6 +179,19 @@ public class DBUtils {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void updateResponsible(Connection conn, String fileId, Boolean value) {
+		try {
+			PreparedStatement p = conn.prepareStatement(updateResponsible);
+			p.setBoolean(1, value);
+			p.setString(2, fileId);
+			p.executeUpdate();
+			Utils.log("UpdateResponsible: " + fileId + " has been updated");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void insertBackupRequested(Connection conn, BackupRequest backupRequest) {
 		Boolean wasRequested = wasBackupRequestedBefore(conn, backupRequest.getFileId());
 		if (!wasRequested) {

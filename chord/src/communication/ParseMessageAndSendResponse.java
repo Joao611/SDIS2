@@ -132,7 +132,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			response = parseChunkMsg(secondLine,thirdLine);
 			break;
 		case RESPONSIBLE:
-			response = parseResponsible(secondLine);
+			response = parseResponsible(lines);
 			break;
 		default:
 			System.err.println("Unexpected message received: " + request);
@@ -141,13 +141,16 @@ public class ParseMessageAndSendResponse implements Runnable {
 		return response;
 	}
 	
-	private String parseResponsible(String[] input) {
-		String fileID = input[0];
-		String peerRequesting = input[1];
-		int degree = Integer.valueOf(input[2]);
-		FileStoredInfo fileInfo = new FileStoredInfo(fileID, true);
-
-		DBUtils.insertStoredFile(dbConnection, fileInfo);
+	private String parseResponsible(String[] lines) {
+		for(int i=1;i<lines.length-1;i++) {
+			String[] currentLine = lines[i].split(" ");
+			String fileID = currentLine[0];
+			int degree = Integer.valueOf(currentLine[2]);
+			FileStoredInfo fileInfo = new FileStoredInfo(fileID, true);
+			fileInfo.setDesiredRepDegree(degree);
+			DBUtils.insertStoredFile(dbConnection, fileInfo);
+		}
+		
 
 		return null;
 	}
