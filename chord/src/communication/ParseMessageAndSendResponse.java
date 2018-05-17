@@ -141,14 +141,16 @@ public class ParseMessageAndSendResponse implements Runnable {
 		return response;
 	}
 	
-	private String parseResponsible(String[] input) {
-		String fileID = input[0];
-		String peerRequesting = input[1];
-		int degree = Integer.valueOf(input[2]);
-		FileStoredInfo fileInfo = new FileStoredInfo(fileID, true);
-
-		DBUtils.insertStoredFile(dbConnection, fileInfo);
-
+	private String parseResponsible(String[] lines) {
+		System.out.println("Received Responsible");
+		for(int i=1;i<lines.length-1;i++) {
+			String[] currentLine = lines[i].split(" ");
+			String fileID = currentLine[0];
+			int degree = Integer.valueOf(currentLine[1]);
+			FileStoredInfo fileInfo = new FileStoredInfo(fileID, true);
+			fileInfo.setDesiredRepDegree(degree);
+			DBUtils.insertStoredFile(dbConnection, fileInfo);
+		}
 		return null;
 	}
 
@@ -477,7 +479,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			PeerInfo newPredecessor = potentialNewPredecessor;
 			Utils.LOGGER.info("Updated predecessor to " + newPredecessor.getId());
 			this.peer.getChordManager().setPredecessor(newPredecessor);
-
+			System.out.println("Updated predecessor, sending responsibility");
 			peer.sendResponsability();
 		}
 	}
