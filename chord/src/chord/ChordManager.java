@@ -47,6 +47,7 @@ public class ChordManager implements Runnable {
 		InetAddress addr;
 		try {
 			addr = InetAddress.getLocalHost();
+			System.err.println(addr.getHostAddress());
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			return;

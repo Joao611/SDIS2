@@ -21,7 +21,7 @@ import database.Database;
 import runnableProtocols.SendGetChunk;
 import runnableProtocols.SendInitDelete;
 import runnableProtocols.SendPutChunk;
-import utils.Confidentiallyty;
+import utils.Confidentiality;
 import utils.ReadInput;
 import utils.SingletonThreadPoolExecutor;
 import utils.Utils;
@@ -180,11 +180,11 @@ public class Peer {
 		byte[] file = Utils.readFile(filename).getBytes(StandardCharsets.ISO_8859_1);
 		System.err.println("FILE ZIZE "+file.length);
 		int n = Math.floorDiv(file.length,LENGTH_OF_CHUNK) + 1;
-		Confidentiallyty c;
+		Confidentiality c;
 		if(encryptKey == null) {
-			c = new Confidentiallyty();
+			c = new Confidentiality();
 		} else {
-			c = new Confidentiallyty(encryptKey);
+			c = new Confidentiality(encryptKey);
 		}
 		encryptKey = new String(c.getKey(), StandardCharsets.ISO_8859_1);
 		BackupRequest backupRequest = new BackupRequest(fileID,filename,encryptKey, degree, n);

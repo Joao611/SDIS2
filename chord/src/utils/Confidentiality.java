@@ -15,12 +15,12 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-public class Confidentiallyty {
+public class Confidentiality {
 	private byte[] key;
 
 	private static final String AES = "AES";
 	private static final String AES_ECB_PKCS5Padding = "AES/ECB/PKCS5Padding";
-	public Confidentiallyty() {
+	public Confidentiality() {
 		super();
 		KeyGenerator keygen;
 		try {
@@ -33,7 +33,7 @@ public class Confidentiallyty {
 		this.setKey(aesKey.getEncoded());
 	}
 
-	public Confidentiallyty(String encryptKey) {
+	public Confidentiality(String encryptKey) {
 		this.setKey(encryptKey.getBytes(StandardCharsets.ISO_8859_1));
 	}
 

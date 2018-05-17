@@ -33,7 +33,7 @@ import database.FileStoredInfo;
 import messages.MessageFactory;
 import messages.MessageType;
 import program.Peer;
-import utils.Confidentiallyty;
+import utils.Confidentiality;
 import utils.Utils;
 
 /**
@@ -173,7 +173,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		BackupRequest b = DBUtils.getBackupRequested(dbConnection, file_id);
 
 		
-		Confidentiallyty c = new Confidentiallyty(b.getEncryptKey());
+		Confidentiality c = new Confidentiality(b.getEncryptKey());
 		
 		body_bytes = c.dencript(body_bytes);
 		Path filepath = Peer.getPath().resolve("restoreFile-" + b.getFilename());
