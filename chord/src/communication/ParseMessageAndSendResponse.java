@@ -131,9 +131,9 @@ public class ParseMessageAndSendResponse implements Runnable {
 		case CHUNK:
 			response = parseChunkMsg(secondLine,thirdLine);
 			break;
-//		case UPDATETIME:
-//			response = parseUpdateTime(secondLine);
-//			break;
+		case RESPONSIBLE:
+			response = parseResponsible(secondLine);
+			break;
 		default:
 			System.err.println("Unexpected message received: " + request);
 			break;
@@ -141,6 +141,17 @@ public class ParseMessageAndSendResponse implements Runnable {
 		return response;
 	}
 	
+	private String parseResponsible(String[] input) {
+		String fileID = input[0];
+		String peerRequesting = input[1];
+		int degree = Integer.valueOf(input[2]);
+		FileStoredInfo fileInfo = new FileStoredInfo(fileID, true);
+
+		DBUtils.insertStoredFile(dbConnection, fileInfo);
+
+		return null;
+	}
+
 	private void parseSuccessors(String[] secondLine) {
 		Deque<PeerInfo> peersReceived = new ArrayDeque<PeerInfo>();
 		int numberOfSuccessorsReceived = secondLine.length / 3;
@@ -466,7 +477,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			PeerInfo newPredecessor = potentialNewPredecessor;
 			Utils.LOGGER.info("Updated predecessor to " + newPredecessor.getId());
 			this.peer.getChordManager().setPredecessor(newPredecessor);
-
+			// TODO: enviar msg RESPONSIBLE
 		}
 	}
 

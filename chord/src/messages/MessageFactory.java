@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import chord.PeerInfo;
+import database.FileStoredInfo;
 
 public class MessageFactory {
 
@@ -39,6 +40,10 @@ public class MessageFactory {
 	public static String getSuccessor(String senderId, PeerInfo peer) {
 		String msg = getFirstLine(MessageType.SUCCESSOR,"1.0",senderId);
 		return appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort()});
+	}
+	public static String getResponsible(String senderId, FileStoredInfo file) {
+		String msg = getFirstLine(MessageType.RESPONSIBLE,"1.0",senderId);
+		return appendLine(msg, new Object[] {file.getFileId(),file.getPeerRequesting(),file.getDesiredRepDegree());
 	}
 	
 	public static String getSuccessors(String senderId, List<PeerInfo> nextPeers) {
