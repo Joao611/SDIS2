@@ -14,7 +14,10 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import chord.AbstractPeerInfo;
 import chord.ChordManager;
+import chord.PeerInfo;
+import communication.Client;
 import communication.Server;
 import database.BackupRequest;
 import database.DBUtils;
@@ -224,23 +227,27 @@ public class Peer {
 	public Database getDatabase() {
 		return database;
 	}
-
+	
+	/**
+	 * When a peer joins, tell him which files he is responsible for.
+	 */
 	public void sendResponsability() {
 		ArrayList<FileStoredInfo> filesIAmResponsible = DBUtils.getFilesIAmResponsible(this.database.getConnection());
 		ArrayList<FileStoredInfo> toSend = new ArrayList<FileStoredInfo> ();
+		AbstractPeerInfo predecessor = this.chordManager.getPredecessor();
+		if (predecessor.isNull()) return;
 		for(int i = 0; i < filesIAmResponsible.size(); i++) {
-			if(Utils.inBetween(this.chordManager.getPredecessor().getId(),
+			if(Utils.inBetween(predecessor.getId(),
 					this.chordManager.getPeerInfo().getId(),
 					filesIAmResponsible.get(i).getFileId())) {
 				DBUtils.updateResponsible(this.database.getConnection(),filesIAmResponsible.get(i).getFileId(), true);
 				toSend.add(filesIAmResponsible.get(i));
 			}
 		}
-		
-		
-		
-		String msg = MessageFactory.getResponsible(this.chordManager.getPeerInfo().getId(), filesIAmResponsible);
-		
+		if (toSend.isEmpty())return;
+		String msg = MessageFactory.getResponsible(this.chordManager.getPeerInfo().getId(), toSend);
+		Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), msg, false);
+		System.out.println("Sent responsible");
 	}
 
 }
