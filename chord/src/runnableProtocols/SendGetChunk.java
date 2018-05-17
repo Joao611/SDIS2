@@ -30,7 +30,7 @@ public class SendGetChunk implements Runnable {
 	public void run() {
 		PeerInfo owner = chord.getChunkOwner(backupRequest.getFileId());
 		String getChunkMessage = MessageFactory.getGetChunk(chord.getPeerInfo().getId(), chord.getPeerInfo().getAddr(),chord.getPeerInfo().getPort(), this.backupRequest.getFileId(), this.chunkNo);
-		String response = Client.sendMessage(owner.getAddr(), owner.getPort(), getChunkMessage, false);
+		Client.sendMessage(owner.getAddr(), owner.getPort(), getChunkMessage, false);
 	}
 
 }
