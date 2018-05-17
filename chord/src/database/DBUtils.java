@@ -58,6 +58,9 @@ public class DBUtils {
 			+ "SET last_time_stored = CURRENT_TIMESTAMP "
 			+ "WHERE file_id = ?";
 	private static final String getFilesToUpdate = "SELECT * FROM BACKUPSREQUESTED";
+	private static final String getFiles = 
+			"SELECT * FROM FILESSTORED "
+			+ "WHERE i_am_responsible";
 
 
 	public static void insertPeer(Connection conn, PeerInfo peerInfo) {
@@ -431,6 +434,23 @@ public class DBUtils {
 						result.getString("filename"),
 						result.getInt("desired_rep_degree")
 						));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return res;
+	}
+	public static ArrayList<FileStoredInfo> getFilesIAmResponsible(Connection conn) {
+		ArrayList<FileStoredInfo> res = new ArrayList<FileStoredInfo>();
+		PreparedStatement p;
+		try {
+			p = conn.prepareStatement(getFiles);
+			ResultSet result = p.executeQuery();
+			while (result.next()) {
+				res.add(new FileStoredInfo(
+						result.getString("file_id"), 
+						true, result.getInt("desired_rep_degree")));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

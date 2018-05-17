@@ -3,6 +3,7 @@ package messages;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import chord.PeerInfo;
@@ -41,9 +42,12 @@ public class MessageFactory {
 		String msg = getFirstLine(MessageType.SUCCESSOR,"1.0",senderId);
 		return appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort()});
 	}
-	public static String getResponsible(String senderId, FileStoredInfo file) {
-		String msg = getFirstLine(MessageType.RESPONSIBLE,"1.0",senderId);
-		return appendLine(msg, new Object[] {file.getFileId(),file.getPeerRequesting(),file.getDesiredRepDegree());
+	public static String getResponsible(String string, ArrayList<FileStoredInfo> toSend) {
+		String msg = getFirstLine(MessageType.RESPONSIBLE,"1.0",string);
+		for(int i = 0; i < toSend.size(); i++) {
+			msg += appendLine(msg, new Object[] {toSend.get(i).getFileId(),toSend.get(i).getDesiredRepDegree()});
+		}
+		return msg;
 	}
 	
 	public static String getSuccessors(String senderId, List<PeerInfo> nextPeers) {

@@ -477,7 +477,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			PeerInfo newPredecessor = potentialNewPredecessor;
 			Utils.LOGGER.info("Updated predecessor to " + newPredecessor.getId());
 			this.peer.getChordManager().setPredecessor(newPredecessor);
-			// TODO: enviar msg RESPONSIBLE
+			peer.sendResponsability();
 		}
 	}
 

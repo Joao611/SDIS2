@@ -11,6 +11,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import chord.ChordManager;
@@ -18,6 +19,8 @@ import communication.Server;
 import database.BackupRequest;
 import database.DBUtils;
 import database.Database;
+import database.FileStoredInfo;
+import messages.MessageFactory;
 import runnableProtocols.SendGetChunk;
 import runnableProtocols.SendInitDelete;
 import runnableProtocols.SendPutChunk;
@@ -220,6 +223,24 @@ public class Peer {
 	
 	public Database getDatabase() {
 		return database;
+	}
+
+	public void sendResponsability() {
+		ArrayList<FileStoredInfo> filesIAmResponsible = DBUtils.getFilesIAmResponsible(this.database.getConnection());
+		ArrayList<FileStoredInfo> toSend = new ArrayList<FileStoredInfo> ();
+		for(int i = 0; i < filesIAmResponsible.size(); i++) {
+			if(Utils.inBetween(this.chordManager.getPredecessor().getId(),
+					this.chordManager.getPeerInfo().getId(),
+					filesIAmResponsible.get(i).getFileId())) {
+				DBUtils.updateResponsible(this.database.getConnection(),filesIAmResponsible.get(i).getFileId(), true);
+				toSend.add(filesIAmResponsible.get(i));
+			}
+		}
+		
+		
+		
+		String msg = MessageFactory.getResponsible(this.chordManager.getPeerInfo().getId(), filesIAmResponsible);
+		
 	}
 
 }
