@@ -43,7 +43,7 @@ public class MessageFactory {
 	}
 	public static String getResponsible(String senderId, FileStoredInfo file) {
 		String msg = getFirstLine(MessageType.RESPONSIBLE,"1.0",senderId);
-		return appendLine(msg, new Object[] {file.getFileId(),file.getPeerRequesting(),file.getDesiredRepDegree());
+		return appendLine(msg, new Object[] {file.getFileId(),file.getPeerRequesting(),file.getDesiredRepDegree()});
 	}
 	
 	public static String getSuccessors(String senderId, List<PeerInfo> nextPeers) {
