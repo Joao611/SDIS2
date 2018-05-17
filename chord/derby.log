@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Thu May 17 15:59:21 WEST 2018:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0163-6e9c-d2d9-000006747df0 
+on database directory /home/anabela/Desktop/SDIS2/chord/localDB1554d412 with class loader sun.misc.Launcher$AppClassLoader@14ae5a5 
+Loaded from file:/home/anabela/Desktop/SDIS2/chord/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_171-8u171-b11-0ubuntu0.16.04.1-b11
+user.dir=/home/anabela/Desktop/SDIS2/chord
+os.name=Linux
+os.arch=amd64
+os.version=4.4.0-124-generic
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

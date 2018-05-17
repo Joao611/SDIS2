@@ -26,9 +26,7 @@ public class SendPutChunk implements Runnable {
 	}
 	@Override
 	public void run() {
-		System.err.println("RUN");
 		PeerInfo owner = chord.getChunkOwner(fileID);
-		System.err.println("Owner: "+ owner);
 		String putChunkMessage = MessageFactory.getPutChunk(chord.getPeerInfo().getId(), owner.getAddr(),owner.getPort(), this.fileID, this.chunkNo, this.replicationDeg, this.body);
 		String response = Client.sendMessage(owner.getAddr(), owner.getPort(), putChunkMessage, false);
 

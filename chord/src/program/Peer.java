@@ -1,6 +1,7 @@
 package program;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +17,6 @@ import java.util.Arrays;
 
 import chord.AbstractPeerInfo;
 import chord.ChordManager;
-import chord.PeerInfo;
 import communication.Client;
 import communication.Server;
 import database.BackupRequest;
@@ -44,6 +44,10 @@ public class Peer {
 
 
 	public Peer(ChordManager chordManager, Server server, Database database) {
+		
+		System.out.println(chordManager.getPeerInfo().getId() + " "
+		+ new BigInteger(chordManager.getPeerInfo().getId(),16));
+		
 		this.chordManager = chordManager;
 		this.server = server;
 		this.database = database;
@@ -184,7 +188,6 @@ public class Peer {
 			return;
 		}
 		byte[] file = Utils.readFile(filename).getBytes(StandardCharsets.ISO_8859_1);
-		System.err.println("FILE ZIZE "+file.length);
 		int n = Math.floorDiv(file.length,LENGTH_OF_CHUNK) + 1;
 		Confidentiality c;
 		if(encryptKey == null) {
@@ -198,14 +201,12 @@ public class Peer {
 		int chunkNo = 0;
 		while(file.length > (chunkNo + 1)*LENGTH_OF_CHUNK) {
 			byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, (chunkNo + 1) *LENGTH_OF_CHUNK);
-			System.err.println("FILE 64000 "+body.length);
 			body = c.encript(body);
 			SendPutChunk th = new SendPutChunk(fileID, chunkNo, degree, body, this.getChordManager());
 			SingletonThreadPoolExecutor.getInstance().get().execute(th);
 			chunkNo++;
 		}
 		byte[] body = Arrays.copyOfRange(file, chunkNo * LENGTH_OF_CHUNK, file.length);
-		System.err.println("FILE last "+body.length);
 		body = c.encript(body);
 		SendPutChunk th = new SendPutChunk(fileID, chunkNo, degree, body, this.getChordManager());
 		SingletonThreadPoolExecutor.getInstance().get().execute(th);
