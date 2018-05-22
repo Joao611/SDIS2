@@ -58,7 +58,7 @@ public class FixFingerTable implements Runnable {
 		}
 	}
 
-	private String getKeyToLookUp(String id, int i) {
+	static String getKeyToLookUp(String id, int i) {
 		
 		BigInteger _id = new BigInteger(id, 16);
 		BigInteger add = new BigInteger((Math.pow(2, i)+"").getBytes());

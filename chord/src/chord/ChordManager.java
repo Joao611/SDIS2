@@ -12,9 +12,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 import communication.Client;
@@ -35,9 +33,9 @@ public class ChordManager implements Runnable {
 	private PeerInfo peerInfo;
 	private ArrayList<PeerInfo> fingerTable = new ArrayList<PeerInfo>();
 	private AbstractPeerInfo predecessor;
-	
+
 	private Deque<PeerInfo> nextPeers; //this is an enhancement to the protocol
-	
+
 	private String ASK_MESSAGE;
 	private String SUCCESSOR_MESSAGE;
 	private Database database;
@@ -63,11 +61,11 @@ public class ChordManager implements Runnable {
 		byte[] hash = digest.digest(("" + addr + port).getBytes(StandardCharsets.ISO_8859_1));
 		String id = Utils.getIdFromHash(hash, M/8);
 		this.setPeerInfo(new PeerInfo(id, addr, port));
-		
+
 		ASK_MESSAGE = MessageFactory.getFirstLine(MessageType.ASK, "1.0", this.getPeerInfo().getId());
 		SUCCESSOR_MESSAGE = MessageFactory.getFirstLine(MessageType.SUCCESSOR, "1.0", this.getPeerInfo().getId());
 		nextPeers = new ConcurrentLinkedDeque<PeerInfo>();
-		
+
 		for (int i = 0; i < getM(); i++) {
 			getFingerTable().add(getPeerInfo());
 		}
@@ -77,13 +75,13 @@ public class ChordManager implements Runnable {
 
 	@Override
 	public void run() {
-		
+
 		Stabilize stabilizeThread = new Stabilize(this);
 		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(stabilizeThread, 10, 5000, TimeUnit.MILLISECONDS);
-		
+
 		CheckPredecessor checkPredecessorThread = new CheckPredecessor(this);
 		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(checkPredecessorThread, 1000, 10000, TimeUnit.MILLISECONDS);
-		
+
 		FixFingerTable fixFingerTableThread = new FixFingerTable(this);
 		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(fixFingerTableThread, 2000, 5000, TimeUnit.MILLISECONDS);
 
@@ -107,7 +105,7 @@ public class ChordManager implements Runnable {
 		}
 		setNextPeer(nextPeer);
 	}
-	
+
 	public void setNextPeer(PeerInfo nextPeer) {
 		if (nextPeer == null || nextPeer.isNull()) return;
 		this.getFingerTable().set(0, nextPeer);
@@ -138,14 +136,14 @@ public class ChordManager implements Runnable {
 		if (closestPrecedingNode != null) return closestPrecedingNode;
 		return MessageFactory.appendLine(ASK_MESSAGE, this.getFingerTable().get(getM() - 1).asArray());
 	}
-	
+
 	public String closestPrecedingNode(String key) {
 		String fingersMsg = null;
 		String nextPeersMsg = null;
 		String fingerTableHighestId = null;
 		String nextPeersHighestId = null;
 		Iterator<PeerInfo> it = nextPeers.descendingIterator();
-		PeerInfo currentPeer;
+		AbstractPeerInfo currentPeer;
 		for (int i = getM() - 1; i > 0; i--) {
 			currentPeer = this.getFingerTable().get(i);
 			if (Utils.inBetween(this.getPeerInfo().getId(), key, currentPeer.getId())) {
@@ -181,7 +179,9 @@ public class ChordManager implements Runnable {
 		PeerInfo successor = getNextPeer();
 		PeerInfo potentialSuccessor = (PeerInfo) x;
 
-		if (Utils.inBetween(this.peerInfo.getId(), successor.getId(), potentialSuccessor.getId())) {
+		if (Utils.inBetween(this.peerInfo.getId(),
+				successor.getId(),
+				potentialSuccessor.getId())) {
 			setNextPeer(potentialSuccessor);
 		}
 	}
@@ -215,10 +215,10 @@ public class ChordManager implements Runnable {
 		if (Utils.inBetween(this.getPeerInfo().getId(), this.getFingerTable().get(0).getId(), key)) {
 			return this.getFingerTable().get(0);
 		}
-		
+
 		InetAddress addr = null;
 		int port = -1;
-		
+
 		for (int i = getM() - 1; i > 0; i--) {
 			if (Utils.inBetween(this.getPeerInfo().getId(), key, this.getFingerTable().get(i).getId())) {
 				addr = this.getFingerTable().get(i).getAddr();
@@ -248,7 +248,7 @@ public class ChordManager implements Runnable {
 
 		return owner;
 	}
-	
+
 	public List<PeerInfo> getNextPeers() {
 		List<PeerInfo> nextPeersArray = new ArrayList<PeerInfo>();
 		int i = 0;
@@ -259,11 +259,27 @@ public class ChordManager implements Runnable {
 		}
 		return nextPeersArray;
 	}
-	
+
 	public void popNextPeer() {
 		nextPeers.pop();
+		this.getFingerTable().set(0,nextPeers.peekFirst());
+		try {
+			String keyToLookup = FixFingerTable.getKeyToLookUp(this.getPeerInfo().getId(), 0);
+			String lookupMessage = MessageFactory.getLookup(this.getPeerInfo().getId(), keyToLookup);
+			String response = this.lookup(keyToLookup);
+			response = response.trim();
+			PeerInfo info = new PeerInfo(response);
+			while(response.startsWith(MessageType.ASK.getType())) {
+				response = Client.sendMessage(info.getAddr(), info.getPort(), lookupMessage, true);
+				if (response.equals(MessageFactory.getErrorMessage())) return;
+				info = new PeerInfo(response);
+			}
+			this.getFingerTable().set(0, info);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-	
+
 	public PeerInfo getNextPeer() {
 		return nextPeers.peek();
 	}

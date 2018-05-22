@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="System.err.println" key="selection"/>
+		<item value="false" key="casesensitive"/>
+		<item value="false" key="incremental"/>
+		<item value="true" key="wrap"/>
+		<item value="false" key="wholeword"/>
+		<list key="findhistory">
+			<item value="Going to call Backup"/>
+			<item value="System.err.println"/>
+			<item value="System.err"/>
+			<item value="System."/>
+			<item value="System.out.println"/>
+			<item value="parseNotify"/>
+			<item value="+"/>
+			<item value="responsib"/>
+			<item value="respons"/>
+			<item value="parseRespo"/>
+			<item value="notify"/>
+			<item value="getFile"/>
+			<item value="Responsi"/>
+			<item value="Responw"/>
+			<item value="amIRe"/>
+		</list>
+		<list key="replacehistory">
+			<item value="Utils.LOGGER.warning"/>
+			<item value="Utils.LOGGER.info"/>
+			<item value="Uttils.logger"/>
+			<item value=""/>
+			<item value="peerID"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="344" key="DIALOG_WIDTH"/>
+		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+		<item value="440" key="DIALOG_HEIGHT"/>
+		<item value="1264" key="DIALOG_X_ORIGIN"/>
+		<item value="105" key="DIALOG_Y_ORIGIN"/>
+	</section>
+</section>

@@ -6,8 +6,6 @@ package chord;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import utils.Utils;
-
 /**
  * @author anabela
  *

@@ -1,6 +1,7 @@
 package program;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +17,6 @@ import java.util.Arrays;
 
 import chord.AbstractPeerInfo;
 import chord.ChordManager;
-import chord.PeerInfo;
 import communication.Client;
 import communication.Server;
 import database.BackupRequest;
@@ -44,6 +44,10 @@ public class Peer {
 
 
 	public Peer(ChordManager chordManager, Server server, Database database) {
+		
+		System.out.println(chordManager.getPeerInfo().getId() + " "
+		+ new BigInteger(chordManager.getPeerInfo().getId(),16));
+		
 		this.chordManager = chordManager;
 		this.server = server;
 		this.database = database;

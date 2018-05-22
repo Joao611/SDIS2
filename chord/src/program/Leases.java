@@ -7,11 +7,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import communication.Client;
 import database.BackupRequest;
 import database.ChunkInfo;
 import database.DBUtils;
-import messages.MessageFactory;
 import utils.Utils;
 
 /**
