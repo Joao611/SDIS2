@@ -48,7 +48,7 @@ public class Leases implements Runnable {
 			peer.backup(filesToUpdate.get(i).getFilename(),
 					filesToUpdate.get(i).getDesiredRepDegree(),
 					filesToUpdate.get(i).getEncryptKey());
-			System.out.println("Updated file: " + filesToUpdate.get(i));
+			Utils.LOGGER.info("Lease:Updated file: " + filesToUpdate.get(i));
 		}
 
 	}
@@ -65,10 +65,8 @@ public class Leases implements Runnable {
 				Peer.decreaseStorageUsed(chunk.getSize());
 			});
 			DBUtils.deleteFile(peer.getConnection(), filesToDelete.get(i));
-			System.out.println("Deleted file: " + filesToDelete.get(i));
+			Utils.LOGGER.info("Lease:Deleted file: " + filesToDelete.get(i));
 		}
-
-		System.err.println(msg);
 	}
 
 }

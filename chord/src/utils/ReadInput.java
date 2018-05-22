@@ -127,7 +127,6 @@ public class ReadInput{
 			}
 		} while((degree < 1) || (degree > 9));
 			
-		System.out.println("Going to call Backup");
 		peer.backup(filename, degree,null);
 		System.out.println("Called Backup!");
 	}

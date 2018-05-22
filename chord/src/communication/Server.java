@@ -56,7 +56,7 @@ public class Server implements Runnable {
 			try {
 				socket = (SSLSocket) serverSocket.accept();
 			} catch (IOException e) {
-				System.out.println("Socket closed");
+				Utils.LOGGER.warning("Socket closed");
 				return;
 			}
 			try {

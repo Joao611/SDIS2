@@ -35,7 +35,7 @@ public class Stabilize implements Runnable {
 			String stabilizeMessage = MessageFactory.getHeader(MessageType.STABILIZE, "1.0", myPeerId);
 			String response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), stabilizeMessage, true);
 			if(response.equals(MessageFactory.getErrorMessage())) {
-				System.err.println("Next peer dropped");
+				Utils.LOGGER.warning("Next peer dropped");
 				this.chordManager.popNextPeer();
 				return;
 			}

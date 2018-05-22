@@ -176,7 +176,6 @@ public class DBUtils {
 			p.setBoolean(1, value);
 			p.setString(2, fileId);
 			p.executeUpdate();
-			System.out.println("UpdateResponsible: " + fileId + " has been updated");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

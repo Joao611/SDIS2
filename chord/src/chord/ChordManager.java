@@ -47,7 +47,6 @@ public class ChordManager implements Runnable {
 		InetAddress addr;
 		try {
 			addr = InetAddress.getLocalHost();
-			System.err.println(addr.getHostAddress());
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			return;
@@ -101,6 +100,7 @@ public class ChordManager implements Runnable {
 			response = Client.sendMessage(nextPeer.getAddr(), nextPeer.getPort(), lookupMessage, true);
 			if (response == null) {
 				System.err.println("Could not join the network");
+				Utils.LOGGER.severe("Could not join the network");
 				return;
 			}
 			nextPeer = new PeerInfo(response);
@@ -188,11 +188,11 @@ public class ChordManager implements Runnable {
 
 	public void printNextPeers() {
 		Iterator<PeerInfo> it = nextPeers.iterator();
-		System.out.println("Printing next peers");
+		Utils.LOGGER.info("Printing next peers");
 		while(it.hasNext()) {
-			System.out.println(it.next().getId());
+			Utils.LOGGER.info(it.next().getId());
 		}
-		System.out.println("------------");
+		Utils.LOGGER.info("------------");
 	}
 	/**
 	 * Notify newly found closer successor node that I might be its predecessor
@@ -203,7 +203,7 @@ public class ChordManager implements Runnable {
 		message = MessageFactory.appendLine(message, new String[] {"" + this.getPeerInfo().getPort()});
 		String response = Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message, true);
 		if (response.equals(MessageFactory.getErrorMessage())) {
-			System.err.println("2.NextPeer dropped");
+			Utils.LOGGER.warning("Next peer dropped");
 			this.popNextPeer();
 		}
 	}
@@ -239,6 +239,7 @@ public class ChordManager implements Runnable {
 			response = Client.sendMessage(owner.getAddr(), owner.getPort(), lookupMessage, true);
 			if (response == null) {
 				System.err.println("Could not join the network");
+				Utils.LOGGER.severe("Could not join the network");
 				return null;
 			}
 			response = response.trim();
