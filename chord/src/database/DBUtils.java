@@ -434,7 +434,9 @@ public class DBUtils {
 				res.add(new BackupRequest(
 						result.getString("file_id"),
 						result.getString("filename"),
-						result.getInt("desired_rep_degree")
+						result.getString("encrypt_key"),
+						result.getInt("desired_rep_degree"),
+						result.getInt("numberOfChunks")
 						));
 			}
 		} catch (SQLException e) {

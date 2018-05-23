@@ -191,8 +191,10 @@ public class Peer {
 		int n = Math.floorDiv(file.length,LENGTH_OF_CHUNK) + 1;
 		Confidentiality c;
 		if(encryptKey == null) {
+			System.err.println("ERRO");
 			c = new Confidentiality();
 		} else {
+			System.err.println("Estou a enviar a encr");
 			c = new Confidentiality(encryptKey);
 		}
 		encryptKey = new String(c.getKey(), StandardCharsets.ISO_8859_1);
