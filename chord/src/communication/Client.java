@@ -27,8 +27,7 @@ public class Client {
 			socket = (SSLSocket) socketFactory.createSocket(addr, port);
 			socket.setSoTimeout(5000);
 		} catch (IOException e) {
-			System.err.println("Connection refused - couldn't connect to server"+ port);
-			//TODO: delete port
+			System.err.println("Connection refused - couldn't connect to server");
 			return ERROR_MESSAGE;
 		}
 
@@ -37,9 +36,7 @@ public class Client {
 		try {
 			send(message, socket);
 		} catch (IOException e1) {
-			System.err.println("Connection refused - couldn't send message"+port);
-
-			//TODO: delete port
+			System.err.println("Connection refused - couldn't send message");
 			return ERROR_MESSAGE;
 		}
 		if(waitForResponse) {
