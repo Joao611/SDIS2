@@ -15,7 +15,6 @@ import messages.MessageFactory;
 
 public class Client {
 	private static ArrayList<String> cipher = new ArrayList<String>(Arrays.asList("TLS_DHE_RSA_WITH_AES_128_CBC_SHA"));
-	private static final String ERROR_MESSAGE = MessageFactory.getErrorMessage();
 	
 
 	public static String sendMessage(InetAddress addr, int port, String message, boolean waitForResponse) {
@@ -29,7 +28,7 @@ public class Client {
 		} catch (IOException e) {
 			System.err.println("Connection refused - couldn't connect to server"+ port);
 			//TODO: delete port
-			return ERROR_MESSAGE;
+			return null;
 		}
 
 		socket.setEnabledCipherSuites(cipher.toArray(new String[0]));
@@ -40,7 +39,7 @@ public class Client {
 			System.err.println("Connection refused - couldn't send message"+port);
 
 			//TODO: delete port
-			return ERROR_MESSAGE;
+			return null;
 		}
 		if(waitForResponse) {
 			response = getResponse(socket);//fica bloqueado a espera de resposta
@@ -50,7 +49,7 @@ public class Client {
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("Error closing connection");
-			return ERROR_MESSAGE;
+			return null;
 		}
 		return response;
 	}

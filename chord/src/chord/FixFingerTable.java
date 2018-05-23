@@ -17,7 +17,6 @@ import utils.Utils;
 public class FixFingerTable implements Runnable {
 
 	private ChordManager chord;
-	private final String ERROR_MESSAGE;
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
@@ -46,7 +45,7 @@ public class FixFingerTable implements Runnable {
 				PeerInfo info = new PeerInfo(response);
 				while(response.startsWith(MessageType.ASK.getType())) {
 					response = Client.sendMessage(info.getAddr(), info.getPort(), lookupMessage, true);
-					if (response.equals(ERROR_MESSAGE)) return;
+					if (response == null) return;
 					info = new PeerInfo(response);
 				}
 				chord.getFingerTable().set(i, info);
@@ -70,6 +69,5 @@ public class FixFingerTable implements Runnable {
 
 	public FixFingerTable(ChordManager chord) {
 		this.chord = chord;
-		this.ERROR_MESSAGE = MessageFactory.getErrorMessage();
 	}
 }

@@ -202,7 +202,7 @@ public class ChordManager implements Runnable {
 		String message = MessageFactory.getFirstLine(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
 		message = MessageFactory.appendLine(message, new String[] {"" + this.getPeerInfo().getPort()});
 		String response = Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message, true);
-		if (response.equals(MessageFactory.getErrorMessage())) {
+		if (response == null) {
 			Utils.LOGGER.warning("Next peer dropped");
 			this.popNextPeer();
 		}
@@ -271,7 +271,7 @@ public class ChordManager implements Runnable {
 			PeerInfo info = new PeerInfo(response);
 			while(response.startsWith(MessageType.ASK.getType())) {
 				response = Client.sendMessage(info.getAddr(), info.getPort(), lookupMessage, true);
-				if (response.equals(MessageFactory.getErrorMessage())) return;
+				if (response == null) return;
 				info = new PeerInfo(response);
 			}
 			this.getFingerTable().set(0, info);
