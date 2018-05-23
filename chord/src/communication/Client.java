@@ -11,8 +11,6 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import utils.Utils;
 
-import messages.MessageFactory;
-
 public class Client {
 	private static ArrayList<String> cipher = new ArrayList<String>(Arrays.asList("TLS_DHE_RSA_WITH_AES_128_CBC_SHA"));
 	
@@ -26,8 +24,7 @@ public class Client {
 			socket = (SSLSocket) socketFactory.createSocket(addr, port);
 			socket.setSoTimeout(5000);
 		} catch (IOException e) {
-			System.err.println("Connection refused - couldn't connect to server"+ port);
-			//TODO: delete port
+			System.err.println("Connection refused - couldn't connect to server");
 			return null;
 		}
 
@@ -36,13 +33,11 @@ public class Client {
 		try {
 			send(message, socket);
 		} catch (IOException e1) {
-			System.err.println("Connection refused - couldn't send message"+port);
-
-			//TODO: delete port
+			System.err.println("Connection refused - couldn't send message");
 			return null;
 		}
 		if(waitForResponse) {
-			response = getResponse(socket);//fica bloqueado a espera de resposta
+			response = getResponse(socket);
 		}
 		try {
 			socket.close();
