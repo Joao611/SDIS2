@@ -217,6 +217,7 @@ public class Peer {
 	public void delete(String fileID) {
 		SendInitDelete th = new SendInitDelete(fileID,this.getChordManager());
 		SingletonThreadPoolExecutor.getInstance().get().execute(th);
+		DBUtils.deleteFileFromBackupsRequested(getConnection(), fileID);
 	}
 
 	public void restore(BackupRequest backupRequest) {
