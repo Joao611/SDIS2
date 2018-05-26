@@ -133,6 +133,8 @@ public class ParseMessageAndSendResponse implements Runnable {
 		case RESPONSIBLE:
 			response = parseResponsible(secondLine);
 			break;
+		case CONFIRMSTORED:
+			parseConfirmStored(secondLine);
 		default:
 			Utils.LOGGER.warning("Unexpected message received: " + request);
 			break;
@@ -140,6 +142,14 @@ public class ParseMessageAndSendResponse implements Runnable {
 		return response;
 	}
 	
+	private void parseConfirmStored(String[] secondLine) {
+		String fileId = secondLine[0];
+		Integer chunkNo = Integer.parseInt(secondLine[1]);
+		Integer repDegree = Integer.parseInt(secondLine[2]);
+		Utils.LOGGER.info("Chunk " + fileId + "_" + chunkNo + ", saved with rep degree=" + repDegree);
+		
+	}
+
 	private String parseResponsible(String[] lines) {
 		Utils.LOGGER.info("Received Responsible");
 		for(int i=1;i<lines.length-1;i++) {
