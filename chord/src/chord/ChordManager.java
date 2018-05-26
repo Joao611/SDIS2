@@ -16,9 +16,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
 import communication.Client;
+import communication.messages.MessageFactory;
+import communication.messages.MessageType;
 import database.Database;
-import messages.MessageFactory;
-import messages.MessageType;
 import utils.SingletonThreadPoolExecutor;
 import utils.Utils;
 

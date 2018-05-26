@@ -6,8 +6,8 @@ package runnableProtocols;
 import chord.ChordManager;
 import chord.PeerInfo;
 import communication.Client;
+import communication.messages.MessageFactory;
 import database.BackupRequest;
-import messages.MessageFactory;
 
 /**
  * @author anabela

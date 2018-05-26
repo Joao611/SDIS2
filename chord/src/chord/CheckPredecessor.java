@@ -1,7 +1,7 @@
 package chord;
 
 import communication.Client;
-import messages.MessageFactory;
+import communication.messages.MessageFactory;
 import utils.Utils;
 
 public class CheckPredecessor implements Runnable {

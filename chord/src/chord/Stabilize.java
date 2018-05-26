@@ -1,8 +1,8 @@
 package chord;
 
 import communication.Client;
-import messages.MessageFactory;
-import messages.MessageType;
+import communication.messages.MessageFactory;
+import communication.messages.MessageType;
 import utils.Utils;
 
 public class Stabilize implements Runnable {

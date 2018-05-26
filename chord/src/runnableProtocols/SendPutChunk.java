@@ -2,7 +2,7 @@ package runnableProtocols;
 
 import java.util.Arrays;
 import communication.Client;
-import messages.MessageFactory;
+import communication.messages.MessageFactory;
 import chord.ChordManager;
 import chord.PeerInfo;
 

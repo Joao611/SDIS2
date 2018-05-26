@@ -3,7 +3,7 @@ package runnableProtocols;
 import chord.ChordManager;
 import chord.PeerInfo;
 import communication.Client;
-import messages.MessageFactory;
+import communication.messages.MessageFactory;
 import utils.Utils;
 
 public class SendInitDelete implements Runnable{

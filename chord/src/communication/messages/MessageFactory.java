@@ -1,4 +1,4 @@
-package messages;
+package communication.messages;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;

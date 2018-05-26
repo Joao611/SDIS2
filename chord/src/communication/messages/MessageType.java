@@ -1,4 +1,4 @@
-package messages;
+package communication.messages;
 
 public enum MessageType {
 

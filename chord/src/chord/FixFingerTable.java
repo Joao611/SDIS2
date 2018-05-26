@@ -6,8 +6,8 @@ package chord;
 import java.math.BigInteger;
 
 import communication.Client;
-import messages.MessageFactory;
-import messages.MessageType;
+import communication.messages.MessageFactory;
+import communication.messages.MessageType;
 import utils.Utils;
 
 /**
