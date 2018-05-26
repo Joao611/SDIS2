@@ -26,7 +26,7 @@ public class CheckPredecessor implements Runnable {
 			if (predecessor.getId().equals(myPeerId)) return;
 			String pingMessage = MessageFactory.getPing(myPeerId);
 			String response = Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), pingMessage, true);
-			if (response.equals(MessageFactory.getErrorMessage())) {
+			if (response == null) {
 				Utils.LOGGER.finest("Could not establish connection with predecessor");
 				chordManager.setPredecessor(new NullPeerInfo());
 			}	

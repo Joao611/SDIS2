@@ -294,7 +294,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 	private void parseInitDelete(String[] firstLine, String[] secondLine) {
 		String fileToDelete = secondLine[0];
 		int repDegree = DBUtils.getMaxRepDegree(dbConnection, fileToDelete);
-		DBUtils.deleteFileFromBackupsRequested(dbConnection, fileToDelete);
 		deleteFile(fileToDelete,repDegree);
 	}
 

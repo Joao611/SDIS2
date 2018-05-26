@@ -114,7 +114,6 @@ public class MessageFactory {
 			return appendBody(msg2, body);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
-			
 			return null;
 		}
 	}
@@ -130,10 +129,6 @@ public class MessageFactory {
 
 	public static String getPing(String senderId) {
 		return getHeader(MessageType.PING,"1.0",senderId);
-	}
-	
-	public static String getErrorMessage() {
-		return "error";
 	}
 
 	public static String getUpdateTime(String senderId, String fileID) {
