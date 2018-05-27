@@ -15,7 +15,6 @@ public class CheckPredecessor implements Runnable {
 	@Override
 	public void run() {
 		try {
-			Utils.LOGGER.info("Running CheckPredecessor");
 			AbstractPeerInfo predecessor = chordManager.getPredecessor();
 			String myPeerId = chordManager.getPeerInfo().getId();
 			if (predecessor.isNull()) {

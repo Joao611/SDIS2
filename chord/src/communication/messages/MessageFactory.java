@@ -38,6 +38,12 @@ public class MessageFactory {
 		String msg = getFirstLine(MessageType.LOOKUP,"1.0",senderId);
 		return appendLine(msg, new String[] {""+key});
 	}
+	
+	public static String getNotify(String senderId,Integer senderListeningPort) {
+		String message = MessageFactory.getFirstLine(MessageType.NOTIFY, "1.0", senderId);
+		return MessageFactory.appendLine(message, new String[] {"" + senderListeningPort});
+	}
+	
 	public static String getSuccessor(String senderId, PeerInfo peer) {
 		String msg = getFirstLine(MessageType.SUCCESSOR,"1.0",senderId);
 		return appendLine(msg, new Object[] {peer.getId(),peer.getAddr().getHostAddress(),peer.getPort()});

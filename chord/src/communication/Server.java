@@ -27,11 +27,11 @@ public class Server implements Runnable {
 
 		setSystemProperties();
 
-		this.cipher_list = new ArrayList<String>();
+		/*this.cipher_list = new ArrayList<String>();
 
 		for (int i = 1; i < cipher_suite.length; i++) {
 			this.cipher_list.add(cipher_suite[i]);
-		}
+		}*/
 	}
 
 	@Override
@@ -45,11 +45,14 @@ public class Server implements Runnable {
 			e.printStackTrace();
 			return;
 		}
-
+		String[] a = serverSocket.getEnabledCipherSuites();
+		for(String b: a) {
+			System.out.println(b);
+		}
 		serverSocket.setNeedClientAuth(true);
 		serverSocket.setEnabledProtocols(serverSocket.getSupportedProtocols());
 
-		this.cipher_list.toArray(new String[0]);
+		//this.cipher_list.toArray(new String[0]);
 
 		while (true) {
 			SSLSocket socket;

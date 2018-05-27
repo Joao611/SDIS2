@@ -199,8 +199,7 @@ public class ChordManager implements Runnable {
 	 * @param newSuccessorId Closer successor than previous successor.
 	 */
 	public void notify(PeerInfo newSuccessor) {
-		String message = MessageFactory.getFirstLine(MessageType.NOTIFY, "1.0", this.getPeerInfo().getId());
-		message = MessageFactory.appendLine(message, new String[] {"" + this.getPeerInfo().getPort()});
+		String message = MessageFactory.getNotify(this.getPeerInfo().getId(), this.getPeerInfo().getPort());
 		String response = Client.sendMessage(newSuccessor.getAddr(), newSuccessor.getPort(), message, true);
 		if (response == null) {
 			Utils.LOGGER.warning("Next peer dropped");
