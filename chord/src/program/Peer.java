@@ -45,8 +45,8 @@ public class Peer {
 
 	public Peer(ChordManager chordManager, Server server, Database database) {
 		
-		System.out.println(chordManager.getPeerInfo().getId() + " "
-		+ new BigInteger(chordManager.getPeerInfo().getId(),16));
+		/*System.out.println(chordManager.getPeerInfo().getId() + " "
+		+ new BigInteger(chordManager.getPeerInfo().getId(),16));*/
 		
 		this.chordManager = chordManager;
 		this.server = server;
@@ -191,10 +191,8 @@ public class Peer {
 		int n = Math.floorDiv(file.length,LENGTH_OF_CHUNK) + 1;
 		Confidentiality c;
 		if(encryptKey == null) {
-			System.err.println("ERRO");
 			c = new Confidentiality();
 		} else {
-			System.err.println("Estou a enviar a encr");
 			c = new Confidentiality(encryptKey);
 		}
 		encryptKey = new String(c.getKey(), StandardCharsets.ISO_8859_1);
@@ -241,14 +239,14 @@ public class Peer {
 		AbstractPeerInfo predecessor = this.chordManager.getPredecessor();
 		if (predecessor.isNull()) return;
 		for(int i = 0; i < filesIAmResponsible.size(); i++) {
-			if(Utils.inBetween(predecessor.getId(),
-					this.chordManager.getPeerInfo().getId(),
-					filesIAmResponsible.get(i).getFileId())) {
-				DBUtils.updateResponsible(this.database.getConnection(),filesIAmResponsible.get(i).getFileId(), true);
+			if(Utils.inBetween(this.chordManager.getPeerInfo().getId(), predecessor.getId(), filesIAmResponsible.get(i).getFileId())) {
+				DBUtils.updateResponsible(this.database.getConnection(),filesIAmResponsible.get(i).getFileId(), false);
 				toSend.add(filesIAmResponsible.get(i));
 			}
 		}
 		if (toSend.isEmpty())return;
+		System.out.println("Sending resposibility for files: ");
+		toSend.forEach(k->System.out.println(k.getFileId()));
 		String msg = MessageFactory.getResponsible(this.chordManager.getPeerInfo().getId(), toSend);
 		Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), msg, false);
 		System.out.println("Sent responsible");

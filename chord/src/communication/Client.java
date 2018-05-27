@@ -42,7 +42,6 @@ public class Client {
 		try {
 			socket.close();
 		} catch (IOException e) {
-			e.printStackTrace();
 			System.err.println("Error closing connection");
 			return null;
 		}
@@ -93,7 +92,7 @@ public class Client {
 		try {
 			readStream = socket.getInputStream();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("Error getting input stream");
 			return null;
 		}
 		try {
@@ -102,13 +101,13 @@ public class Client {
 			System.err.println("Socket timeout");
 			return null;
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("Error reading");
 			return null;
 		}
 		try {
 			socket.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("Error closing connection");;
 			return null;
 		}
 		return new String(readData,StandardCharsets.ISO_8859_1);

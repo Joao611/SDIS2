@@ -29,6 +29,8 @@ public class DBUtils {
 	private static final String updateFileStored = "UPDATE FILESSTORED "
 			+ "SET last_time_stored = CURRENT_TIMESTAMP, i_am_responsible = ?, peer_requesting = ? "
 			+ "WHERE file_id = ?";
+	private static final String setIamStoring = "UPDATE FILESSTORED "
+			+ "SET i_am_storing = ? WHERE file_id = ?";
 	private static final String updateChunkStoredRepDegree = "UPDATE CHUNKSSTORED "
 			+ "SET actual_rep_degree = ? WHERE chunk_id = ? AND file_id = ?";
 	private static final String updateBackupRequested = "UPDATE BACKUPSREQUESTED "
@@ -40,12 +42,12 @@ public class DBUtils {
 	private static final String getPeerWhichRequested = "SELECT peer_id,ip,port FROM PEERS "
 			+ "JOIN (SELECT peer_requesting FROM FILESSTORED WHERE file_id = ?) AS F ON PEERS.peer_id = F.peer_requesting";
 	private static final String getBackupRequested = "SELECT * FROM BACKUPSREQUESTED WHERE file_id = ?";
-	private static final String getFileStored = "SELECT file_id, desired_rep_degree FROM FILESSTORED WHERE file_id = ?";
+	private static final String getFileStored = "SELECT file_id, desired_rep_degree, i_am_storing FROM FILESSTORED WHERE file_id = ?";
 	private static final String getChunksOfFile = "SELECT chunk_id, file_id, size FROM CHUNKSSTORED WHERE file_id = ?";
 	private static final String getActualRepDegree = "SELECT max(actual_rep_degree) FROM CHUNKSSTORED WHERE file_id = ?";
 	private static final String deleteFileStored = "DELETE FROM FILESSTORED WHERE file_id = ?";
 	private static final String deleteFileRequested = "DELETE FROM BACKUPSREQUESTED WHERE file_id = ?";
-	private static final String getFilesToDelete = "SELECT file_id FROM FILESSTORED WHERE { fn TIMESTAMPADD(SQL_TSI_MINUTE,?,last_time_stored)} < ?";
+	private static final String getFilesToDelete = "SELECT file_id FROM FILESSTORED WHERE { fn TIMESTAMPADD(SQL_TSI_SECOND,?,last_time_stored)} < ?";
 	private static final String updateFile = "UPDATE FILESSTORED "
 			+ "SET last_time_stored = CURRENT_TIMESTAMP "
 			+ "WHERE file_id = ?";
@@ -67,7 +69,7 @@ public class DBUtils {
 			Utils.LOGGER.info("Not a new INSERT, updating");
 			updatePeer(conn, peerInfo);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	private static void updatePeer(Connection conn, PeerInfo peerInfo) {
@@ -79,7 +81,7 @@ public class DBUtils {
 			p.executeUpdate();
 			Utils.log("Peer " + peerInfo.getId() + " has been updated");
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	public static void insertStoredFile(Connection conn, FileStoredInfo fileInfo) {
@@ -105,7 +107,7 @@ public class DBUtils {
 			Utils.LOGGER.info("Not a new INSERT, updating");
 			updateStoredFile(conn, fileInfo);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	public static void updateStoredFile(Connection conn, FileStoredInfo fileInfo) {
@@ -122,9 +124,22 @@ public class DBUtils {
 			p.executeUpdate();
 			Utils.log("File " + fileInfo.getFileId() + " has been updated");
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
+	
+	public static void setIamStoring(Connection conn, String fileId, Boolean iAmStoring) {
+		try {
+			PreparedStatement p = conn.prepareStatement(setIamStoring);
+			p.setBoolean(1, iAmStoring);
+			p.setString(2, fileId);
+			p.executeUpdate();
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+	}
+	
+	
 	public static void insertStoredChunk(Connection conn, ChunkInfo chunkInfo) {
 		try {
 			PreparedStatement p = conn.prepareStatement(insertChunkStored);
@@ -141,7 +156,7 @@ public class DBUtils {
 		} catch (DerbySQLIntegrityConstraintViolationException e) {
 			Utils.LOGGER.info("Chunk " + chunkInfo.getFilename() + " has been stored before");
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	public static void updateStoredChunkRepDegree(Connection conn, ChunkInfo chunkInfo) {
@@ -155,7 +170,7 @@ public class DBUtils {
 			p.executeUpdate();
 			Utils.log("Chunk " + chunkInfo.getFileId() + ":" + chunkInfo.getChunkId() + " has been updated");
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	private static void updateBackupRequested(Connection conn, BackupRequest backupReq) {
@@ -166,7 +181,7 @@ public class DBUtils {
 			p.executeUpdate();
 			Utils.log("BackupRequest: " + backupReq.getFileId() + " has been updated");
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	
@@ -177,7 +192,7 @@ public class DBUtils {
 			p.setString(2, fileId);
 			p.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	
@@ -199,7 +214,7 @@ public class DBUtils {
 				p.executeUpdate();
 				Utils.log("BackupRequest for file " + backupRequest.getFilename() + " has been stored");
 			} catch (SQLException e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 			}
 		} else {
 			// Update old
@@ -224,7 +239,7 @@ public class DBUtils {
 			try {
 				p.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 			}
 		}
 		return false;
@@ -248,7 +263,7 @@ public class DBUtils {
 			try {
 				p.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 			}
 		}
 		return false;
@@ -267,7 +282,7 @@ public class DBUtils {
 				array.add(currentBackupRequest);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		return array;
 	}
@@ -287,7 +302,7 @@ public class DBUtils {
 				return new PeerInfo(result.getString(1),address,result.getInt(3));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		return null;
 	}
@@ -301,7 +316,7 @@ public class DBUtils {
 				return true;
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		return false;
 	}
@@ -320,7 +335,7 @@ public class DBUtils {
 						result.getInt("numberOfChunks"));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		return null;
 	}
@@ -334,7 +349,7 @@ public class DBUtils {
 				return result.getInt(2);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		return 0;
 	}
@@ -348,7 +363,7 @@ public class DBUtils {
 				return result.getInt(1);
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		return 0;
 	}
@@ -358,12 +373,26 @@ public class DBUtils {
 			p = conn.prepareStatement(getFileStored);
 			p.setString(1, fileId);
 			ResultSet result =  p.executeQuery();
-			return result.next();
+			return result.next() && result.getBoolean(3);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		return false;
 	}
+	
+	public static boolean iKnowAboutTheFile(Connection conn, String fileId) {
+		PreparedStatement p;
+		try {
+			p = conn.prepareStatement(getFileStored);
+			p.setString(1, fileId);
+			ResultSet result =  p.executeQuery();
+			return result.next();
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		return false;
+	}
+	
 	public static ArrayList<ChunkInfo> getAllChunksOfFile(Connection conn, String fileId) {
 		PreparedStatement p;
 		ArrayList<ChunkInfo> chunksInfo = new ArrayList<ChunkInfo>();
@@ -375,7 +404,7 @@ public class DBUtils {
 				chunksInfo.add(new ChunkInfo(result.getInt(1), result.getString(2), result.getInt(3)));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		return chunksInfo;
 	}
@@ -385,7 +414,7 @@ public class DBUtils {
 			p.setString(1, fileId);
 			p.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	public static void deleteFileFromBackupsRequested(Connection conn, String fileId) {
@@ -394,7 +423,7 @@ public class DBUtils {
 			p.setString(1, fileId);
 			p.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 
 	}
@@ -410,7 +439,7 @@ public class DBUtils {
 				res.add(result.getString(1));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 			return null;
 		}
 		return res;
@@ -421,7 +450,7 @@ public class DBUtils {
 			p.setString(1, fileId);
 			p.executeUpdate();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 	public static ArrayList<BackupRequest> getFilesToUpdate(Connection conn) {
@@ -440,8 +469,7 @@ public class DBUtils {
 						));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
+			System.err.println(e.getMessage());
 		}
 		return res;
 	}
@@ -457,8 +485,7 @@ public class DBUtils {
 						true, result.getInt("desired_rep_degree")));
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
+			System.err.println(e.getMessage());
 		}
 		return res;
 	}

@@ -264,8 +264,9 @@ public class ParseMessageAndSendResponse implements Runnable {
 
 
 	private void deleteFile(String fileToDelete, int repDegree) {
-		Utils.LOGGER.info("Received Delete for file: " + fileToDelete + ". Rep Degree: " + repDegree);
+		System.out.println("Received Delete for file: " + fileToDelete + ". Rep Degree: " + repDegree);
 		boolean isFileStored = DBUtils.isFileStored(dbConnection, fileToDelete);
+		System.out.println("File: " +fileToDelete + " is stored: " + isFileStored);
 		if (isFileStored) {
 			ArrayList<ChunkInfo> allChunks = DBUtils.getAllChunksOfFile(dbConnection, fileToDelete);
 			allChunks.forEach(chunk -> {
@@ -275,9 +276,12 @@ public class ParseMessageAndSendResponse implements Runnable {
 			DBUtils.deleteFile(dbConnection, fileToDelete);
 			repDegree--;
 			Utils.LOGGER.info("Deleted file: " + fileToDelete);
+		} else if (DBUtils.iKnowAboutTheFile(dbConnection, fileToDelete)) {
+			DBUtils.deleteFile(dbConnection, fileToDelete);
 		}
 		
 		if (repDegree > 1 || !isFileStored) {
+			System.out.println("Forwarding delete to peer: " + peer.getChordManager().getSuccessor(0).getId());
 			String message = MessageFactory.getDelete(myPeerID, fileToDelete, repDegree);
 			PeerInfo successor = peer.getChordManager().getSuccessor(0);
 			Client.sendMessage(successor.getAddr(), successor.getPort(), message, false);
@@ -288,11 +292,14 @@ public class ParseMessageAndSendResponse implements Runnable {
 	
 	private void parseDelete(String [] secondLine) {
 		String fileToDelete = secondLine[0];
+		System.out.println("Received Delete for file: " + fileToDelete);
 		int repDegree = Integer.parseInt(secondLine[1]);
 		deleteFile(fileToDelete,repDegree);
 	}
 	private void parseInitDelete(String[] firstLine, String[] secondLine) {
+		
 		String fileToDelete = secondLine[0];
+		System.out.println("Received InitDelete for file: " + fileToDelete);
 		int repDegree = DBUtils.getMaxRepDegree(dbConnection, fileToDelete);
 		deleteFile(fileToDelete,repDegree);
 	}
@@ -373,6 +380,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		if(id.equals(myPeerID)) {//sou o dono do ficheiro que quero fazer backup...
 			//nao faz senido guardarmos um ficheiro com o chunk, visto que guardamos o ficheiro
 			//enviar o KEEPCHUNK
+			DBUtils.setIamStoring(dbConnection, fileInfo.getFileId(), false);
 			PeerInfo nextPeer = chordManager.getSuccessor(0);
 			String message = MessageFactory.getKeepChunk(id, addr, port, fileID, chunkNo, replicationDegree, body_bytes);
 			Client.sendMessage(nextPeer.getAddr(),nextPeer.getPort(), message, false);

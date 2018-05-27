@@ -45,10 +45,10 @@ public class Server implements Runnable {
 			e.printStackTrace();
 			return;
 		}
-		String[] a = serverSocket.getEnabledCipherSuites();
+		/*String[] a = serverSocket.getEnabledCipherSuites();
 		for(String b: a) {
 			System.out.println(b);
-		}
+		}*/
 		serverSocket.setNeedClientAuth(true);
 		serverSocket.setEnabledProtocols(serverSocket.getSupportedProtocols());
 

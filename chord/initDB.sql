@@ -2,6 +2,7 @@ CREATE TABLE filesstored(
 	id INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
 	file_id VARCHAR(16) NOT NULL,
 	i_am_responsible BOOLEAN DEFAULT false,
+	i_am_storing BOOLEAN DEFAULT true,
 	peer_requesting VARCHAR(16),
 	desired_rep_degree INTEGER,
 	last_time_stored TIMESTAMP DEFAULT CURRENT_TIMESTAMP
