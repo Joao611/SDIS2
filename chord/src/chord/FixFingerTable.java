@@ -24,7 +24,7 @@ public class FixFingerTable implements Runnable {
 	public void run() {
 		Utils.LOGGER.info("Running fix finger table");
 		fix_fingerTable();
-		printFingerTable();
+		//printFingerTable();
 	}
 
 	private void printFingerTable() {
