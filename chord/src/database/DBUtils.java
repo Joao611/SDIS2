@@ -400,19 +400,6 @@ public class DBUtils {
 		return false;
 	}
 	
-	public static boolean iKnowAboutTheFile(Connection conn, String fileId) {
-		PreparedStatement p;
-		try {
-			p = conn.prepareStatement(getFileStored);
-			p.setString(1, fileId);
-			ResultSet result =  p.executeQuery();
-			return result.next();
-		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-		}
-		return false;
-	}
-	
 	public static ArrayList<ChunkInfo> getAllChunksOfFile(Connection conn, String fileId) {
 		PreparedStatement p;
 		ArrayList<ChunkInfo> chunksInfo = new ArrayList<ChunkInfo>();
