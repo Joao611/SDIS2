@@ -480,6 +480,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		InetAddress addr = socket.getInetAddress();
 		int port = Integer.parseInt(secondLine[0].trim());
 		PeerInfo potentialNewPredecessor = new PeerInfo(id, addr, port);
+		if (potentialNewPredecessor.getId() == myPeerID) return;
 		AbstractPeerInfo previousPredecessor = peer.getChordManager().getPredecessor();
 		if (previousPredecessor.isNull() || Utils.inBetween(previousPredecessor.getId(), myPeerID, potentialNewPredecessor.getId())) {
 			PeerInfo newPredecessor = potentialNewPredecessor;

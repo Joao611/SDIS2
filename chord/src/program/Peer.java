@@ -239,6 +239,7 @@ public class Peer {
 		ArrayList<FileStoredInfo> toSend = new ArrayList<FileStoredInfo> ();
 		AbstractPeerInfo predecessor = this.chordManager.getPredecessor();
 		if (predecessor.isNull()) return;
+		if (predecessor.getId().equals(this.chordManager.getPeerInfo().getId())) return;
 		for(int i = 0; i < filesIAmResponsible.size(); i++) {
 			if(Utils.inBetween(this.chordManager.getPeerInfo().getId(), predecessor.getId(), filesIAmResponsible.get(i).getFileId())) {
 				DBUtils.updateResponsible(this.database.getConnection(),filesIAmResponsible.get(i).getFileId(), false);
