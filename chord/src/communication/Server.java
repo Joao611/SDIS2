@@ -65,7 +65,7 @@ public class Server implements Runnable {
 			try {
 				socket.startHandshake();
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 				return;
 			}
 
@@ -82,7 +82,7 @@ public class Server implements Runnable {
 		try {
 			serverSocket.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 
