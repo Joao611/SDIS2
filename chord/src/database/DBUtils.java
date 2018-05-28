@@ -27,7 +27,7 @@ public class DBUtils {
 			"SET ip = ?, port = ? " + 
 			"WHERE peer_id = ?";
 	private static final String updateFileStored = "UPDATE FILESSTORED "
-			+ "SET last_time_stored = CURRENT_TIMESTAMP, i_am_responsible = ?, peer_requesting = ? "
+			+ "SET last_time_stored = CURRENT_TIMESTAMP, i_am_responsible = ?, peer_requesting = ?, desired_rep_degree = ?"
 			+ "WHERE file_id = ?";
 	private static final String setIamStoring = "UPDATE FILESSTORED "
 			+ "SET i_am_storing = ? WHERE file_id = ?";
@@ -115,6 +115,7 @@ public class DBUtils {
 	}
 	public static void updateStoredFile(Connection conn, FileStoredInfo fileInfo) {
 		String peerRequesting = fileInfo.getPeerRequesting();
+		Integer desiredRepDegree = fileInfo.getDesiredRepDegree();
 		try {
 			PreparedStatement p = conn.prepareStatement(updateFileStored);
 			p.setBoolean(1, fileInfo.getiAmResponsible());
@@ -123,7 +124,13 @@ public class DBUtils {
 			} else {
 				p.setString(2, peerRequesting);
 			}
-			p.setString(3, fileInfo.getFileId());
+			if (desiredRepDegree == null){
+				p.setNull(3, Types.INTEGER);
+			}else {
+				p.setInt(3, desiredRepDegree);
+			}
+			p.setString(4, fileInfo.getFileId());
+
 			p.executeUpdate();
 			conn.commit();
 			Utils.log("File " + fileInfo.getFileId() + " has been updated");
@@ -160,7 +167,7 @@ public class DBUtils {
 			conn.commit();
 			Utils.log("Chunk " + chunkInfo.getFileId() + ":" + chunkInfo.getChunkId() + " has been stored");
 		} catch (DerbySQLIntegrityConstraintViolationException e) {
-			Utils.LOGGER.info("Chunk " + chunkInfo.getFilename() + " has been stored before");
+			updateStoredChunkRepDegree(conn,chunkInfo);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
@@ -239,9 +246,11 @@ public class DBUtils {
 			p.setString(1, fileId);
 			ResultSet result = p.executeQuery();
 			conn.setAutoCommit(false);
+			conn.commit();
 			if (result.next()) {
 				return result.getBoolean("i_am_responsible");
 			}
+			System.out.println("amIResponsible: file not found");
 
 		} catch (SQLException e) {
 			e.printStackTrace();

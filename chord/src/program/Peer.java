@@ -213,9 +213,10 @@ public class Peer {
 	}
 
 	public void delete(String fileID) {
+		DBUtils.deleteFileFromBackupsRequested(getConnection(), fileID);
 		SendInitDelete th = new SendInitDelete(fileID,this.getChordManager());
 		SingletonThreadPoolExecutor.getInstance().get().execute(th);
-		DBUtils.deleteFileFromBackupsRequested(getConnection(), fileID);
+		
 	}
 
 	public void restore(BackupRequest backupRequest) {
@@ -245,7 +246,7 @@ public class Peer {
 			}
 		}
 		if (toSend.isEmpty())return;
-		System.out.println("Sending resposibility for files: ");
+		System.out.println("Sending resposibility for files to peer: " + predecessor.getId());
 		toSend.forEach(k->System.out.println(k.getFileId()));
 		String msg = MessageFactory.getResponsible(this.chordManager.getPeerInfo().getId(), toSend);
 		Client.sendMessage(predecessor.getAddr(), predecessor.getPort(), msg, false);

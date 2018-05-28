@@ -22,7 +22,7 @@ public class SendInitDelete implements Runnable{
 	public void run() {
 		PeerInfo successor = chordManager.getChunkOwner(fileId);
 		String message = MessageFactory.getInitDelete(senderId, fileId);
-		Utils.LOGGER.info("Sending DeleteInit for file: " + fileId);
+		Utils.LOGGER.info("Sending InitDelete for file: " + fileId);
 		Client.sendMessage(successor.getAddr(), successor.getPort(), message, false);
 		System.out.println("Sent request to delete file: " + fileId);
 	}

@@ -266,7 +266,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 	private void deleteFile(String fileToDelete, int repDegree) {
 		System.out.println("Received Delete for file: " + fileToDelete + ". Rep Degree: " + repDegree);
 		boolean isFileStored = DBUtils.isFileStored(dbConnection, fileToDelete);
-		System.out.println("File: " +fileToDelete + " is stored: " + isFileStored);
 		if (isFileStored) {
 			ArrayList<ChunkInfo> allChunks = DBUtils.getAllChunksOfFile(dbConnection, fileToDelete);
 			allChunks.forEach(chunk -> {
@@ -276,8 +275,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 			DBUtils.deleteFile(dbConnection, fileToDelete);
 			repDegree--;
 			Utils.LOGGER.info("Deleted file: " + fileToDelete);
-		} else if (DBUtils.iKnowAboutTheFile(dbConnection, fileToDelete)) {
-			DBUtils.deleteFile(dbConnection, fileToDelete);
 		}
 		
 		if (repDegree > 0 || !isFileStored) {
@@ -291,15 +288,14 @@ public class ParseMessageAndSendResponse implements Runnable {
 	}
 	
 	private void parseDelete(String [] secondLine) {
-		String fileToDelete = secondLine[0];
-		System.out.println("Received Delete for file: " + fileToDelete);
+		String fileToDelete = secondLine[0].trim();
 		int repDegree = Integer.parseInt(secondLine[1]);
+		if (DBUtils.amIResponsible(dbConnection, fileToDelete)) return;
 		deleteFile(fileToDelete,repDegree);
 	}
 	private void parseInitDelete(String[] firstLine, String[] secondLine) {
 		
 		String fileToDelete = secondLine[0];
-		System.out.println("Received InitDelete for file: " + fileToDelete);
 		int repDegree = DBUtils.getMaxRepDegree(dbConnection, fileToDelete);
 		deleteFile(fileToDelete,repDegree);
 	}
@@ -350,7 +346,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 	}
 
 	private void parsePutChunkMsg(String[] header, String body) {
-		System.out.println("Received putchunk");
 		ChordManager chordManager = peer.getChordManager();
 		byte [] body_bytes = body.getBytes(StandardCharsets.ISO_8859_1);
 
@@ -416,7 +411,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 	}
 
 	private void parseKeepChunkMsg(String[] header, String body) {
-		System.out.println("Received Keep Chunk");
 		ChordManager chordManager = peer.getChordManager();
 		byte [] body_bytes = body.getBytes(StandardCharsets.ISO_8859_1);
 
