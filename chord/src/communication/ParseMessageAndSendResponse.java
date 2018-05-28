@@ -197,7 +197,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 		
 		Confidentiality c = new Confidentiality(b.getEncryptKey());
 		
-		body_bytes = c.dencript(body_bytes);
+		body_bytes = c.decrypt(body_bytes);
 		Path filepath = Peer.getPath().resolve("restoreFile-" + b.getFilename());
 
 		try {
@@ -280,7 +280,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 			DBUtils.deleteFile(dbConnection, fileToDelete);
 		}
 		
-		if (repDegree > 1 || !isFileStored) {
+		if (repDegree > 0 || !isFileStored) {
 			System.out.println("Forwarding delete to peer: " + peer.getChordManager().getSuccessor(0).getId());
 			String message = MessageFactory.getDelete(myPeerID, fileToDelete, repDegree);
 			PeerInfo successor = peer.getChordManager().getSuccessor(0);
@@ -350,7 +350,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 	}
 
 	private void parsePutChunkMsg(String[] header, String body) {
-
+		System.out.println("Received putchunk");
 		ChordManager chordManager = peer.getChordManager();
 		byte [] body_bytes = body.getBytes(StandardCharsets.ISO_8859_1);
 
@@ -416,7 +416,7 @@ public class ParseMessageAndSendResponse implements Runnable {
 	}
 
 	private void parseKeepChunkMsg(String[] header, String body) {
-		Utils.LOGGER.info("Received Keep Chunk");
+		System.out.println("Received Keep Chunk");
 		ChordManager chordManager = peer.getChordManager();
 		byte [] body_bytes = body.getBytes(StandardCharsets.ISO_8859_1);
 
@@ -453,7 +453,6 @@ public class ParseMessageAndSendResponse implements Runnable {
 		}
 
 		if(!Peer.capacityExceeded(body_bytes.length)) { //tem espaco para fazer o backup
-			Utils.LOGGER.info("Writing/Savign chunk");
 			DBUtils.insertStoredFile(dbConnection, new FileStoredInfo(fileID, false));
 			DBUtils.insertStoredChunk(dbConnection, new ChunkInfo(chunkNo,fileID, body_bytes.length));
 			try {

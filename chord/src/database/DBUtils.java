@@ -64,6 +64,7 @@ public class DBUtils {
 			p.setString(2, peerInfo.getAddr().getHostAddress());
 			p.setInt(3, peerInfo.getPort());
 			p.executeUpdate();
+			conn.commit();
 			Utils.log("Peer " + peerInfo.getId() + " has been stored");
 		} catch (DerbySQLIntegrityConstraintViolationException e) {
 			Utils.LOGGER.info("Not a new INSERT, updating");
@@ -79,6 +80,7 @@ public class DBUtils {
 			p.setInt(2, peerInfo.getPort());
 			p.setString(3, peerInfo.getId());
 			p.executeUpdate();
+			conn.commit();
 			Utils.log("Peer " + peerInfo.getId() + " has been updated");
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
@@ -102,7 +104,8 @@ public class DBUtils {
 				p.setInt(4, desiredRepDegree);
 			}
 			p.executeUpdate();
-			Utils.log("File " + fileInfo.getFileId() + " has been stored");
+			conn.commit();
+			System.out.println("File " + fileInfo.getFileId() + " has been stored in database");
 		} catch (DerbySQLIntegrityConstraintViolationException e) {
 			Utils.LOGGER.info("Not a new INSERT, updating");
 			updateStoredFile(conn, fileInfo);
@@ -122,6 +125,7 @@ public class DBUtils {
 			}
 			p.setString(3, fileInfo.getFileId());
 			p.executeUpdate();
+			conn.commit();
 			Utils.log("File " + fileInfo.getFileId() + " has been updated");
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
@@ -134,6 +138,7 @@ public class DBUtils {
 			p.setBoolean(1, iAmStoring);
 			p.setString(2, fileId);
 			p.executeUpdate();
+			conn.commit();
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
@@ -152,6 +157,7 @@ public class DBUtils {
 			}
 			p.setInt(4, chunkInfo.getSize());
 			p.executeUpdate();
+			conn.commit();
 			Utils.log("Chunk " + chunkInfo.getFileId() + ":" + chunkInfo.getChunkId() + " has been stored");
 		} catch (DerbySQLIntegrityConstraintViolationException e) {
 			Utils.LOGGER.info("Chunk " + chunkInfo.getFilename() + " has been stored before");
@@ -168,6 +174,7 @@ public class DBUtils {
 			p.setInt(2, chunkInfo.getChunkId());
 			p.setString(3, chunkInfo.getFileId());
 			p.executeUpdate();
+			conn.commit();
 			Utils.log("Chunk " + chunkInfo.getFileId() + ":" + chunkInfo.getChunkId() + " has been updated");
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
@@ -179,6 +186,7 @@ public class DBUtils {
 			p.setInt(1, backupReq.getDesiredRepDegree());
 			p.setString(2, backupReq.getFileId());
 			p.executeUpdate();
+			conn.commit();
 			Utils.log("BackupRequest: " + backupReq.getFileId() + " has been updated");
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
@@ -191,6 +199,7 @@ public class DBUtils {
 			p.setBoolean(1, value);
 			p.setString(2, fileId);
 			p.executeUpdate();
+			conn.commit();
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
@@ -212,6 +221,7 @@ public class DBUtils {
 				}
 				p.setInt(5, backupRequest.getNumberOfChunks());
 				p.executeUpdate();
+				conn.commit();
 				Utils.log("BackupRequest for file " + backupRequest.getFilename() + " has been stored");
 			} catch (SQLException e) {
 				System.err.println(e.getMessage());
@@ -245,6 +255,7 @@ public class DBUtils {
 		return false;
 	}
 	public static boolean checkStoredChunk(Connection conn, ChunkInfo chunkInfo) {
+
 		PreparedStatement p = null;
 		try {
 			
@@ -449,6 +460,7 @@ public class DBUtils {
 			PreparedStatement p = conn.prepareStatement(updateFile);
 			p.setString(1, fileId);
 			p.executeUpdate();
+			conn.commit();
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}

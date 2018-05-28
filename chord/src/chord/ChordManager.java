@@ -77,7 +77,7 @@ public class ChordManager implements Runnable {
 	public void run() {
 
 		Stabilize stabilizeThread = new Stabilize(this);
-		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(stabilizeThread, 10, 5000, TimeUnit.MILLISECONDS);
+		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(stabilizeThread, 10, 2500, TimeUnit.MILLISECONDS);
 
 		CheckPredecessor checkPredecessorThread = new CheckPredecessor(this);
 		SingletonThreadPoolExecutor.getInstance().get().scheduleAtFixedRate(checkPredecessorThread, 1000, 10000, TimeUnit.MILLISECONDS);
