@@ -1,7 +1,7 @@
 Para compilar o programa:
 
 make
-OU
+*ou*
 javac -d bin/ -cp "derby.jar:src" src/program/Peer.java 
 
 Para correr o primeiro peer:
